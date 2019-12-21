@@ -1,8 +1,9 @@
 = Conjure Sourcery
 
-[quote, Terry Pratchett in Sourcery]
 ____
 As they say in Discworld, we are trying to unravel the Mighty Infinite using a language which was designed to tell one another where the fresh fruit was.
+
+— Terry Pratchett in Sourcery 
 ____
 
 An experimental reimplementation of https://github.com/Olical/conjure[Conjure] in Lua via https://github.com/bakpakin/Fennel[Fennel]. This is mostly made possible by my precursor project to this one, https://github.com/Olical/aniseed[Aniseed]. It's a toolkit that aids development of Neovim plugins and configuration through Fennel.
