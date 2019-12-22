@@ -1,1 +1,1 @@
-lua require("conjure-sourcery")
+lua require("conjure-sourcery.main").main()
