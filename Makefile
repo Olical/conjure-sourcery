@@ -17,11 +17,10 @@ compile:
 test:
 	rm -rf test/lua
 	nvim -u NONE \
-		-c "set rtp+=deps/aniseed" \
 		-c "let &runtimepath = &runtimepath . ',' . getcwd() . ',' . getcwd() . '/test'" \
-		-c "lua require('aniseed.compile').glob('**/*.fnl', 'test/fnl', 'test/lua', {force = true}) " \
+		-c "lua require('conjure-sourcery.aniseed.compile').glob('**/*.fnl', 'test/fnl', 'test/lua', {force = true})" \
 		-c "lua require('conjure-sourcery.test-suite').main()" \
-		test.clj ; \
+		test.clj; \
 		EXIT_CODE=$$?; \
 		cat test/results.txt; \
 		exit $$EXIT_CODE
