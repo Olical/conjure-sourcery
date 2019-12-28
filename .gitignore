@@ -2,3 +2,4 @@
 /.lnvim.lua
 /test/results.txt
 /test/lua/
+/.cpcache/
