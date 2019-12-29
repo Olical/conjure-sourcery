@@ -16,6 +16,8 @@ compile:
 
 test:
 	rm -rf test/lua
+	make prepl &
+	while [ ! -f .prepl-port ]; do sleep 0.2; done
 	nvim -u NONE \
 		-c "let &runtimepath = &runtimepath . ',' . getcwd() . ',' . getcwd() . '/test'" \
 		-c "lua require('conjure-sourcery.aniseed.compile').glob('**/*.fnl', 'test/fnl', 'test/lua', {force = true})" \
@@ -24,6 +26,7 @@ test:
 		EXIT_CODE=$$?; \
 		cat test/results.txt; \
 		exit $$EXIT_CODE
+	echo "(System/exit 0)" | netcat localhost $$(cat .prepl-port)
 
 prepl:
 	clj -m propel.main -w

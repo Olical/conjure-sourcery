@@ -5,5 +5,5 @@ jobs:
       - image: archlinux/base
     steps:
       - checkout
-      - run: pacman -Sy --noconfirm make neovim
+      - run: pacman -Sy --noconfirm make neovim netcat
       - run: make test
