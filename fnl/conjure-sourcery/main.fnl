@@ -2,9 +2,9 @@
   ((. (require :conjure-sourcery.main) :single-eval)
    "(+ 10 20)\n"))
 
-(local ani (require :aniseed.core))
-(local nvim (require :aniseed.nvim))
-(local nu (require :aniseed.nvim.util))
+(local ani (require :conjure-sourcery.aniseed.core))
+(local nvim (require :conjure-sourcery.aniseed.nvim))
+(local nu (require :conjure-sourcery.aniseed.nvim.util))
 
 (fn parse [s]
   {:tag (-> s (: :match ":tag :%a+") (: :sub 7))
