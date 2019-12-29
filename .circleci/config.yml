@@ -2,8 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: archlinux/base
+      - image: olical/conjure-sourcery-circleci:0.0.1
     steps:
       - checkout
-      - run: pacman -Sy --noconfirm make neovim netcat clojure rlwrap
       - run: make test
