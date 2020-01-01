@@ -1,10 +1,10 @@
 (comment
-  ((. (require :conjure-sourcery.main) :single-eval)
+  ((. (require :conjure.main) :single-eval)
    "(+ 10 20)\n"))
 
-(local ani (require :conjure-sourcery.aniseed.core))
-(local nvim (require :conjure-sourcery.aniseed.nvim))
-(local nu (require :conjure-sourcery.aniseed.nvim.util))
+(local ani (require :conjure.aniseed.core))
+(local nvim (require :conjure.aniseed.nvim))
+(local nu (require :conjure.aniseed.nvim.util))
 
 (fn parse [s]
   {:tag (-> s (: :match ":tag :%a+") (: :sub 7))
@@ -20,9 +20,17 @@
 
 (nu.fn-bridge
   :ConjureSourceryChanOnData
-  :conjure-sourcery.main :chan-on-data)
+  :conjure.main :chan-on-data)
 
 (fn main []
+  ;; TODO Initialise all other modules.
+  ;;  * ui for the log and other display methods.
+  ;;  * log for high level concepts of UI.
+  ;;  * socks for socket management.
+  ;;  * eval for evaluation of code via socks.
+  ;;  * config for... config.
+  ;;  * some module for working out what we should connect to.
+  ;;  * keys for all mappings.
   (ani.pr "Sourcery!?"))
 
 (fn single-eval [code]
@@ -34,7 +42,7 @@
     (nvim.fn.chansend chan-id code))
   nil)
 
-{:aniseed/module :conjure-sourcery.main
+{:aniseed/module :conjure.main
  :main main
  :single-eval single-eval
  :chan-on-data chan-on-data}

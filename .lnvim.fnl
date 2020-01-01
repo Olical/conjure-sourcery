@@ -6,4 +6,4 @@
       (vim.api.nvim_call_function :getcwd [])))
 
 ;; Initialise the plugin.
-(vim.api.nvim_command "source plugin/conjure-sourcery.vim")
+(vim.api.nvim_command "source plugin/conjure.vim")

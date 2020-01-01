@@ -1,4 +1,4 @@
-local core = require("conjure-sourcery.aniseed.core")
+local core = require("conjure.aniseed.core")
 local function join(...)
   local args = {...}
   local function _0_(...)
@@ -35,4 +35,4 @@ local function join(...)
   end
   return result
 end
-return {["aniseed/module"] = "conjure-sourcery.aniseed.string", join = join}
+return {["aniseed/module"] = "conjure.aniseed.string", join = join}

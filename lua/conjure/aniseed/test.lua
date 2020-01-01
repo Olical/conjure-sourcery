@@ -1,5 +1,5 @@
-local core = require("conjure-sourcery.aniseed.core")
-local str = require("conjure-sourcery.aniseed.string")
+local core = require("conjure.aniseed.core")
+local str = require("conjure.aniseed.string")
 local function ok_3f(_0_0)
   local _1_ = _0_0
   local tests = _1_["tests"]
@@ -115,4 +115,4 @@ local function run_all()
   end
   return display_results(core.reduce(_1_, {["assertions-passed"] = 0, ["tests-passed"] = 0, assertions = 0, tests = 0}, core.filter(core["table?"], core.map(run, core.keys(package.loaded)))), "[total]")
 end
-return {["aniseed/module"] = "conjure-sourcery.aniseed.test", ["ok?"] = ok_3f, ["run-all"] = run_all, run = run}
+return {["aniseed/module"] = "conjure.aniseed.test", ["ok?"] = ok_3f, ["run-all"] = run_all, run = run}

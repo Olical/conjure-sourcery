@@ -1,7 +1,7 @@
-local core = require("conjure-sourcery.aniseed.core")
-local fs = require("conjure-sourcery.aniseed.fs")
-local nvim = require("conjure-sourcery.aniseed.nvim")
-local fennel = require("conjure-sourcery.aniseed.fennel")
+local core = require("conjure.aniseed.core")
+local fs = require("conjure.aniseed.fs")
+local nvim = require("conjure.aniseed.nvim")
+local fennel = require("conjure.aniseed.fennel")
 local function str(content, opts)
   local function _0_()
     return fennel.compileString(content, opts)
@@ -38,4 +38,4 @@ local function glob(src_expr, src_dir, dest_dir, opts)
   end
   return nil
 end
-return {["aniseed/module"] = "conjure-sourcery.aniseed.compile", file = file, glob = glob, str = str}
+return {["aniseed/module"] = "conjure.aniseed.compile", file = file, glob = glob, str = str}

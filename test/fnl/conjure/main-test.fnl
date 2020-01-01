@@ -1,6 +1,6 @@
-(local main (require :conjure-sourcery.main))
+(local main (require :conjure.main))
 
-{:aniseed/module :conjure-sourcery.main-test
+{:aniseed/module :conjure.main-test
  :aniseed/tests
  {:single-eval
   (fn [t]
