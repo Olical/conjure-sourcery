@@ -6,15 +6,17 @@
 (local nvim (require :conjure.aniseed.nvim))
 (local nu (require :conjure.aniseed.nvim.util))
 
+(local ui (require :conjure.ui))
+
 (fn parse [s]
   {:tag (-> s (: :match ":tag :%a+") (: :sub 7))
    :val (-> s (: :match ":val %b\"\"") (: :sub 7 -2))})
 
 (fn chan-on-data [chan-id data]
-  (->> data
-      (ani.first)
-      (parse)
-      (ani.pr))
+  (let [{: tag : val} (->> data
+                           (ani.first)
+                           (parse))]
+    (ui.log-append [(.. ";; " tag) val]))
   (nvim.fn.chanclose chan-id)
   nil)
 
@@ -31,7 +33,7 @@
   ;;  * config for... config.
   ;;  * some module for working out what we should connect to.
   ;;  * keys for all mappings.
-  (ani.pr "Sourcery!?"))
+  (ui.log-append [";; Sourcery!?"]))
 
 (fn single-eval [code]
   (let [chan-id (nvim.fn.sockconnect
