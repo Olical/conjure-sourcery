@@ -10,13 +10,13 @@ local function chan_on_data(chan_id, data)
   nvim.fn.chanclose(chan_id)
   return nil
 end
-nu["fn-bridge"]("ConjureSourceryChanOnData", "conjure.main", "chan-on-data")
+nu["fn-bridge"]("ConjureChanOnData", "conjure.main", "chan-on-data")
 local function main()
   return ani.pr("Sourcery!?")
 end
 local function single_eval(code)
   do
-    local chan_id = nvim.fn.sockconnect("tcp", ("localhost:" .. ani.first(nvim.fn.readfile(".prepl-port"))), {on_data = "ConjureSourceryChanOnData"})
+    local chan_id = nvim.fn.sockconnect("tcp", ("localhost:" .. ani.first(nvim.fn.readfile(".prepl-port"))), {on_data = "ConjureChanOnData"})
     nvim.fn.chansend(chan_id, code)
   end
   return nil

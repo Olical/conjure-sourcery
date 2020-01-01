@@ -19,7 +19,7 @@
   nil)
 
 (nu.fn-bridge
-  :ConjureSourceryChanOnData
+  :ConjureChanOnData
   :conjure.main :chan-on-data)
 
 (fn main []
@@ -38,7 +38,7 @@
                   :tcp (.. "localhost:"
                            (-> (nvim.fn.readfile ".prepl-port")
                                (ani.first)))
-                  {:on_data :ConjureSourceryChanOnData})]
+                  {:on_data :ConjureChanOnData})]
     (nvim.fn.chansend chan-id code))
   nil)
 
