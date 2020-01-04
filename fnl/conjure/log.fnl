@@ -20,13 +20,16 @@
     (upsert-buf)
     -1 -1 false lines))
 
-(fn split []
+(fn create-win [split-fn]
   (upsert-buf)
-  (nvim.ex.split log-buf-name))
+  (split-fn log-buf-name)
+  (nvim.ex.normal_ "G"))
+
+(fn split []
+  (create-win nvim.ex.split))
 
 (fn vsplit []
-  (upsert-buf)
-  (nvim.ex.vsplit log-buf-name))
+  (create-win nvim.ex.vsplit))
 
 {:aniseed/module :conjure.log
  :append append
