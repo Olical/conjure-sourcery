@@ -26,7 +26,7 @@
     (let [new-lines (nvim.buf_line_count buf)]
       (ani.run!
         (fn [win]
-          (let [[row col] (nvim.win_get_cursor)]
+          (let [[row col] (nvim.win_get_cursor win)]
             (when (and (= buf (nvim.win_get_buf win))
                        (= col 0)
                        (= old-lines row))

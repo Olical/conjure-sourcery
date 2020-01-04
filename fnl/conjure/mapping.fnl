@@ -21,11 +21,18 @@
     {:noremap true
      :silent true})
 
+  (nvim.set_keymap
+    :n "<Plug>(conjure_prepl_sync)"
+    ":lua require('conjure.prepl').sync()<cr>"
+    {:noremap true
+     :silent true})
+
   ;; TODO Optional and configurable.
   (nvim.ex.augroup :conjure)
   (nvim.ex.autocmd_)
   (ft-map :clojure :n :ls :conjure_log_split)
   (ft-map :clojure :n :lv :conjure_log_vsplit)
+  (ft-map :clojure :n :ps :conjure_prepl_sync)
   (nvim.ex.augroup :END))
 
 {:aniseed/module :conjure.mapping

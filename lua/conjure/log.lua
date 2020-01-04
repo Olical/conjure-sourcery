@@ -22,7 +22,7 @@ local function append(lines)
   do
     local new_lines = nvim.buf_line_count(buf)
     local function _0_(win)
-      local _1_ = nvim.win_get_cursor()
+      local _1_ = nvim.win_get_cursor(win)
       local row = _1_[1]
       local col = _1_[2]
       if ((buf == nvim.win_get_buf(win)) and (col == 0) and (old_lines == row)) then
