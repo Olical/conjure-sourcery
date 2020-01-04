@@ -15,6 +15,7 @@
         buf)
       buf)))
 
+;; TODO Implement trimming using a marker so as not to cut forms in half.
 (fn append [lines]
   (let [buf (upsert-buf)
         old-lines (nvim.buf_line_count buf)]
