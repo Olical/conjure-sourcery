@@ -2,7 +2,7 @@
 local ani = require("conjure.aniseed.core")
 local nvim = require("conjure.aniseed.nvim")
 local nu = require("conjure.aniseed.nvim.util")
-local ui = require("conjure.ui")
+local log = require("conjure.log")
 local function parse(s)
   return {tag = s:match(":tag :%a+"):sub(7), val = s:match(":val %b\"\""):sub(7, -2)}
 end
@@ -11,14 +11,14 @@ local function chan_on_data(chan_id, data)
     local _0_ = parse(ani.first(data))
     local val = _0_["val"]
     local tag = _0_["tag"]
-    ui["log-append"]({(";; " .. tag), val})
+    log.append({(";; " .. tag), val})
   end
   nvim.fn.chanclose(chan_id)
   return nil
 end
 nu["fn-bridge"]("ConjureChanOnData", "conjure.main", "chan-on-data")
 local function main()
-  return ui["log-append"]({";; Sourcery!?"})
+  return log.append({";; Sourcery!?"})
 end
 local function single_eval(code)
   do
