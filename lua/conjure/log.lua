@@ -18,4 +18,12 @@ end
 local function append(lines)
   return nvim.buf_set_lines(upsert_buf(), -1, -1, false, lines)
 end
-return {["aniseed/module"] = "conjure.log", append = append}
+local function split()
+  upsert_buf()
+  return nvim.ex.split(log_buf_name)
+end
+local function vsplit()
+  upsert_buf()
+  return nvim.ex.vsplit(log_buf_name)
+end
+return {["aniseed/module"] = "conjure.log", append = append, split = split, vsplit = vsplit}

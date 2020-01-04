@@ -7,6 +7,7 @@
 (local nu (require :conjure.aniseed.nvim.util))
 
 (local log (require :conjure.log))
+(local mapping (require :conjure.mapping))
 
 (fn parse [s]
   {:tag (-> s (: :match ":tag :%a+") (: :sub 7))
@@ -25,15 +26,7 @@
   :conjure.main :chan-on-data)
 
 (fn main []
-  ;; TODO Initialise all other modules.
-  ;;  * ui for the log and other display methods.
-  ;;  * log for high level concepts of UI.
-  ;;  * socks for socket management.
-  ;;  * eval for evaluation of code via socks.
-  ;;  * config for... config.
-  ;;  * some module for working out what we should connect to.
-  ;;  * keys for all mappings.
-  (log.append [";; Sourcery!?"]))
+  (mapping.init))
 
 (fn single-eval [code]
   (let [chan-id (nvim.fn.sockconnect

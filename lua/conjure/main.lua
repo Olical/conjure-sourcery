@@ -3,6 +3,7 @@ local ani = require("conjure.aniseed.core")
 local nvim = require("conjure.aniseed.nvim")
 local nu = require("conjure.aniseed.nvim.util")
 local log = require("conjure.log")
+local mapping = require("conjure.mapping")
 local function parse(s)
   return {tag = s:match(":tag :%a+"):sub(7), val = s:match(":val %b\"\""):sub(7, -2)}
 end
@@ -18,7 +19,7 @@ local function chan_on_data(chan_id, data)
 end
 nu["fn-bridge"]("ConjureChanOnData", "conjure.main", "chan-on-data")
 local function main()
-  return log.append({";; Sourcery!?"})
+  return mapping.init()
 end
 local function single_eval(code)
   do
