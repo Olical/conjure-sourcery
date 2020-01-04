@@ -16,14 +16,27 @@
       buf)))
 
 (fn append [lines]
-  (nvim.buf_set_lines
-    (upsert-buf)
-    -1 -1 false lines))
+  (let [buf (upsert-buf)
+        old-lines (nvim.buf_line_count buf)]
+    (nvim.buf_set_lines
+      buf
+      -1 -1 false lines)
+
+    (let [new-lines (nvim.buf_line_count buf)]
+      (ani.run!
+        (fn [win]
+          (let [[row col] (nvim.win_get_cursor)]
+            (when (and (= buf (nvim.win_get_buf win))
+                       (= col 0)
+                       (= old-lines row))
+              (nvim.win_set_cursor win [new-lines 0]))))
+        (nvim.list_wins)))))
 
 (fn create-win [split-fn]
-  (upsert-buf)
-  (split-fn log-buf-name)
-  (nvim.ex.normal_ "G"))
+  (let [buf (upsert-buf)]
+    (nvim.win_set_cursor
+      (split-fn log-buf-name)
+      [(nvim.buf_line_count buf) 0])))
 
 (fn split []
   (create-win nvim.ex.split))

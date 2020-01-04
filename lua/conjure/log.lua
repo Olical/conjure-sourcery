@@ -16,12 +16,25 @@ local function upsert_buf()
   end
 end
 local function append(lines)
-  return nvim.buf_set_lines(upsert_buf(), -1, -1, false, lines)
+  local buf = upsert_buf()
+  local old_lines = nvim.buf_line_count(buf)
+  nvim.buf_set_lines(buf, -1, -1, false, lines)
+  do
+    local new_lines = nvim.buf_line_count(buf)
+    local function _0_(win)
+      local _1_ = nvim.win_get_cursor()
+      local row = _1_[1]
+      local col = _1_[2]
+      if ((buf == nvim.win_get_buf(win)) and (col == 0) and (old_lines == row)) then
+        return nvim.win_set_cursor(win, {new_lines, 0})
+      end
+    end
+    return ani["run!"](_0_, nvim.list_wins())
+  end
 end
 local function create_win(split_fn)
-  upsert_buf()
-  split_fn(log_buf_name)
-  return nvim.ex.normal_("G")
+  local buf = upsert_buf()
+  return nvim.win_set_cursor(split_fn(log_buf_name), {nvim.buf_line_count(buf), 0})
 end
 local function split()
   return create_win(nvim.ex.split)
