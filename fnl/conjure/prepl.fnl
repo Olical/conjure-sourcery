@@ -48,6 +48,11 @@
           (set conn {:chan-id chan-id
                      :address address}))))))
 
+(fn send [code]
+  (when conn
+    (nvim.fn.chansend (. conn :chan-id) code)))
+
 {:aniseed/module :conjure.prepl
  :chan-on-data chan-on-data
- :sync sync}
+ :sync sync
+ :send send}

@@ -41,4 +41,9 @@ local function sync()
     end
   end
 end
-return {["aniseed/module"] = "conjure.prepl", ["chan-on-data"] = chan_on_data, sync = sync}
+local function send(code)
+  if conn then
+    return nvim.fn.chansend(conn["chan-id"], code)
+  end
+end
+return {["aniseed/module"] = "conjure.prepl", ["chan-on-data"] = chan_on_data, send = send, sync = sync}

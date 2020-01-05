@@ -27,12 +27,19 @@
     {:noremap true
      :silent true})
 
+  (nvim.set_keymap
+    :n "<Plug>(conjure_eval_current_form)"
+    ":lua require('conjure.eval')['current-form']()<cr>"
+    {:noremap true
+     :silent true})
+
   ;; TODO Optional and configurable.
   (nvim.ex.augroup :conjure)
   (nvim.ex.autocmd_)
   (ft-map :clojure :n :ls :conjure_log_split)
   (ft-map :clojure :n :lv :conjure_log_vsplit)
   (ft-map :clojure :n :ps :conjure_prepl_sync)
+  (ft-map :clojure :n :ee :conjure_eval_current_form)
   (nvim.ex.augroup :END))
 
 {:aniseed/module :conjure.mapping
