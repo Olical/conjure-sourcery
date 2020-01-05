@@ -10,6 +10,8 @@ An experimental reimplementation of https://github.com/Olical/conjure[Conjure] i
 
 If this experiment is a success it'll eventually replace the main repository as the default Conjure implementation. I'm planning on carrying over a lot of the best behaviors and features while making it smoother, faster and easier to use.
 
+I'm also considering supporting other Lisps such as Scheme, Racket and Fennel. I think the model of selecting forms and working with results in alog buffer is universal, the thing that changes is how evaluations are performed and wrapped. Food for thought!
+
 == Unlicenced
 
 Find the full http://unlicense.org/[unlicense] in the `UNLICENSE` file, but here's a snippet.
