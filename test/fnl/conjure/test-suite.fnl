@@ -4,7 +4,7 @@
 (fn main []
   (nvim.ex.redir_ "> test/results.txt")
 
-  (require :conjure.main-test)
+  (require :conjure.extract-test)
 
   (let [results (test.run-all)]
     (if (test.ok? results)

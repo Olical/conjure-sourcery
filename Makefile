@@ -21,8 +21,7 @@ test:
 	nvim -u NONE \
 		-c "let &runtimepath = &runtimepath . ',' . getcwd() . ',' . getcwd() . '/test'" \
 		-c "lua require('conjure.aniseed.compile').glob('**/*.fnl', 'test/fnl', 'test/lua', {force = true})" \
-		-c "lua require('conjure.test-suite').main()" \
-		test.clj; \
+		-c "lua require('conjure.test-suite').main()"; \
 		EXIT_CODE=$$?; \
 		cat test/results.txt; \
 		exit $$EXIT_CODE
