@@ -8,7 +8,7 @@
 
   (let [results (test.run-all)]
     (if (test.ok? results)
-      (nvim.ex.q)
+      (nvim.ex.qa_)
       (nvim.ex.cq))))
 
 {:aniseed/module :conjure.test-suite

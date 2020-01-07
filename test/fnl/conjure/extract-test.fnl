@@ -1,13 +1,24 @@
 (local nvim (require :conjure.aniseed.nvim))
 (local extract (require :conjure.extract))
 
+(fn with-buf [lines cursor f]
+  (nvim.ex.edit (.. (nvim.fn.tempname) "-test.clj"))
+  (nvim.buf_set_lines 0 0 -1 false lines)
+  (nvim.win_set_cursor 0 cursor)
+  (f)
+  (nvim.ex.bdelete_))
+
 {:aniseed/module :conjure.extract-test
  :aniseed/tests
  {:current-form
   (fn [t]
-    (nvim.ex.edit "test/example.clj")
-    (nvim.win_set_cursor 0 [6 1])
-    (t.pr= {:range {:start [6 1]
-                    :end [6 21]}
-            :content "(comment (add 10 20))"}
-           (extract.current-form)))}}
+    (with-buf
+      ["(ns foo)"
+       ""
+       "(+ 10 20 (* 10 2))"]
+      [3 10]
+      (fn []
+        (t.pr= {:range {:start [3 10]
+                        :end [3 17]}
+                :content "(* 10 2)"}
+               (extract.current-form)))))}}
