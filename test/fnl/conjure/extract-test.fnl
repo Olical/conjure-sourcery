@@ -1,19 +1,11 @@
-(local nvim (require :conjure.aniseed.nvim))
 (local extract (require :conjure.extract))
-
-(fn with-buf [lines f]
-  (let [at (fn [cursor]
-             (nvim.win_set_cursor 0 cursor))]
-    (nvim.ex.split (.. (nvim.fn.tempname) "_test.clj"))
-    (nvim.buf_set_lines 0 0 -1 false lines)
-    (f at)
-    (nvim.ex.bdelete_)))
+(local tu (require :conjure.test-utils))
 
 {:aniseed/module :conjure.extract-test
  :aniseed/tests
  {:current-form
   (fn [t]
-    (with-buf
+    (tu.with-buf
       ["(ns foo)"
        ""
        "(+ 10 20 (* 10 2))"]
@@ -41,7 +33,7 @@
                         :end [3 18]}
                 :content "(+ 10 20 (* 10 2))"}
                (extract.current-form))
-        
+
         (at [3 17])
         (t.pr= {:range {:start [3 1]
                         :end [3 18]}
