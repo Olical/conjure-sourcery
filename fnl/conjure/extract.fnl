@@ -22,11 +22,13 @@
   (let [;; 'W' don't Wrap around the end of the file
         ;; 'c' accept a match at the Cursor position
         ;; 'n' do Not move the cursor
-        flags "Wcn"
+        ;; 'z' start searching at the cursor column instead of Zero
+        flags "Wnz"
 
         ;; TODO Handle when cursor is on open or close.
         ;; Need a fn to extract current char using get cursor
         ;; pos and line value.
+        ;; I don't think using c is the right option, it leads to weirdness.
         end (nvim.fn.searchpairpos
               "(" "" ")" flags)
 
