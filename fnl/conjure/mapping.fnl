@@ -34,6 +34,8 @@
      :silent true})
 
   ;; TODO Optional and configurable.
+  ;; TODO Clojure specific mappings but make eval generic.
+  ;; Need a module that handles dispatching code to the right places.
   (nvim.ex.augroup :conjure)
   (nvim.ex.autocmd_)
   (ft-map :clojure :n :ls :conjure_log_split)
