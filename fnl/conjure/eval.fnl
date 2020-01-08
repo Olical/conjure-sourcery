@@ -4,12 +4,18 @@
 (local prepl (require :conjure.prepl))
 (local log (require :conjure.log))
 
-;; TODO Need to de-escape things like newlines.
 (fn current-form []
-  (let [form (extract.current-form)]
+  (let [form (extract.form {})]
     (when form
       (log.append [";; Evaluating current form"])
       (prepl.send (.. (. form :content) "\n")))))
 
+(fn root-form []
+  (let [form (extract.form {:root? true})]
+    (when form
+      (log.append [";; Evaluating root form"])
+      (prepl.send (.. (. form :content) "\n")))))
+
 {:aniseed/module :conjure.eval
- :current-form current-form}
+ :current-form current-form
+ :root-form root-form}

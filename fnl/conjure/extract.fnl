@@ -28,21 +28,23 @@
   (or (not pos)
       (= 0 (unpack pos))))
 
-(fn current-form []
-  (let [char (current-char)
-
-        ;; 'W' don't Wrap around the end of the file
+;; TODO Root in comments? Need to skip?
+;; TODO Handle [] and {} pairs, including matching inner or outer most pair.
+(fn form [{: root?}]
+  (let [;; 'W' don't Wrap around the end of the file
         ;; 'n' do Not move the cursor
         ;; 'z' start searching at the cursor column instead of Zero
         ;; 'b' search Backward instead of forward
         ;; 'c' accept a match at the Cursor position
-        flags "Wnz"
+        ;; 'r' repeat until no more matches found; will find the outer pair
+        flags (.. "Wnz" (if root? "r" ""))
+        cursor-char (current-char)
         start (nvim.fn.searchpairpos
                 "(" "" ")"
-                (.. flags "b" (if (= char "(") "c" "")))
+                (.. flags "b" (if (= cursor-char "(") "c" "")))
         end (nvim.fn.searchpairpos
               "(" "" ")"
-              (.. flags (if (= char ")") "c" "")))]
+              (.. flags (if (= cursor-char ")") "c" "")))]
 
     (let [range {:start start
                  :end end}]
@@ -52,4 +54,4 @@
          :content (read-range range)}))))
 
 {:aniseed/module :conjure.extract
- :current-form current-form}
+ :form form}

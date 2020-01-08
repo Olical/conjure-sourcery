@@ -8,6 +8,7 @@
 (var conn nil)
 
 ;; TODO Hunt for :exception flags.
+;; TODO Need to de-escape things in results like newlines.
 (fn parse [s]
   {:tag (-> s (: :match ":tag :%a+") (: :sub 7))
    :val (-> s (: :match ":val %b\"\"") (: :sub 7 -2))})

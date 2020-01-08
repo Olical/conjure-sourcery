@@ -33,6 +33,12 @@
     {:noremap true
      :silent true})
 
+  (nvim.set_keymap
+    :n "<Plug>(conjure_eval_root_form)"
+    ":lua require('conjure.eval')['root-form']()<cr>"
+    {:noremap true
+     :silent true})
+
   ;; TODO Optional and configurable.
   ;; TODO Clojure specific mappings but make eval generic.
   ;; Need a module that handles dispatching code to the right places.
@@ -42,6 +48,7 @@
   (ft-map :clojure :n :lv :conjure_log_vsplit)
   (ft-map :clojure :n :ps :conjure_prepl_sync)
   (ft-map :clojure :n :ee :conjure_eval_current_form)
+  (ft-map :clojure :n :er :conjure_eval_root_form)
   (nvim.ex.augroup :END))
 
 {:aniseed/module :conjure.mapping
