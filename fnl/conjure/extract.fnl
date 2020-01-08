@@ -6,7 +6,7 @@
 
 (fn read-range [{:start [srow scol] :end [erow ecol]}]
   (let [lines (nvim.buf_get_lines
-                0 (ani.dec srow) erow false)]
+                0 (- srow 1) erow false)]
     (-> lines
         (ani.update
           (length lines)
@@ -18,30 +18,39 @@
             (string.sub s scol)))
         (->> (str.join "\n")))))
 
+(fn buf-char [at]
+  (let [[row col] at
+        [line] (nvim.buf_get_lines 0 (- row 1) row false)
+        char (+ col 1)]
+    (string.sub line char char)))
+
+(fn nil-pos? [pos]
+  (or (not pos)
+      (= 0 (unpack pos))))
+
 (fn current-form []
-  (let [;; 'W' don't Wrap around the end of the file
-        ;; 'c' accept a match at the Cursor position
+  (let [cursor (nvim.win_get_cursor 0)
+        current-char (buf-char cursor)
+
+        ;; 'W' don't Wrap around the end of the file
         ;; 'n' do Not move the cursor
         ;; 'z' start searching at the cursor column instead of Zero
-        flags "Wnz"
-
-        ;; TODO Handle when cursor is on open or close.
-        ;; Need a fn to extract current char using get cursor
-        ;; pos and line value.
-        ;; I don't think using c is the right option, it leads to weirdness.
-        end (nvim.fn.searchpairpos
-              "(" "" ")" flags)
-
         ;; 'b' search Backward instead of forward
+        ;; 'c' accept a match at the Cursor position
+        flags "Wnz"
         start (nvim.fn.searchpairpos
-                "(" "" ")" (.. flags "b"))
+                "(" "" ")"
+                (.. flags "b" (if (= current-char "(") "c" "")))
+        end (nvim.fn.searchpairpos
+              "(" "" ")"
+              (.. flags (if (= current-char ")") "c" "")))]
 
-        range {:start start
-               :end end}]
-    (when (and (not= 0 (unpack start))
-               (not= 0 (unpack end)))
-      {:range range
-       :content (read-range range)})))
+    (let [range {:start start
+                 :end end}]
+      (when (and (not (nil-pos? start))
+                 (not (nil-pos? end)))
+        {:range range
+         :content (read-range range)}))))
 
 {:aniseed/module :conjure.extract
  :current-form current-form}
