@@ -18,8 +18,8 @@
             (string.sub s scol)))
         (->> (str.join "\n")))))
 
-(fn buf-char [at]
-  (let [[row col] at
+(fn current-char []
+  (let [[row col] (nvim.win_get_cursor 0)
         [line] (nvim.buf_get_lines 0 (- row 1) row false)
         char (+ col 1)]
     (string.sub line char char)))
@@ -29,8 +29,7 @@
       (= 0 (unpack pos))))
 
 (fn current-form []
-  (let [cursor (nvim.win_get_cursor 0)
-        current-char (buf-char cursor)
+  (let [char (current-char)
 
         ;; 'W' don't Wrap around the end of the file
         ;; 'n' do Not move the cursor
@@ -40,10 +39,10 @@
         flags "Wnz"
         start (nvim.fn.searchpairpos
                 "(" "" ")"
-                (.. flags "b" (if (= current-char "(") "c" "")))
+                (.. flags "b" (if (= char "(") "c" "")))
         end (nvim.fn.searchpairpos
               "(" "" ")"
-              (.. flags (if (= current-char ")") "c" "")))]
+              (.. flags (if (= char ")") "c" "")))]
 
     (let [range {:start start
                  :end end}]
