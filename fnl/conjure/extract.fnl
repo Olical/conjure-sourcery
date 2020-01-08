@@ -4,7 +4,7 @@
 
 ;; form (root / current), element, namespace
 
-(fn read-range [{:start [srow scol] :end [erow ecol]}]
+(fn read-range [[srow scol] [erow ecol]]
   (let [lines (nvim.buf_get_lines
                 0 (- srow 1) erow false)]
     (-> lines
@@ -28,7 +28,6 @@
   (or (not pos)
       (= 0 (unpack pos))))
 
-;; TODO Root in comments? Need to skip?
 ;; TODO Handle [] and {} pairs, including matching inner or outer most pair.
 (fn form [{: root?}]
   (let [;; 'W' don't Wrap around the end of the file
@@ -39,19 +38,16 @@
         ;; 'r' repeat until no more matches found; will find the outer pair
         flags (.. "Wnz" (if root? "r" ""))
         cursor-char (current-char)
-        start (nvim.fn.searchpairpos
-                "(" "" ")"
-                (.. flags "b" (if (= cursor-char "(") "c" "")))
-        end (nvim.fn.searchpairpos
-              "(" "" ")"
-              (.. flags (if (= cursor-char ")") "c" "")))]
+        start (->> (.. flags "b" (if (= cursor-char "(") "c" ""))
+                   (nvim.fn.searchpairpos "(" "" ")"))
+        end (->> (.. flags (if (= cursor-char ")") "c" ""))
+                 (nvim.fn.searchpairpos "(" "" ")"))]
 
     (when (and (not (nil-pos? start))
                (not (nil-pos? end)))
-      (let [range {:start start
-                   :end end}]
-        {:range range
-         :content (read-range range)}))))
+      {:range {:start (ani.update start 2 ani.dec)
+               :end (ani.update end 2 ani.dec)}
+       :content (read-range start end)})))
 
 {:aniseed/module :conjure.extract
  :form form}
