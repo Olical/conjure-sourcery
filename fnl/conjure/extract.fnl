@@ -46,10 +46,10 @@
               "(" "" ")"
               (.. flags (if (= cursor-char ")") "c" "")))]
 
-    (let [range {:start start
-                 :end end}]
-      (when (and (not (nil-pos? start))
-                 (not (nil-pos? end)))
+    (when (and (not (nil-pos? start))
+               (not (nil-pos? end)))
+      (let [range {:start start
+                   :end end}]
         {:range range
          :content (read-range range)}))))
 

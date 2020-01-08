@@ -64,11 +64,9 @@ local function form(_1_0)
       end
     end
     _end = nvim.fn.searchpairpos("(", "", ")", (flags .. _5_()))
-    do
+    if (not nil_pos_3f(start) and not nil_pos_3f(_end)) then
       local range = {["end"] = _end, start = start}
-      if (not nil_pos_3f(start) and not nil_pos_3f(_end)) then
-        return {content = read_range(range), range = range}
-      end
+      return {content = read_range(range), range = range}
     end
   end
 end
