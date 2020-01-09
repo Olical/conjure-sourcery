@@ -1,5 +1,6 @@
 (local ani (require :conjure.aniseed.core))
 (local nvim (require :conjure.aniseed.nvim))
+(local nu (require :conjure.aniseed.nvim.util))
 (local str (require :conjure.aniseed.string))
 
 ;; form (root / current), element, namespace
@@ -28,6 +29,21 @@
   (or (not pos)
       (= 0 (unpack pos))))
 
+(fn cursor-in-code? []
+  (let [[row col] (nvim.win_get_cursor 0)
+        stack (nvim.fn.synstack row col)
+        stack-size (length stack)]
+    (or (= 0 stack-size)
+        (let [name (nvim.fn.synIDattr (. stack stack-size) :name)]
+          (not (or (name:find "Comment$")
+                   (name:find "String$")
+                   (name:find "Regexp$")))))))
+
+(nu.fn-bridge
+  :ConjureCursorInCode
+  :conjure.extract :cursor-in-code?
+  {:return true})
+
 ;; TODO Handle [] and {} pairs, including matching inner or outer most pair.
 (fn form [{: root?}]
   (let [;; 'W' don't Wrap around the end of the file
@@ -38,10 +54,21 @@
         ;; 'r' repeat until no more matches found; will find the outer pair
         flags (.. "Wnz" (if root? "r" ""))
         cursor-char (current-char)
-        start (->> (.. flags "b" (if (= cursor-char "(") "c" ""))
-                   (nvim.fn.searchpairpos "(" "" ")"))
-        end (->> (.. flags (if (= cursor-char ")") "c" ""))
-                 (nvim.fn.searchpairpos "(" "" ")"))]
+
+        ;; Ignore matches inside comments or strings.
+        ;; We only have to do this for non-root form reading.
+        ;;  https://github.com/Olical/conjure/issues/34
+        skip (when (not root?)
+               "!ConjureCursorInCode()")
+
+        start (nvim.fn.searchpairpos
+                "(" "" ")"
+                (.. flags "b" (if (= cursor-char "(") "c" ""))
+                skip)
+        end (nvim.fn.searchpairpos
+              "(" "" ")"
+              (.. flags (if (= cursor-char ")") "c" ""))
+              skip)]
 
     (when (and (not (nil-pos? start))
                (not (nil-pos? end)))
@@ -50,4 +77,5 @@
        :content (read-range start end)})))
 
 {:aniseed/module :conjure.extract
- :form form}
+ :form form
+ :cursor-in-code? cursor-in-code?}

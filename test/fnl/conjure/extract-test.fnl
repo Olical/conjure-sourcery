@@ -92,28 +92,27 @@
 
         (at [2 0])
         (t.= nil (extract.form {:root? true}) "matching nothing for root"))))
-  
-  ; :ignoring-comments
-  ; (fn [t]
-  ;   (tu.with-buf
-  ;     ["(ns ohno)"
-  ;      ""
-  ;      "(inc"
-  ;      " ; )"
-  ;      " 5)"]
-  ;     (fn [at]
-  ;       (at [4 0])
-  ;       (t.pr= {:range {:start [3 0]
-  ;                       :end [5 2]}
-  ;               :content "(inc\n ;)\n 5)"}
-  ;              (extract.form {})
-  ;              "skips the comment paren with current form")
 
-  ;       (at [4 0])
-  ;       (t.pr= {:range {:start [3 0]
-  ;                       :end [5 2]}
-  ;               :content "(inc\n ;)\n 5)"}
-  ;              (extract.form {:root? true})
-  ;              "skips the comment paren with root form"))))
-}}
+  :ignoring-comments
+  (fn [t]
+    (tu.with-buf
+      ["(ns ohno)"
+       ""
+       "(inc"
+       " ; )"
+       " 5)"]
+      (fn [at]
+        (at [4 0])
+        (t.pr= {:range {:start [3 0]
+                        :end [5 2]}
+                :content "(inc\n ;)\n 5)"}
+               (extract.form {})
+               "skips the comment paren with current form")
+
+        (at [4 0])
+        (t.pr= {:range {:start [3 0]
+                        :end [5 2]}
+                :content "(inc\n ;)\n 5)"}
+               (extract.form {:root? true})
+               "skips the comment paren with root form"))))}}
 
