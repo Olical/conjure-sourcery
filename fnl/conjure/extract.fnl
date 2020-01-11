@@ -55,20 +55,16 @@
         flags (.. "Wnz" (if root? "r" ""))
         cursor-char (current-char)
 
-        ;; Ignore matches inside comments or strings.
-        ;; We only have to do this for non-root form reading.
-        ;;  https://github.com/Olical/conjure/issues/34
-        skip (when (not root?)
-               "!ConjureCursorInCode()")
+        skip-non-code "!ConjureCursorInCode()"
 
         start (nvim.fn.searchpairpos
                 "(" "" ")"
                 (.. flags "b" (if (= cursor-char "(") "c" ""))
-                skip)
+                skip-non-code)
         end (nvim.fn.searchpairpos
               "(" "" ")"
               (.. flags (if (= cursor-char ")") "c" ""))
-              skip)]
+              skip-non-code)]
 
     (when (and (not (nil-pos? start))
                (not (nil-pos? end)))

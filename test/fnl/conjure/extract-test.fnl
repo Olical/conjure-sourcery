@@ -114,5 +114,19 @@
                         :end [5 2]}
                 :content "(inc\n ;)\n 5)"}
                (extract.form {:root? true})
-               "skips the comment paren with root form"))))}}
+               "skips the comment paren with root form")))
+    
+    (tu.with-buf
+      [";; some comment ("
+       ""
+       "#_(do"
+       "    (pr-str \"I'm a comment block\")"
+       "    (foo 1))"]
+      (fn [at]
+        (at [4 8])
+        (t.pr= {:range {:start [3 2]
+                        :end [5 11]}
+                :content "(do\n    (pr-str \"I'm a comment block\")\n    (foo 1))"}
+               (extract.form {:root? true})
+               "ignores the unbalanced paren in the comment above the commented form"))))}}
 

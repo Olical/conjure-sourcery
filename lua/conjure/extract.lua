@@ -59,28 +59,25 @@ local function form(_2_0)
     end
     flags = ("Wnz" .. _4_())
     local cursor_char = current_char()
-    local skip = skip
-    if not root_3f then
-      skip = "!ConjureCursorInCode()"
-    end
+    local skip_non_code = "!ConjureCursorInCode()"
     local start = start
-    local function _6_()
+    local function _5_()
       if (cursor_char == "(") then
         return "c"
       else
         return ""
       end
     end
-    start = nvim.fn.searchpairpos("(", "", ")", (flags .. "b" .. _6_()), skip)
+    start = nvim.fn.searchpairpos("(", "", ")", (flags .. "b" .. _5_()), skip_non_code)
     local _end = nil
-    local function _7_()
+    local function _6_()
       if (cursor_char == ")") then
         return "c"
       else
         return ""
       end
     end
-    _end = nvim.fn.searchpairpos("(", "", ")", (flags .. _7_()), skip)
+    _end = nvim.fn.searchpairpos("(", "", ")", (flags .. _6_()), skip_non_code)
     if (not nil_pos_3f(start) and not nil_pos_3f(_end)) then
       return {content = read_range(start, _end), range = {["end"] = ani.update(_end, 2, ani.dec), start = ani.update(start, 2, ani.dec)}}
     end
