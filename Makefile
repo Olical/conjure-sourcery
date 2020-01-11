@@ -19,6 +19,7 @@ test:
 	make prepl &
 	while [ ! -f .prepl-port ]; do sleep 0.2; done
 	nvim -u NONE \
+		-c "syntax on" \
 		-c "let &runtimepath = &runtimepath . ',' . getcwd() . ',' . getcwd() . '/test'" \
 		-c "lua require('conjure.aniseed.compile').glob('**/*.fnl', 'test/fnl', 'test/lua', {force = true})" \
 		-c "lua require('conjure.test-suite').main()"; \
