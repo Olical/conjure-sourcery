@@ -1,6 +1,5 @@
 (local ani (require :conjure.aniseed.core))
 (local nvim (require :conjure.aniseed.nvim))
-(local nu (require :conjure.aniseed.nvim.util))
 (local str (require :conjure.aniseed.string))
 
 ;; form (root / current), element, namespace
@@ -29,20 +28,15 @@
   (or (not pos)
       (= 0 (unpack pos))))
 
-(fn cursor-in-code? []
+(fn skip-match? []
   (let [[row col] (nvim.win_get_cursor 0)
         stack (nvim.fn.synstack row col)
         stack-size (length stack)]
-    (or (= 0 stack-size)
-        (let [name (nvim.fn.synIDattr (. stack stack-size) :name)]
-          (not (or (name:find "Comment$")
-                   (name:find "String$")
-                   (name:find "Regexp$")))))))
-
-(nu.fn-bridge
-  :ConjureCursorInCode
-  :conjure.extract :cursor-in-code?
-  {:return true})
+    (and (> stack-size 0)
+         (let [name (nvim.fn.synIDattr (. stack stack-size) :name)]
+           (or (name:find "Comment$")
+               (name:find "String$")
+               (name:find "Regexp$"))))))
 
 ;; TODO Handle [] and {} pairs, including matching inner or outer most pair.
 (fn form [{: root?}]
@@ -55,16 +49,16 @@
         flags (.. "Wnz" (if root? "r" ""))
         cursor-char (current-char)
 
-        skip-non-code "!ConjureCursorInCode()"
+        skip-match?-viml "luaeval(\"package.loaded['conjure.extract']['skip-match?']()\")"
 
         start (nvim.fn.searchpairpos
                 "(" "" ")"
                 (.. flags "b" (if (= cursor-char "(") "c" ""))
-                skip-non-code)
+                skip-match?-viml)
         end (nvim.fn.searchpairpos
               "(" "" ")"
               (.. flags (if (= cursor-char ")") "c" ""))
-              skip-non-code)]
+              skip-match?-viml)]
 
     (when (and (not (nil-pos? start))
                (not (nil-pos? end)))
@@ -74,4 +68,4 @@
 
 {:aniseed/module :conjure.extract
  :form form
- :cursor-in-code? cursor-in-code?}
+ :skip-match? skip-match?}

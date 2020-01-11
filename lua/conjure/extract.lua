@@ -1,6 +1,5 @@
 local ani = require("conjure.aniseed.core")
 local nvim = require("conjure.aniseed.nvim")
-local nu = require("conjure.aniseed.nvim.util")
 local str = require("conjure.aniseed.string")
 local function read_range(_0_0, _1_0)
   local _1_ = _0_0
@@ -32,7 +31,7 @@ end
 local function nil_pos_3f(pos)
   return (not pos or (0 == unpack(pos)))
 end
-local function cursor_in_code_3f()
+local function skip_match_3f()
   local _2_ = nvim.win_get_cursor(0)
   local row = _2_[1]
   local col = _2_[2]
@@ -40,11 +39,10 @@ local function cursor_in_code_3f()
   local stack_size = #stack
   local function _3_()
     local name = nvim.fn.synIDattr(stack[stack_size], "name")
-    return not (name:find("Comment$") or name:find("String$") or name:find("Regexp$"))
+    return (name:find("Comment$") or name:find("String$") or name:find("Regexp$"))
   end
-  return ((0 == stack_size) or _3_())
+  return ((stack_size > 0) and _3_())
 end
-nu["fn-bridge"]("ConjureCursorInCode", "conjure.extract", "cursor-in-code?", {["return"] = true})
 local function form(_2_0)
   local _3_ = _2_0
   local root_3f = _3_["root?"]
@@ -59,7 +57,7 @@ local function form(_2_0)
     end
     flags = ("Wnz" .. _4_())
     local cursor_char = current_char()
-    local skip_non_code = "!ConjureCursorInCode()"
+    local skip_match_3f_viml = "luaeval(\"package.loaded['conjure.extract']['skip-match?']()\")"
     local start = start
     local function _5_()
       if (cursor_char == "(") then
@@ -68,7 +66,7 @@ local function form(_2_0)
         return ""
       end
     end
-    start = nvim.fn.searchpairpos("(", "", ")", (flags .. "b" .. _5_()), skip_non_code)
+    start = nvim.fn.searchpairpos("(", "", ")", (flags .. "b" .. _5_()), skip_match_3f_viml)
     local _end = nil
     local function _6_()
       if (cursor_char == ")") then
@@ -77,10 +75,10 @@ local function form(_2_0)
         return ""
       end
     end
-    _end = nvim.fn.searchpairpos("(", "", ")", (flags .. _6_()), skip_non_code)
+    _end = nvim.fn.searchpairpos("(", "", ")", (flags .. _6_()), skip_match_3f_viml)
     if (not nil_pos_3f(start) and not nil_pos_3f(_end)) then
       return {content = read_range(start, _end), range = {["end"] = ani.update(_end, 2, ani.dec), start = ani.update(start, 2, ani.dec)}}
     end
   end
 end
-return {["aniseed/module"] = "conjure.extract", ["cursor-in-code?"] = cursor_in_code_3f, form = form}
+return {["aniseed/module"] = "conjure.extract", ["skip-match?"] = skip_match_3f, form = form}
