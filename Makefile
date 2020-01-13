@@ -3,7 +3,7 @@
 deps:
 	mkdir -p deps
 	if [ ! -d "deps/aniseed" ]; then git clone https://github.com/Olical/aniseed.git deps/aniseed; fi
-	cd deps/aniseed && git fetch && git checkout v2.1.0
+	cd deps/aniseed && git fetch && git checkout develop
 
 compile:
 	rm -rf lua
