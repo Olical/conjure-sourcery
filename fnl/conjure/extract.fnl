@@ -1,10 +1,11 @@
-(local ani (require :conjure.aniseed.core))
-(local nvim (require :conjure.aniseed.nvim))
-(local str (require :conjure.aniseed.string))
+(module conjure.extract
+  {require {ani conjure.aniseed.core
+            nvim conjure.aniseed.nvim
+            str conjure.aniseed.string}})
 
 ;; form (root / current), element, namespace
 
-(fn read-range [[srow scol] [erow ecol]]
+(defn- read-range [[srow scol] [erow ecol]]
   (let [lines (nvim.buf_get_lines
                 0 (- srow 1) erow false)]
     (-> lines
@@ -18,17 +19,17 @@
             (string.sub s scol)))
         (->> (str.join "\n")))))
 
-(fn current-char []
+(defn- current-char []
   (let [[row col] (nvim.win_get_cursor 0)
         [line] (nvim.buf_get_lines 0 (- row 1) row false)
         char (+ col 1)]
     (string.sub line char char)))
 
-(fn nil-pos? [pos]
+(defn- nil-pos? [pos]
   (or (not pos)
       (= 0 (unpack pos))))
 
-(fn skip-match? []
+(defn skip-match? []
   (let [[row col] (nvim.win_get_cursor 0)
         stack (nvim.fn.synstack row col)
         stack-size (length stack)]
@@ -39,7 +40,7 @@
                (name:find "Regexp$"))))))
 
 ;; TODO Handle [] and {} pairs, including matching inner or outer most pair.
-(fn form [{: root?}]
+(defn form [{: root?}]
   (let [;; 'W' don't Wrap around the end of the file
         ;; 'n' do Not move the cursor
         ;; 'z' start searching at the cursor column instead of Zero
@@ -65,7 +66,3 @@
       {:range {:start (ani.update start 2 ani.dec)
                :end (ani.update end 2 ani.dec)}
        :content (read-range start end)})))
-
-{:aniseed/module :conjure.extract
- :form form
- :skip-match? skip-match?}

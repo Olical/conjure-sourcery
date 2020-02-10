@@ -1,45 +1,122 @@
-local ani = require("conjure.aniseed.core")
-local nvim = require("conjure.aniseed.nvim")
-local log_buf_name = (nvim.fn.tempname() .. "_conjure.cljc")
-local function upsert_buf()
-  local buf = nvim.fn.bufnr(log_buf_name)
-  if (-1 == buf) then
-    local buf = nvim.fn.bufadd(log_buf_name)
-    nvim.buf_set_lines(buf, 0, 1, false, {";; Welcome to Conjure!"})
-    nvim.buf_set_option(buf, "buftype", "nofile")
-    nvim.buf_set_option(buf, "bufhidden", "hide")
-    nvim.buf_set_option(buf, "swapfile", false)
-    nvim.buf_set_option(buf, "buflisted", false)
-    return buf
+local _0_0 = nil
+do
+  local name_23_0_ = "conjure.log"
+  local loaded_23_0_ = package.loaded[name_23_0_]
+  local module_23_0_ = nil
+  if ("table" == type(loaded_23_0_)) then
+    module_23_0_ = loaded_23_0_
   else
-    return buf
+    module_23_0_ = {}
   end
+  module_23_0_["aniseed/module"] = name_23_0_
+  module_23_0_["aniseed/locals"] = (module_23_0_["aniseed/locals"] or {})
+  module_23_0_["aniseed/local-fns"] = (module_23_0_["aniseed/local-fns"] or {})
+  package.loaded[name_23_0_] = module_23_0_
+  _0_0 = module_23_0_
 end
-local function append(lines)
-  local buf = upsert_buf()
-  local old_lines = nvim.buf_line_count(buf)
-  nvim.buf_set_lines(buf, -1, -1, false, lines)
+local function _1_(...)
+  _0_0["aniseed/local-fns"] = {require = {ani = "conjure.aniseed.core", nvim = "conjure.aniseed.nvim"}}
+  return {require("conjure.aniseed.core"), require("conjure.aniseed.nvim")}
+end
+local _2_ = _1_(...)
+local ani = _2_[1]
+local nvim = _2_[2]
+do local _ = ({nil, _0_0, nil})[2] end
+local log_buf_name = nil
+do
+  local v_23_0_ = (nvim.fn.tempname() .. "_conjure.cljc")
+  _0_0["aniseed/locals"]["log-buf-name"] = v_23_0_
+  log_buf_name = v_23_0_
+end
+local upsert_buf = nil
+do
+  local v_23_0_ = nil
+  local function upsert_buf0()
+    local buf = nvim.fn.bufnr(log_buf_name)
+    if (-1 == buf) then
+      local buf0 = nvim.fn.bufadd(log_buf_name)
+      nvim.buf_set_lines(buf0, 0, 1, false, {";; Welcome to Conjure!"})
+      nvim.buf_set_option(buf0, "buftype", "nofile")
+      nvim.buf_set_option(buf0, "bufhidden", "hide")
+      nvim.buf_set_option(buf0, "swapfile", false)
+      nvim.buf_set_option(buf0, "buflisted", false)
+      return buf0
+    else
+      return buf
+    end
+  end
+  v_23_0_ = upsert_buf0
+  _0_0["aniseed/locals"]["upsert-buf"] = v_23_0_
+  upsert_buf = v_23_0_
+end
+local append = nil
+do
+  local v_23_0_ = nil
   do
-    local new_lines = nvim.buf_line_count(buf)
-    local function _0_(win)
-      local _1_ = nvim.win_get_cursor(win)
-      local row = _1_[1]
-      local col = _1_[2]
-      if ((buf == nvim.win_get_buf(win)) and (col == 0) and (old_lines == row)) then
-        return nvim.win_set_cursor(win, {new_lines, 0})
+    local v_23_0_0 = nil
+    local function append0(lines)
+      local buf = upsert_buf()
+      local old_lines = nvim.buf_line_count(buf)
+      nvim.buf_set_lines(buf, -1, -1, false, lines)
+      do
+        local new_lines = nvim.buf_line_count(buf)
+        local function _3_(win)
+          local _4_ = nvim.win_get_cursor(win)
+          local row = _4_[1]
+          local col = _4_[2]
+          if ((buf == nvim.win_get_buf(win)) and (col == 0) and (old_lines == row)) then
+            return nvim.win_set_cursor(win, {new_lines, 0})
+          end
+        end
+        return ani["run!"](_3_, nvim.list_wins())
       end
     end
-    return ani["run!"](_0_, nvim.list_wins())
+    v_23_0_0 = append0
+    _0_0["append"] = v_23_0_0
+    v_23_0_ = v_23_0_0
   end
+  _0_0["aniseed/locals"]["append"] = v_23_0_
+  append = v_23_0_
 end
-local function create_win(split_fn)
-  local buf = upsert_buf()
-  return nvim.win_set_cursor(split_fn(log_buf_name), {nvim.buf_line_count(buf), 0})
+local create_win = nil
+do
+  local v_23_0_ = nil
+  local function create_win0(split_fn)
+    local buf = upsert_buf()
+    return nvim.win_set_cursor(split_fn(log_buf_name), {nvim.buf_line_count(buf), 0})
+  end
+  v_23_0_ = create_win0
+  _0_0["aniseed/locals"]["create-win"] = v_23_0_
+  create_win = v_23_0_
 end
-local function split()
-  return create_win(nvim.ex.split)
+local split = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function split0()
+      return create_win(nvim.ex.split)
+    end
+    v_23_0_0 = split0
+    _0_0["split"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["split"] = v_23_0_
+  split = v_23_0_
 end
-local function vsplit()
-  return create_win(nvim.ex.vsplit)
+local vsplit = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function vsplit0()
+      return create_win(nvim.ex.vsplit)
+    end
+    v_23_0_0 = vsplit0
+    _0_0["vsplit"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["vsplit"] = v_23_0_
+  vsplit = v_23_0_
 end
-return {["aniseed/module"] = "conjure.log", append = append, split = split, vsplit = vsplit}
+return nil

@@ -1,9 +1,10 @@
-(local ani (require :conjure.aniseed.core))
-(local nvim (require :conjure.aniseed.nvim))
+(module conjure.log
+  {require {ani conjure.aniseed.core
+            nvim conjure.aniseed.nvim}})
 
-(local log-buf-name (.. (nvim.fn.tempname) "_conjure.cljc"))
+(def- log-buf-name (.. (nvim.fn.tempname) "_conjure.cljc"))
 
-(fn upsert-buf []
+(defn- upsert-buf []
   (let [buf (nvim.fn.bufnr log-buf-name)]
     (if (= -1 buf)
       (let [buf (nvim.fn.bufadd log-buf-name)]
@@ -16,7 +17,7 @@
       buf)))
 
 ;; TODO Implement trimming using a marker so as not to cut forms in half.
-(fn append [lines]
+(defn append [lines]
   (let [buf (upsert-buf)
         old-lines (nvim.buf_line_count buf)]
     (nvim.buf_set_lines
@@ -33,19 +34,14 @@
               (nvim.win_set_cursor win [new-lines 0]))))
         (nvim.list_wins)))))
 
-(fn create-win [split-fn]
+(defn- create-win [split-fn]
   (let [buf (upsert-buf)]
     (nvim.win_set_cursor
       (split-fn log-buf-name)
       [(nvim.buf_line_count buf) 0])))
 
-(fn split []
+(defn split []
   (create-win nvim.ex.split))
 
-(fn vsplit []
+(defn vsplit []
   (create-win nvim.ex.vsplit))
-
-{:aniseed/module :conjure.log
- :append append
- :split split
- :vsplit vsplit}

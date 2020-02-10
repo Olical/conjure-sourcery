@@ -6,21 +6,13 @@ deps:
 compile:
 	rm -rf lua
 	deps/aniseed/scripts/compile.sh
-	cp -r deps/aniseed/lua/aniseed lua/conjure/aniseed
-	find lua/conjure/aniseed -type f -name "*.lua" -exec sed -i 's/"aniseed\./"conjure.aniseed./g' {} \;
+	deps/aniseed/scripts/embed.sh aniseed conjure
 
 test:
 	rm -rf test/lua
 	make prepl &
 	while [ ! -f .prepl-port ]; do sleep 0.2; done
-	nvim -u NONE \
-		-c "syntax on" \
-		-c "let &runtimepath = &runtimepath . ',' . getcwd() . ',' . getcwd() . '/test'" \
-		-c "lua require('conjure.aniseed.compile').glob('**/*.fnl', 'test/fnl', 'test/lua', {force = true})" \
-		-c "lua require('conjure.test-suite').main()"; \
-		EXIT_CODE=$$?; \
-		cat test/results.txt; \
-		exit $$EXIT_CODE
+	PREFIX="-c 'syntax on'" deps/aniseed/scripts/test.sh
 	echo "(System/exit 0)" | netcat localhost $$(cat .prepl-port)
 
 prepl:
