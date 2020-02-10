@@ -5,10 +5,7 @@ deps:
 
 compile:
 	rm -rf lua
-	nvim -u NONE \
-		-c "set rtp+=deps/aniseed" \
-		-c "lua require('aniseed.compile').glob('**/*.fnl', 'fnl', 'lua')" \
-		+q
+	deps/aniseed/scripts/compile.sh
 	cp -r deps/aniseed/lua/aniseed lua/conjure/aniseed
 	find lua/conjure/aniseed -type f -name "*.lua" -exec sed -i 's/"aniseed\./"conjure.aniseed./g' {} \;
 
