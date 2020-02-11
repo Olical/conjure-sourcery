@@ -5,4 +5,5 @@ jobs:
       - image: olical/conjure-sourcery-circleci:0.0.1
     steps:
       - checkout
+      - run: make deps
       - run: make test
