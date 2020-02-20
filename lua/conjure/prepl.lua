@@ -16,11 +16,11 @@ do
 end
 local function _1_(...)
   _0_0["aniseed/local-fns"] = {require = {ani = "conjure.aniseed.core", log = "conjure.log", nu = "conjure.aniseed.nvim.util", nvim = "conjure.aniseed.nvim"}}
-  return {require("conjure.log"), require("conjure.aniseed.core"), require("conjure.aniseed.nvim.util"), require("conjure.aniseed.nvim")}
+  return {require("conjure.aniseed.core"), require("conjure.log"), require("conjure.aniseed.nvim.util"), require("conjure.aniseed.nvim")}
 end
 local _2_ = _1_(...)
-local log = _2_[1]
-local ani = _2_[2]
+local ani = _2_[1]
+local log = _2_[2]
 local nu = _2_[3]
 local nvim = _2_[4]
 do local _ = ({nil, _0_0, nil})[2] end

@@ -16,11 +16,11 @@ do
 end
 local function _1_(...)
   _0_0["aniseed/local-fns"] = {require = {extract = "conjure.extract", log = "conjure.log", prepl = "conjure.prepl"}}
-  return {require("conjure.log"), require("conjure.extract"), require("conjure.prepl")}
+  return {require("conjure.extract"), require("conjure.log"), require("conjure.prepl")}
 end
 local _2_ = _1_(...)
-local log = _2_[1]
-local extract = _2_[2]
+local extract = _2_[1]
+local log = _2_[2]
 local prepl = _2_[3]
 do local _ = ({nil, _0_0, nil})[2] end
 local current_form = nil

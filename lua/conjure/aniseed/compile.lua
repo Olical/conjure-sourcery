@@ -16,13 +16,13 @@ do
 end
 local function _1_(...)
   _0_0["aniseed/local-fns"] = {require = {core = "conjure.aniseed.core", fennel = "conjure.aniseed.fennel", fs = "conjure.aniseed.fs", nvim = "conjure.aniseed.nvim"}}
-  return {require("conjure.aniseed.core"), require("conjure.aniseed.fs"), require("conjure.aniseed.nvim"), require("conjure.aniseed.fennel")}
+  return {require("conjure.aniseed.core"), require("conjure.aniseed.fennel"), require("conjure.aniseed.fs"), require("conjure.aniseed.nvim")}
 end
 local _2_ = _1_(...)
 local core = _2_[1]
-local fs = _2_[2]
-local nvim = _2_[3]
-local fennel = _2_[4]
+local fennel = _2_[2]
+local fs = _2_[3]
+local nvim = _2_[4]
 do local _ = ({nil, _0_0, nil})[2] end
 local macros_prefix = nil
 do
