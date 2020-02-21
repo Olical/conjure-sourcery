@@ -1,7 +1,5 @@
 (module conjure.main
-  {require {mapping conjure.mapping
-            prepl conjure.prepl}})
+  {require {mapping conjure.mapping}})
 
 (defn main []
-  (mapping.init)
-  (prepl.sync))
+  (mapping.init))

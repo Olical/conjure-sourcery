@@ -47,7 +47,6 @@
   (nvim.ex.autocmd_)
   (ft-map :clojure :n :ls :conjure_log_split)
   (ft-map :clojure :n :lv :conjure_log_vsplit)
-  (ft-map :clojure :n :ps :conjure_prepl_sync)
   (ft-map :clojure :n :ee :conjure_eval_current_form)
   (ft-map :clojure :n :er :conjure_eval_root_form)
   (nvim.ex.augroup :END))

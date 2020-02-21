@@ -2,6 +2,7 @@
   {require {ani conjure.aniseed.core
             nvim conjure.aniseed.nvim}})
 
+;; TODO The name / filetype should depend on the language we're working with.
 (def- log-buf-name (.. (nvim.fn.tempname) "_conjure.cljc"))
 
 (defn- upsert-buf []

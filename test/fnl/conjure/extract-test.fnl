@@ -1,9 +1,9 @@
 (module conjure.extract-test
   {require {extract conjure.extract
-            tu conjure.test-utils}})
+            buffer conjure.test.buffer}})
 
 (deftest current-form
-  (tu.with-buf
+  (buffer.with-buf
     ["(ns foo)"
      ""
      "(+ 10 20 (* 10 2))"]
@@ -54,7 +54,7 @@
              "ns form"))))
 
 (deftest root-form
-  (tu.with-buf
+  (buffer.with-buf
     ["(ns foo)"
      ""
      "(+ 10 20 (* 10 2))"]
@@ -92,7 +92,7 @@
 
 (comment
   (deftest ignoring-comments
-    (tu.with-buf
+    (buffer.with-buf
       ["(ns ohno)"
        ""
        "(inc"
