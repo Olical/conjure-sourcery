@@ -3,7 +3,11 @@
             nvim conjure.aniseed.nvim
             str conjure.aniseed.string}})
 
-;; form (root / current), element, namespace
+;; TODO form (root / current)
+
+;; May be language dependant.
+;; TODO element
+;; TODO namespace
 
 (defn- read-range [[srow scol] [erow ecol]]
   (let [lines (nvim.buf_get_lines
