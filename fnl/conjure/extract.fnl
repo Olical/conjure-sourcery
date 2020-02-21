@@ -50,7 +50,7 @@
         flags (.. "Wnz" (if root? "r" ""))
         cursor-char (current-char)
 
-        skip-match?-viml "luaeval(\"package.loaded['conjure.extract']['skip-match?']()\")"
+        skip-match?-viml "luaeval(\"require('conjure.extract')['skip-match?']()\")"
 
         start (nvim.fn.searchpairpos
                 "(" "" ")"
