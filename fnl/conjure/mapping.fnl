@@ -2,6 +2,11 @@
   {require {nvim conjure.aniseed.nvim
             nu conjure.aniseed.nvim.util}})
 
+;; I need an augroup that fires for known filetypes, setting up their mappings.
+;; The augroup needs to be updated as and when the supported langs are set.
+;; I think they'll still map to conjure.eval modules etc but those modules will
+;; delegate to language specific modules.
+
 (defn- ft-map [ft mode from to]
   (nvim.ex.autocmd
     :FileType ft
