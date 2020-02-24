@@ -15,46 +15,105 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {nu = "conjure.aniseed.nvim.util", nvim = "conjure.aniseed.nvim"}}
-  return {require("conjure.aniseed.nvim.util"), require("conjure.aniseed.nvim")}
+  _0_0["aniseed/local-fns"] = {require = {nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string"}}
+  return {require("conjure.aniseed.nvim"), require("conjure.aniseed.string")}
 end
 local _2_ = _1_(...)
-local nu = _2_[1]
-local nvim = _2_[2]
+local nvim = _2_[1]
+local str = _2_[2]
 do local _ = ({nil, _0_0, nil})[2] end
-local ft_map = nil
+local viml__3elua = nil
 do
   local v_23_0_ = nil
-  local function ft_map0(ft, mode, from, to)
-    return nvim.ex.autocmd("FileType", ft, (mode .. "map"), "<buffer>", ("<localleader>" .. from), ("<Plug>(" .. to .. ")"))
+  local function viml__3elua0(m, f)
+    return ("lua require('" .. m .. "')['" .. f .. "']()")
   end
-  v_23_0_ = ft_map0
-  _0_0["aniseed/locals"]["ft-map"] = v_23_0_
-  ft_map = v_23_0_
+  v_23_0_ = viml__3elua0
+  _0_0["aniseed/locals"]["viml->lua"] = v_23_0_
+  viml__3elua = v_23_0_
 end
-local init = nil
+local plug = nil
+do
+  local v_23_0_ = nil
+  local function plug0(name)
+    return ("<Plug>(" .. name .. ")")
+  end
+  v_23_0_ = plug0
+  _0_0["aniseed/locals"]["plug"] = v_23_0_
+  plug = v_23_0_
+end
+local map_plug = nil
+do
+  local v_23_0_ = nil
+  local function map_plug0(name, m, f)
+    return nvim.set_keymap("n", plug(name), (":" .. viml__3elua(m, f) .. "<cr>"), {noremap = true, silent = true})
+  end
+  v_23_0_ = map_plug0
+  _0_0["aniseed/locals"]["map-plug"] = v_23_0_
+  map_plug = v_23_0_
+end
+local map_local__3eplug = nil
+do
+  local v_23_0_ = nil
+  local function map_local__3eplug0(keys, name)
+    return nvim.buf_set_keymap(0, "n", ("<localleader>" .. keys), plug(name), {silent = true})
+  end
+  v_23_0_ = map_local__3eplug0
+  _0_0["aniseed/locals"]["map-local->plug"] = v_23_0_
+  map_local__3eplug = v_23_0_
+end
+local on_filetype = nil
 do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
-    local function init0()
-      nvim.set_keymap("n", "<Plug>(conjure_log_split)", ":lua require('conjure.log').split()<cr>", {noremap = true, silent = true})
-      nvim.set_keymap("n", "<Plug>(conjure_log_vsplit)", ":lua require('conjure.log').vsplit()<cr>", {noremap = true, silent = true})
-      nvim.set_keymap("n", "<Plug>(conjure_eval_current_form)", ":lua require('conjure.eval')['current-form']()<cr>", {noremap = true, silent = true})
-      nvim.set_keymap("n", "<Plug>(conjure_eval_root_form)", ":lua require('conjure.eval')['root-form']()<cr>", {noremap = true, silent = true})
-      nvim.ex.augroup("conjure")
-      nvim.ex.autocmd_()
-      ft_map("clojure", "n", "ls", "conjure_log_split")
-      ft_map("clojure", "n", "lv", "conjure_log_vsplit")
-      ft_map("clojure", "n", "ee", "conjure_eval_current_form")
-      ft_map("clojure", "n", "er", "conjure_eval_root_form")
-      return nvim.ex.augroup("END")
+    local function on_filetype0()
+      map_local__3eplug("ls", "conjure_log_split")
+      map_local__3eplug("lv", "conjure_log_vsplit")
+      map_local__3eplug("ee", "conjure_eval_current_form")
+      return map_local__3eplug("er", "conjure_eval_root_form")
     end
-    v_23_0_0 = init0
-    _0_0["init"] = v_23_0_0
+    v_23_0_0 = on_filetype0
+    _0_0["on-filetype"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
-  _0_0["aniseed/locals"]["init"] = v_23_0_
-  init = v_23_0_
+  _0_0["aniseed/locals"]["on-filetype"] = v_23_0_
+  on_filetype = v_23_0_
+end
+local setup_filetypes = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function setup_filetypes0(filetypes)
+      nvim.ex.augroup("conjure_init_filetypes")
+      nvim.ex.autocmd_()
+      nvim.ex.autocmd("FileType", str.join(",", filetypes), viml__3elua("conjure.mapping", "on-filetype"))
+      return nvim.ex.augroup("END")
+    end
+    v_23_0_0 = setup_filetypes0
+    _0_0["setup-filetypes"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["setup-filetypes"] = v_23_0_
+  setup_filetypes = v_23_0_
+end
+local setup_plug_mappings = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function setup_plug_mappings0(filetypes)
+      map_plug("conjure_log_split", "conjure.log", "split")
+      map_plug("conjure_log_vsplit", "conjure.log", "vsplit")
+      map_plug("conjure_eval_current_form", "conjure.eval", "current-form")
+      return map_plug("conjure_eval_root_form", "conjure.eval", "root-form")
+    end
+    v_23_0_0 = setup_plug_mappings0
+    _0_0["setup-plug-mappings"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["setup-plug-mappings"] = v_23_0_
+  setup_plug_mappings = v_23_0_
 end
 return nil

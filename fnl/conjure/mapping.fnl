@@ -1,51 +1,42 @@
 (module conjure.mapping
   {require {nvim conjure.aniseed.nvim
-            nu conjure.aniseed.nvim.util}})
+            str conjure.aniseed.string}})
 
-;; I need an augroup that fires for known filetypes, setting up their mappings.
-;; The augroup needs to be updated as and when the supported langs are set.
-;; I think they'll still map to conjure.eval modules etc but those modules will
-;; delegate to language specific modules.
+(defn- viml->lua [m f]
+  (.. "lua require('" m "')['" f "']()"))
 
-(defn- ft-map [ft mode from to]
-  (nvim.ex.autocmd
-    :FileType ft
-    (.. mode :map) :<buffer>
-    (.. :<localleader> from)
-    (.. "<Plug>(" to ")")))
+(defn- plug [name]
+  (.. "<Plug>(" name ")"))
 
-(defn init []
+(defn- map-plug [name m f]
   (nvim.set_keymap
-    :n "<Plug>(conjure_log_split)"
-    ":lua require('conjure.log').split()<cr>"
+    :n (plug name)
+    (.. ":" (viml->lua m f) "<cr>")
     {:noremap true
-     :silent true})
+     :silent true}))
 
-  (nvim.set_keymap
-    :n "<Plug>(conjure_log_vsplit)"
-    ":lua require('conjure.log').vsplit()<cr>"
-    {:noremap true
-     :silent true})
+(defn- map-local->plug [keys name]
+  (nvim.buf_set_keymap
+    0 :n (.. :<localleader> keys)
+    (plug name)
+    {:silent true}))
 
-  (nvim.set_keymap
-    :n "<Plug>(conjure_eval_current_form)"
-    ":lua require('conjure.eval')['current-form']()<cr>"
-    {:noremap true
-     :silent true})
+(defn on-filetype []
+  (map-local->plug :ls :conjure_log_split)
+  (map-local->plug :lv :conjure_log_vsplit)
+  (map-local->plug :ee :conjure_eval_current_form)
+  (map-local->plug :er :conjure_eval_root_form))
 
-  (nvim.set_keymap
-    :n "<Plug>(conjure_eval_root_form)"
-    ":lua require('conjure.eval')['root-form']()<cr>"
-    {:noremap true
-     :silent true})
-
-  ;; TODO Optional and configurable.
-  ;; TODO Clojure specific mappings but make eval generic.
-  ;; Need a module that handles dispatching code to the right places.
-  (nvim.ex.augroup :conjure)
+(defn setup-filetypes [filetypes]
+  (nvim.ex.augroup :conjure_init_filetypes)
   (nvim.ex.autocmd_)
-  (ft-map :clojure :n :ls :conjure_log_split)
-  (ft-map :clojure :n :lv :conjure_log_vsplit)
-  (ft-map :clojure :n :ee :conjure_eval_current_form)
-  (ft-map :clojure :n :er :conjure_eval_root_form)
+  (nvim.ex.autocmd
+    :FileType (str.join "," filetypes)
+    (viml->lua :conjure.mapping :on-filetype))
   (nvim.ex.augroup :END))
+
+(defn setup-plug-mappings [filetypes]
+  (map-plug :conjure_log_split :conjure.log :split)
+  (map-plug :conjure_log_vsplit :conjure.log :vsplit)
+  (map-plug :conjure_eval_current_form :conjure.eval :current-form)
+  (map-plug :conjure_eval_root_form :conjure.eval :root-form))

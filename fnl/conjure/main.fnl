@@ -1,5 +1,7 @@
 (module conjure.main
-  {require {mapping conjure.mapping}})
+  {require {mapping conjure.mapping
+            config conjure.config}})
 
 (defn main []
-  (mapping.init))
+  (mapping.setup-plug-mappings)
+  (mapping.setup-filetypes (config.filetypes)))
