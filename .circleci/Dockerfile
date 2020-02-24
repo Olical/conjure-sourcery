@@ -1,4 +1,7 @@
-FROM archlinux/base
+FROM cimg/base:2020.01
 
-RUN pacman -Sy --noconfirm git openssh tar gzip ca-certificates make netcat rlwrap
-RUN pacman -Sy --noconfirm neovim clojure
+RUN mkdir -p ~/bin
+RUN curl -L https://github.com/neovim/neovim/releases/download/v0.4.3/nvim.appimage -o nvim.appimage
+RUN chmod +x ./nvim.appimage
+RUN ./nvim.appimage --appimage-extract
+RUN ln -s ~/project/squashfs-root/usr/bin/nvim ~/bin/nvim 

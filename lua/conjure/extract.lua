@@ -117,7 +117,7 @@ do
         end
         flags = ("Wnz" .. _5_())
         local cursor_char = current_char()
-        local skip_match_3f_viml = "luaeval(\"package.loaded['conjure.extract']['skip-match?']()\")"
+        local skip_match_3f_viml = "luaeval(\"require('conjure.extract')['skip-match?']()\")"
         local start = nil
         local function _6_()
           if (cursor_char == "(") then

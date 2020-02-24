@@ -28,12 +28,6 @@
      :silent true})
 
   (nvim.set_keymap
-    :n "<Plug>(conjure_prepl_sync)"
-    ":lua require('conjure.prepl').sync()<cr>"
-    {:noremap true
-     :silent true})
-
-  (nvim.set_keymap
     :n "<Plug>(conjure_eval_current_form)"
     ":lua require('conjure.eval')['current-form']()<cr>"
     {:noremap true

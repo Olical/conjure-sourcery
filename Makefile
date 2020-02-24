@@ -1,4 +1,4 @@
-.PHONY: deps compile test prepls
+.PHONY: deps compile test
 
 deps:
 	scripts/dep.sh Olical aniseed v3.0.0
@@ -11,10 +11,4 @@ compile:
 
 test:
 	rm -rf test/lua
-	make prepl &
-	while [ ! -f .prepl-port ]; do sleep 0.2; done
 	PREFIX="-c 'syntax on'" deps/aniseed/scripts/test.sh
-	echo "(System/exit 0)" | netcat localhost $$(cat .prepl-port)
-
-prepl:
-	clj -m propel.main -w

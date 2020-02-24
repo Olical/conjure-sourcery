@@ -15,12 +15,11 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {mapping = "conjure.mapping", prepl = "conjure.prepl"}}
-  return {require("conjure.mapping"), require("conjure.prepl")}
+  _0_0["aniseed/local-fns"] = {require = {mapping = "conjure.mapping"}}
+  return {require("conjure.mapping")}
 end
 local _2_ = _1_(...)
 local mapping = _2_[1]
-local prepl = _2_[2]
 do local _ = ({nil, _0_0, nil})[2] end
 local main = nil
 do
@@ -28,8 +27,7 @@ do
   do
     local v_23_0_0 = nil
     local function main0()
-      mapping.init()
-      return prepl.sync()
+      return mapping.init()
     end
     v_23_0_0 = main0
     _0_0["main"] = v_23_0_0
