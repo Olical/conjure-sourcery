@@ -1,6 +1,6 @@
 local _0_0 = nil
 do
-  local name_23_0_ = "conjure.langs.fennel"
+  local name_23_0_ = "conjure.lang"
   local loaded_23_0_ = package.loaded[name_23_0_]
   local module_23_0_ = nil
   if ("table" == type(loaded_23_0_)) then
@@ -19,4 +19,16 @@ local function _1_(...)
   return {}
 end
 local _2_ = _1_(...)
-return ({nil, _0_0, nil})[2]
+do local _ = ({nil, _0_0, nil})[2] end
+local current = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    _0_0["current"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["current"] = v_23_0_
+  current = v_23_0_
+end
+return nil

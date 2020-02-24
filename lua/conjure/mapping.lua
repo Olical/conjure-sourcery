@@ -15,12 +15,14 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string"}}
-  return {require("conjure.aniseed.nvim"), require("conjure.aniseed.string")}
+  _0_0["aniseed/local-fns"] = {require = {config = "conjure.config", lang = "conjure.lang", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string"}}
+  return {require("conjure.config"), require("conjure.lang"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string")}
 end
 local _2_ = _1_(...)
-local nvim = _2_[1]
-local str = _2_[2]
+local config = _2_[1]
+local lang = _2_[2]
+local nvim = _2_[3]
+local str = _2_[4]
 do local _ = ({nil, _0_0, nil})[2] end
 local viml__3elua = nil
 do
@@ -71,7 +73,9 @@ do
       map_local__3eplug("ls", "conjure_log_split")
       map_local__3eplug("lv", "conjure_log_vsplit")
       map_local__3eplug("ee", "conjure_eval_current_form")
-      return map_local__3eplug("er", "conjure_eval_root_form")
+      map_local__3eplug("er", "conjure_eval_root_form")
+      lang.current = require(config["filetype->module-name"](nvim.bo.filetype))
+      return nil
     end
     v_23_0_0 = on_filetype0
     _0_0["on-filetype"] = v_23_0_0

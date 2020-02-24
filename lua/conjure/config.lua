@@ -26,7 +26,7 @@ local core = nil
 do
   local v_23_0_ = nil
   do
-    local v_23_0_0 = {langs = {clojure = "conjure.langs.clojure", fennel = "conjure.langs.fennel"}}
+    local v_23_0_0 = {langs = {clojure = "conjure.lang.clojure", fennel = "conjure.lang.fennel"}}
     _0_0["core"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
@@ -47,5 +47,20 @@ do
   end
   _0_0["aniseed/locals"]["filetypes"] = v_23_0_
   filetypes = v_23_0_
+end
+local filetype__3emodule_name = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function filetype__3emodule_name0(filetype)
+      return core.langs[filetype]
+    end
+    v_23_0_0 = filetype__3emodule_name0
+    _0_0["filetype->module-name"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["filetype->module-name"] = v_23_0_
+  filetype__3emodule_name = v_23_0_
 end
 return nil

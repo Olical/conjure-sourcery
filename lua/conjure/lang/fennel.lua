@@ -1,6 +1,6 @@
 local _0_0 = nil
 do
-  local name_23_0_ = "conjure.langs.clojure"
+  local name_23_0_ = "conjure.lang.fennel"
   local loaded_23_0_ = package.loaded[name_23_0_]
   local module_23_0_ = nil
   if ("table" == type(loaded_23_0_)) then
@@ -15,8 +15,25 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {}
-  return {}
+  _0_0["aniseed/local-fns"] = {require = {["ani-eval"] = "aniseed.eval"}}
+  return {require("aniseed.eval")}
 end
 local _2_ = _1_(...)
-return ({nil, _0_0, nil})[2]
+local ani_eval = _2_[1]
+do local _ = ({nil, _0_0, nil})[2] end
+local eval = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function eval0(code)
+      return ani_eval.str(code)
+    end
+    v_23_0_0 = eval0
+    _0_0["eval"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["eval"] = v_23_0_
+  eval = v_23_0_
+end
+return nil
