@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: olical/conjure-sourcery-circleci:0.0.2
+      - image: olical/conjure-sourcery-circleci:0.0.3
     steps:
       - checkout
       - run: make deps
