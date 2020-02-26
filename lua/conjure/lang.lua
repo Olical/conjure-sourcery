@@ -42,13 +42,39 @@ do
   _0_0["aniseed/locals"]["safe-require"] = v_23_0_
   safe_require = v_23_0_
 end
+local overrides = nil
+do
+  local v_23_0_ = {}
+  _0_0["aniseed/locals"]["overrides"] = v_23_0_
+  overrides = v_23_0_
+end
+local with_filetype = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function with_filetype0(ft, f)
+      overrides["filetype"] = ft
+      do
+        local result = f()
+        overrides["filetype"] = nil
+        return result
+      end
+    end
+    v_23_0_0 = with_filetype0
+    _0_0["with-filetype"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["with-filetype"] = v_23_0_
+  with_filetype = v_23_0_
+end
 local current = nil
 do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
     local function current0()
-      local ft = nvim.bo.filetype
+      local ft = (overrides.filetype or nvim.bo.filetype)
       local mod_name = config["filetype->module-name"](ft)
       if mod_name then
         return safe_require(mod_name)

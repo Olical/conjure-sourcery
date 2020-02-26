@@ -12,8 +12,17 @@
       result
       (nvim.err_writeln result))))
 
+;; TODO Fix defonce in Aniseed and use that here.
+(def- overrides {})
+
+(defn with-filetype [ft f]
+  (tset overrides :filetype ft)
+  (let [result (f)]
+    (tset overrides :filetype nil)
+    result))
+
 (defn current []
-  (let [ft nvim.bo.filetype
+  (let [ft (or overrides.filetype nvim.bo.filetype)
         mod-name (config.filetype->module-name ft)]
     (if mod-name
       (safe-require mod-name)
