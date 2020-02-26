@@ -8,15 +8,8 @@
 (def log-buf-name (.. "conjure-" (nvim.fn.getpid) ".fnl"))
 (def welcome-message [";; Welcome to Conjure, let's write some Fennel!"])
 
-; local function split(str,pat)
-;    local tbl = {}
-;    str:gsub(pat, function(x) tbl[#tbl+1]=x end)
-;    return tbl
-; end
-
 ;; TODO Split safe module loading into something reusable.
 ;; TODO Use safe load to try and load Aniseed. Use built in if not there.
-;; TODO Load multiple langs at a time, worth it?
 
 (defn- display-eval-result [ok? result]
   ;; TODO Split result into lines.

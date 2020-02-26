@@ -3,17 +3,14 @@
             nvim conjure.aniseed.nvim
             lang conjure.lang}})
 
-(defn- buf-name []
-  lang.current.log-buf-name)
-
 (defn- unlist [buf]
   (nvim.buf_set_option buf :buflisted false))
 
 (defn- upsert-buf []
-  (let [buf (nvim.fn.bufnr (buf-name))]
+  (let [buf (nvim.fn.bufnr (lang.get :log-buf-name))]
     (if (= -1 buf)
-      (let [buf (nvim.fn.bufadd (buf-name))]
-        (nvim.buf_set_lines buf 0 1 false lang.current.welcome-message)
+      (let [buf (nvim.fn.bufadd (lang.get :log-buf-name))]
+        (nvim.buf_set_lines buf 0 1 false (lang.get :welcome-message))
         (nvim.buf_set_option buf :buftype :nofile)
         (nvim.buf_set_option buf :bufhidden :hide)
         (nvim.buf_set_option buf :swapfile false)
@@ -42,7 +39,7 @@
 (defn- create-win [split-fn]
   (let [buf (upsert-buf)]
     (nvim.win_set_cursor
-      (split-fn (buf-name))
+      (split-fn (lang.get :log-buf-name))
       [(nvim.buf_line_count buf) 0])
     (unlist buf)))
 

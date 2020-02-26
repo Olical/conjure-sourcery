@@ -5,9 +5,9 @@
 (defn current-form []
   (-> (extract.form {})
       (. :content)
-      (lang.current.eval)))
+      (->> (lang.call :eval))))
 
 (defn root-form []
   (-> (extract.form {:root? true})
       (. :content)
-      (lang.current.eval)))
+      (->> (lang.call :eval))))

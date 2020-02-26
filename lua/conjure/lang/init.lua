@@ -15,32 +15,90 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {}
-  return {}
+  _0_0["aniseed/local-fns"] = {require = {config = "conjure.config", fennel = "conjure.aniseed.fennel", nvim = "conjure.aniseed.nvim"}}
+  return {require("conjure.config"), require("conjure.aniseed.fennel"), require("conjure.aniseed.nvim")}
 end
 local _2_ = _1_(...)
+local config = _2_[1]
+local fennel = _2_[2]
+local nvim = _2_[3]
 do local _ = ({nil, _0_0, nil})[2] end
-local print_warning = nil
+local safe_require = nil
 do
   local v_23_0_ = nil
-  local function print_warning0()
-    return print("No Conjure language selected.")
-  end
-  v_23_0_ = print_warning0
-  _0_0["aniseed/locals"]["print-warning"] = v_23_0_
-  print_warning = v_23_0_
-end
-if not _0_0.current then
-  local current = nil
-  do
-    local v_23_0_ = nil
-    do
-      local v_23_0_0 = {eval = print_warning}
-      _0_0["current"] = v_23_0_0
-      v_23_0_ = v_23_0_0
+  local function safe_require0(name)
+    local ok_3f, result = nil, nil
+    local function _3_()
+      return require(name)
     end
-    _0_0["aniseed/locals"]["current"] = v_23_0_
-    current = v_23_0_
+    ok_3f, result = xpcall(_3_, fennel.traceback)
+    if ok_3f then
+      return result
+    else
+      return nvim.err_writeln(result)
+    end
   end
-  return nil
+  v_23_0_ = safe_require0
+  _0_0["aniseed/locals"]["safe-require"] = v_23_0_
+  safe_require = v_23_0_
 end
+local current = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function current0()
+      local ft = nvim.bo.filetype
+      local mod_name = config["filetype->module-name"](ft)
+      if mod_name then
+        return safe_require(mod_name)
+      else
+        return nvim.err_writeln(("No Conjure language for filetype: " .. ft))
+      end
+    end
+    v_23_0_0 = current0
+    _0_0["current"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["current"] = v_23_0_
+  current = v_23_0_
+end
+local get = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function get0(k)
+      local _3_0 = current()
+      if _3_0 then
+        return _3_0[k]
+      else
+        return _3_0
+      end
+    end
+    v_23_0_0 = get0
+    _0_0["get"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["get"] = v_23_0_
+  get = v_23_0_
+end
+local call = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function call0(fn_name, ...)
+      local f = get(fn_name)
+      if f then
+        return f(...)
+      end
+    end
+    v_23_0_0 = call0
+    _0_0["call"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["call"] = v_23_0_
+  call = v_23_0_
+end
+return nil
