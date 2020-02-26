@@ -1,6 +1,7 @@
 (module conjure.mapping
   {require {nvim conjure.aniseed.nvim
-            str conjure.aniseed.string}})
+            str conjure.aniseed.string
+            config conjure.config}})
 
 (defn- viml->lua [m f]
   (.. "lua require('" m "')['" f "']()"))
@@ -17,15 +18,19 @@
 
 (defn- map-local->plug [keys name]
   (nvim.buf_set_keymap
-    0 :n (.. :<localleader> keys)
+    0 :n (.. config.mappings.prefix keys)
     (plug name)
     {:silent true}))
 
 (defn on-filetype []
-  (map-local->plug :ls :conjure_log_split)
-  (map-local->plug :lv :conjure_log_vsplit)
-  (map-local->plug :ee :conjure_eval_current_form)
-  (map-local->plug :er :conjure_eval_root_form))
+  (map-local->plug
+    config.mappings.log-split :conjure_log_split)
+  (map-local->plug
+    config.mappings.log-vsplit :conjure_log_vsplit)
+  (map-local->plug
+    config.mappings.eval-current-form :conjure_eval_current_form)
+  (map-local->plug
+   config.mappings.eval-root-form :conjure_eval_root_form))
 
 (defn setup-filetypes [filetypes]
   (nvim.ex.augroup :conjure_init_filetypes)

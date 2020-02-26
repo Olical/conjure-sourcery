@@ -1,13 +1,19 @@
 (module conjure.config
-  {require {ani conjure.aniseed.core
-            mapping conjure.mapping}})
+  {require {ani conjure.aniseed.core}})
 
-(def core
-  {:langs {:clojure :conjure.lang.clojure
-           :fennel :conjure.lang.fennel}})
+(def langs
+  {:clojure :conjure.lang.clojure
+   :fennel :conjure.lang.fennel})
+
+(def mappings
+  {:prefix "<localleader>"
+   :log-split "ls"
+   :log-vsplit "lv"
+   :eval-current-form "ee"
+   :eval-root-form "er"})
 
 (defn filetypes []
-  (ani.keys core.langs))
+  (ani.keys langs))
 
 (defn filetype->module-name [filetype]
-  (. core.langs filetype))
+  (. langs filetype))

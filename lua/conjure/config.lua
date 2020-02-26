@@ -15,23 +15,33 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {ani = "conjure.aniseed.core", mapping = "conjure.mapping"}}
-  return {require("conjure.aniseed.core"), require("conjure.mapping")}
+  _0_0["aniseed/local-fns"] = {require = {ani = "conjure.aniseed.core"}}
+  return {require("conjure.aniseed.core")}
 end
 local _2_ = _1_(...)
 local ani = _2_[1]
-local mapping = _2_[2]
 do local _ = ({nil, _0_0, nil})[2] end
-local core = nil
+local langs = nil
 do
   local v_23_0_ = nil
   do
-    local v_23_0_0 = {langs = {clojure = "conjure.lang.clojure", fennel = "conjure.lang.fennel"}}
-    _0_0["core"] = v_23_0_0
+    local v_23_0_0 = {clojure = "conjure.lang.clojure", fennel = "conjure.lang.fennel"}
+    _0_0["langs"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
-  _0_0["aniseed/locals"]["core"] = v_23_0_
-  core = v_23_0_
+  _0_0["aniseed/locals"]["langs"] = v_23_0_
+  langs = v_23_0_
+end
+local mappings = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = {["eval-current-form"] = "ee", ["eval-root-form"] = "er", ["log-split"] = "ls", ["log-vsplit"] = "lv", prefix = "<localleader>"}
+    _0_0["mappings"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["mappings"] = v_23_0_
+  mappings = v_23_0_
 end
 local filetypes = nil
 do
@@ -39,7 +49,7 @@ do
   do
     local v_23_0_0 = nil
     local function filetypes0()
-      return ani.keys(core.langs)
+      return ani.keys(langs)
     end
     v_23_0_0 = filetypes0
     _0_0["filetypes"] = v_23_0_0
@@ -54,7 +64,7 @@ do
   do
     local v_23_0_0 = nil
     local function filetype__3emodule_name0(filetype)
-      return core.langs[filetype]
+      return langs[filetype]
     end
     v_23_0_0 = filetype__3emodule_name0
     _0_0["filetype->module-name"] = v_23_0_0

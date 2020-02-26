@@ -68,7 +68,6 @@ do
   _0_0["aniseed/locals"]["with-filetype"] = v_23_0_
   with_filetype = v_23_0_
 end
-              -- (require-macros conjure.aniseed.macros)
 local current = nil
 do
   local v_23_0_ = nil
