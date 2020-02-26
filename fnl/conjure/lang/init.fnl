@@ -1,3 +1,7 @@
 (module conjure.lang)
 
-(def current nil)
+(defn- print-warning []
+  (print "No Conjure language selected."))
+
+(defonce current
+  {:eval print-warning})

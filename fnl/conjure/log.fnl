@@ -1,15 +1,16 @@
 (module conjure.log
   {require {ani conjure.aniseed.core
-            nvim conjure.aniseed.nvim}})
+            nvim conjure.aniseed.nvim
+            lang conjure.lang}})
 
-;; TODO The name / filetype should depend on the language we're working with.
-(def- log-buf-name (.. (nvim.fn.tempname) "_conjure.cljc"))
+(defn- buf-name []
+  lang.current.log-buf-name)
 
 (defn- upsert-buf []
-  (let [buf (nvim.fn.bufnr log-buf-name)]
+  (let [buf (nvim.fn.bufnr (buf-name))]
     (if (= -1 buf)
-      (let [buf (nvim.fn.bufadd log-buf-name)]
-        (nvim.buf_set_lines buf 0 1 false [";; Welcome to Conjure!"])
+      (let [buf (nvim.fn.bufadd (buf-name))]
+        (nvim.buf_set_lines buf 0 1 false lang.current.welcome-message)
         (nvim.buf_set_option buf :buftype :nofile)
         (nvim.buf_set_option buf :bufhidden :hide)
         (nvim.buf_set_option buf :swapfile false)
@@ -38,7 +39,7 @@
 (defn- create-win [split-fn]
   (let [buf (upsert-buf)]
     (nvim.win_set_cursor
-      (split-fn log-buf-name)
+      (split-fn (buf-name))
       [(nvim.buf_line_count buf) 0])))
 
 (defn split []

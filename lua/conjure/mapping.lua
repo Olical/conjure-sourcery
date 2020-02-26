@@ -15,14 +15,15 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {config = "conjure.config", lang = "conjure.lang", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string"}}
-  return {require("conjure.config"), require("conjure.lang"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string")}
+  _0_0["aniseed/local-fns"] = {require = {config = "conjure.config", fennel = "conjure.aniseed.fennel", lang = "conjure.lang", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string"}}
+  return {require("conjure.config"), require("conjure.aniseed.fennel"), require("conjure.lang"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string")}
 end
 local _2_ = _1_(...)
 local config = _2_[1]
-local lang = _2_[2]
-local nvim = _2_[3]
-local str = _2_[4]
+local fennel = _2_[2]
+local lang = _2_[3]
+local nvim = _2_[4]
+local str = _2_[5]
 do local _ = ({nil, _0_0, nil})[2] end
 local viml__3elua = nil
 do
@@ -64,6 +65,25 @@ do
   _0_0["aniseed/locals"]["map-local->plug"] = v_23_0_
   map_local__3eplug = v_23_0_
 end
+local safe_require = nil
+do
+  local v_23_0_ = nil
+  local function safe_require0(name)
+    local ok_3f, result = nil, nil
+    local function _3_()
+      return require(name)
+    end
+    ok_3f, result = xpcall(_3_, fennel.traceback)
+    if ok_3f then
+      return result
+    else
+      return nvim.err_writeln(result)
+    end
+  end
+  v_23_0_ = safe_require0
+  _0_0["aniseed/locals"]["safe-require"] = v_23_0_
+  safe_require = v_23_0_
+end
 local on_filetype = nil
 do
   local v_23_0_ = nil
@@ -74,7 +94,7 @@ do
       map_local__3eplug("lv", "conjure_log_vsplit")
       map_local__3eplug("ee", "conjure_eval_current_form")
       map_local__3eplug("er", "conjure_eval_root_form")
-      lang.current = require(config["filetype->module-name"](nvim.bo.filetype))
+      lang.current = safe_require(config["filetype->module-name"](nvim.bo.filetype))
       return nil
     end
     v_23_0_0 = on_filetype0

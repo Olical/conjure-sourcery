@@ -3,7 +3,11 @@
             lang conjure.lang}})
 
 (defn current-form []
-  (lang.current.eval (extract.form)))
+  (-> (extract.form {})
+      (. :content)
+      (lang.current.eval)))
 
 (defn root-form []
-  (lang.current.eval (extract.form {:root? true})))
+  (-> (extract.form {:root? true})
+      (. :content)
+      (lang.current.eval)))

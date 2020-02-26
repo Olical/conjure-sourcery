@@ -20,15 +20,27 @@ local function _1_(...)
 end
 local _2_ = _1_(...)
 do local _ = ({nil, _0_0, nil})[2] end
-local current = nil
+local print_warning = nil
 do
   local v_23_0_ = nil
-  do
-    local v_23_0_0 = nil
-    _0_0["current"] = v_23_0_0
-    v_23_0_ = v_23_0_0
+  local function print_warning0()
+    return print("No Conjure language selected.")
   end
-  _0_0["aniseed/locals"]["current"] = v_23_0_
-  current = v_23_0_
+  v_23_0_ = print_warning0
+  _0_0["aniseed/locals"]["print-warning"] = v_23_0_
+  print_warning = v_23_0_
 end
-return nil
+if not _0_0.current then
+  local current = nil
+  do
+    local v_23_0_ = nil
+    do
+      local v_23_0_0 = {eval = print_warning}
+      _0_0["current"] = v_23_0_0
+      v_23_0_ = v_23_0_0
+    end
+    _0_0["aniseed/locals"]["current"] = v_23_0_
+    current = v_23_0_
+  end
+  return nil
+end

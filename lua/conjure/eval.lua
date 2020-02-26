@@ -28,7 +28,7 @@ do
   do
     local v_23_0_0 = nil
     local function current_form0()
-      return lang.current.eval(extract.form())
+      return lang.current.eval(extract.form({}).content)
     end
     v_23_0_0 = current_form0
     _0_0["current-form"] = v_23_0_0
@@ -43,7 +43,7 @@ do
   do
     local v_23_0_0 = nil
     local function root_form0()
-      return lang.current.eval(extract.form({["root?"] = true}))
+      return lang.current.eval(extract.form({["root?"] = true}).content)
     end
     v_23_0_0 = root_form0
     _0_0["root-form"] = v_23_0_0

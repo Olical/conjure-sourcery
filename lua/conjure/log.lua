@@ -15,27 +15,32 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {ani = "conjure.aniseed.core", nvim = "conjure.aniseed.nvim"}}
-  return {require("conjure.aniseed.core"), require("conjure.aniseed.nvim")}
+  _0_0["aniseed/local-fns"] = {require = {ani = "conjure.aniseed.core", lang = "conjure.lang", nvim = "conjure.aniseed.nvim"}}
+  return {require("conjure.aniseed.core"), require("conjure.lang"), require("conjure.aniseed.nvim")}
 end
 local _2_ = _1_(...)
 local ani = _2_[1]
-local nvim = _2_[2]
+local lang = _2_[2]
+local nvim = _2_[3]
 do local _ = ({nil, _0_0, nil})[2] end
-local log_buf_name = nil
+local buf_name = nil
 do
-  local v_23_0_ = (nvim.fn.tempname() .. "_conjure.cljc")
-  _0_0["aniseed/locals"]["log-buf-name"] = v_23_0_
-  log_buf_name = v_23_0_
+  local v_23_0_ = nil
+  local function buf_name0()
+    return lang.current["log-buf-name"]
+  end
+  v_23_0_ = buf_name0
+  _0_0["aniseed/locals"]["buf-name"] = v_23_0_
+  buf_name = v_23_0_
 end
 local upsert_buf = nil
 do
   local v_23_0_ = nil
   local function upsert_buf0()
-    local buf = nvim.fn.bufnr(log_buf_name)
+    local buf = nvim.fn.bufnr(buf_name())
     if (-1 == buf) then
-      local buf0 = nvim.fn.bufadd(log_buf_name)
-      nvim.buf_set_lines(buf0, 0, 1, false, {";; Welcome to Conjure!"})
+      local buf0 = nvim.fn.bufadd(buf_name())
+      nvim.buf_set_lines(buf0, 0, 1, false, lang.current["welcome-message"])
       nvim.buf_set_option(buf0, "buftype", "nofile")
       nvim.buf_set_option(buf0, "bufhidden", "hide")
       nvim.buf_set_option(buf0, "swapfile", false)
@@ -83,7 +88,7 @@ do
   local v_23_0_ = nil
   local function create_win0(split_fn)
     local buf = upsert_buf()
-    return nvim.win_set_cursor(split_fn(log_buf_name), {nvim.buf_line_count(buf), 0})
+    return nvim.win_set_cursor(split_fn(buf_name()), {nvim.buf_line_count(buf), 0})
   end
   v_23_0_ = create_win0
   _0_0["aniseed/locals"]["create-win"] = v_23_0_

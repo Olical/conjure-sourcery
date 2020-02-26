@@ -1,6 +1,7 @@
 (module conjure.mapping
   {require {nvim conjure.aniseed.nvim
             str conjure.aniseed.string
+            fennel conjure.aniseed.fennel
             lang conjure.lang
             config conjure.config}})
 
@@ -23,6 +24,15 @@
     (plug name)
     {:silent true}))
 
+(defn- safe-require [name]
+  (let [(ok? result) (xpcall
+                       (fn []
+                         (require name))
+                       fennel.traceback)]
+    (if ok?
+      result
+      (nvim.err_writeln result))))
+
 (defn on-filetype []
   (map-local->plug :ls :conjure_log_split)
   (map-local->plug :lv :conjure_log_vsplit)
@@ -31,7 +41,7 @@
   (set lang.current
        (-> nvim.bo.filetype
            (config.filetype->module-name)
-           (require))))
+           (safe-require))))
 
 (defn setup-filetypes [filetypes]
   (nvim.ex.augroup :conjure_init_filetypes)
