@@ -44,7 +44,7 @@ do
 end
 local overrides = nil
 do
-  local v_23_0_ = {}
+  local v_23_0_ = (_0_0["aniseed/locals"].overrides or {})
   _0_0["aniseed/locals"]["overrides"] = v_23_0_
   overrides = v_23_0_
 end
@@ -54,10 +54,10 @@ do
   do
     local v_23_0_0 = nil
     local function with_filetype0(ft, f)
-      overrides["filetype"] = ft
+      overrides.filetype = ft
       do
         local result = f()
-        overrides["filetype"] = nil
+        overrides.filetype = nil
         return result
       end
     end
@@ -68,6 +68,7 @@ do
   _0_0["aniseed/locals"]["with-filetype"] = v_23_0_
   with_filetype = v_23_0_
 end
+              -- (require-macros conjure.aniseed.macros)
 local current = nil
 do
   local v_23_0_ = nil

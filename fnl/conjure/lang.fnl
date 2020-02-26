@@ -12,13 +12,12 @@
       result
       (nvim.err_writeln result))))
 
-;; TODO Fix defonce in Aniseed and use that here.
-(def- overrides {})
+(defonce- overrides {})
 
 (defn with-filetype [ft f]
-  (tset overrides :filetype ft)
+  (set overrides.filetype ft)
   (let [result (f)]
-    (tset overrides :filetype nil)
+    (set overrides.filetype nil)
     result))
 
 (defn current []

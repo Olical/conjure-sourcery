@@ -2,7 +2,10 @@
   {require {nvim conjure.aniseed.nvim
             ani conjure.aniseed.core
             str conjure.aniseed.string
-            ani-eval aniseed.eval
+
+            ;; TODO Swap to global one?
+            ani-eval conjure.aniseed.eval
+
             log conjure.log}})
 
 (def log-buf-name (.. "conjure-" (nvim.fn.getpid) ".fnl"))
