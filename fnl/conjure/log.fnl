@@ -6,6 +6,9 @@
 (defn- buf-name []
   lang.current.log-buf-name)
 
+(defn- unlist [buf]
+  (nvim.buf_set_option buf :buflisted false))
+
 (defn- upsert-buf []
   (let [buf (nvim.fn.bufnr (buf-name))]
     (if (= -1 buf)
@@ -14,7 +17,7 @@
         (nvim.buf_set_option buf :buftype :nofile)
         (nvim.buf_set_option buf :bufhidden :hide)
         (nvim.buf_set_option buf :swapfile false)
-        (nvim.buf_set_option buf :buflisted false)
+        (unlist buf)
         buf)
       buf)))
 
@@ -40,7 +43,8 @@
   (let [buf (upsert-buf)]
     (nvim.win_set_cursor
       (split-fn (buf-name))
-      [(nvim.buf_line_count buf) 0])))
+      [(nvim.buf_line_count buf) 0])
+    (unlist buf)))
 
 (defn split []
   (create-win nvim.ex.split))

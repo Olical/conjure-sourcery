@@ -33,6 +33,16 @@ do
   _0_0["aniseed/locals"]["buf-name"] = v_23_0_
   buf_name = v_23_0_
 end
+local unlist = nil
+do
+  local v_23_0_ = nil
+  local function unlist0(buf)
+    return nvim.buf_set_option(buf, "buflisted", false)
+  end
+  v_23_0_ = unlist0
+  _0_0["aniseed/locals"]["unlist"] = v_23_0_
+  unlist = v_23_0_
+end
 local upsert_buf = nil
 do
   local v_23_0_ = nil
@@ -44,7 +54,7 @@ do
       nvim.buf_set_option(buf0, "buftype", "nofile")
       nvim.buf_set_option(buf0, "bufhidden", "hide")
       nvim.buf_set_option(buf0, "swapfile", false)
-      nvim.buf_set_option(buf0, "buflisted", false)
+      unlist(buf0)
       return buf0
     else
       return buf
@@ -88,7 +98,8 @@ do
   local v_23_0_ = nil
   local function create_win0(split_fn)
     local buf = upsert_buf()
-    return nvim.win_set_cursor(split_fn(buf_name()), {nvim.buf_line_count(buf), 0})
+    nvim.win_set_cursor(split_fn(buf_name()), {nvim.buf_line_count(buf), 0})
+    return unlist(buf)
   end
   v_23_0_ = create_win0
   _0_0["aniseed/locals"]["create-win"] = v_23_0_
