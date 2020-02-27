@@ -30,7 +30,9 @@
   (map-local->plug
     config.mappings.eval-current-form :conjure_eval_current_form)
   (map-local->plug
-   config.mappings.eval-root-form :conjure_eval_root_form))
+   config.mappings.eval-root-form :conjure_eval_root_form)
+  (map-local->plug
+   config.mappings.eval-word :conjure_eval_word))
 
 (defn setup-filetypes [filetypes]
   (nvim.ex.augroup :conjure_init_filetypes)
@@ -44,4 +46,5 @@
   (map-plug :conjure_log_split :conjure.log :split)
   (map-plug :conjure_log_vsplit :conjure.log :vsplit)
   (map-plug :conjure_eval_current_form :conjure.eval :current-form)
-  (map-plug :conjure_eval_root_form :conjure.eval :root-form))
+  (map-plug :conjure_eval_root_form :conjure.eval :root-form)
+  (map-plug :conjure_eval_word :conjure.eval :word))

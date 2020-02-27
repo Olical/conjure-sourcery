@@ -70,3 +70,6 @@
       {:range {:start (ani.update start 2 ani.dec)
                :end (ani.update end 2 ani.dec)}
        :content (read-range start end)})))
+
+(defn word []
+  {:content (nvim.fn.expand "<cword>")})

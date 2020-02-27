@@ -36,7 +36,7 @@ local mappings = nil
 do
   local v_23_0_ = nil
   do
-    local v_23_0_0 = {["eval-current-form"] = "ee", ["eval-root-form"] = "er", ["log-split"] = "ls", ["log-vsplit"] = "lv", prefix = "<localleader>"}
+    local v_23_0_0 = {["eval-current-form"] = "ee", ["eval-root-form"] = "er", ["eval-word"] = "ew", ["log-split"] = "ls", ["log-vsplit"] = "lv", prefix = "<localleader>"}
     _0_0["mappings"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end

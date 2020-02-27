@@ -72,7 +72,8 @@ do
       map_local__3eplug(config.mappings["log-split"], "conjure_log_split")
       map_local__3eplug(config.mappings["log-vsplit"], "conjure_log_vsplit")
       map_local__3eplug(config.mappings["eval-current-form"], "conjure_eval_current_form")
-      return map_local__3eplug(config.mappings["eval-root-form"], "conjure_eval_root_form")
+      map_local__3eplug(config.mappings["eval-root-form"], "conjure_eval_root_form")
+      return map_local__3eplug(config.mappings["eval-word"], "conjure_eval_word")
     end
     v_23_0_0 = on_filetype0
     _0_0["on-filetype"] = v_23_0_0
@@ -108,7 +109,8 @@ do
       map_plug("conjure_log_split", "conjure.log", "split")
       map_plug("conjure_log_vsplit", "conjure.log", "vsplit")
       map_plug("conjure_eval_current_form", "conjure.eval", "current-form")
-      return map_plug("conjure_eval_root_form", "conjure.eval", "root-form")
+      map_plug("conjure_eval_root_form", "conjure.eval", "root-form")
+      return map_plug("conjure_eval_word", "conjure.eval", "word")
     end
     v_23_0_0 = setup_plug_mappings0
     _0_0["setup-plug-mappings"] = v_23_0_0

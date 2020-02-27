@@ -11,3 +11,17 @@
   (-> (extract.form {:root? true})
       (. :content)
       (->> (lang.call :eval))))
+
+(defn word []
+  (-> (extract.word)
+      (. :content)
+      (->> (lang.call :eval))))
+
+;; TODO file
+;; TODO buffer
+;; TODO selection
+;; TODO range (same as selection?)
+;; TODO given string
+;; TODO motion
+
+;; TODO Lang specific: Tests in Aniseed + config for mapping.

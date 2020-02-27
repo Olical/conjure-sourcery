@@ -148,4 +148,19 @@ do
   _0_0["aniseed/locals"]["form"] = v_23_0_
   form = v_23_0_
 end
+local word = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function word0()
+      return {content = nvim.fn.expand("<cword>")}
+    end
+    v_23_0_0 = word0
+    _0_0["word"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["word"] = v_23_0_
+  word = v_23_0_
+end
 return nil

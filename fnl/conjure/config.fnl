@@ -10,7 +10,8 @@
    :log-split "ls"
    :log-vsplit "lv"
    :eval-current-form "ee"
-   :eval-root-form "er"})
+   :eval-root-form "er"
+   :eval-word "ew"})
 
 (defn filetypes []
   (ani.keys langs))
