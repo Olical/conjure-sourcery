@@ -72,4 +72,7 @@
        :content (read-range start end)})))
 
 (defn word []
-  {:content (nvim.fn.expand "<cword>")})
+  (nvim.fn.expand "<cword>"))
+
+(defn file-path []
+  (nvim.fn.expand "%:p"))

@@ -5,22 +5,29 @@
 (defn current-form []
   (-> (extract.form {})
       (. :content)
-      (->> (lang.call :eval))))
+      (->> (lang.call :eval-str)
+           (lang.call :display-result))))
 
 (defn root-form []
   (-> (extract.form {:root? true})
       (. :content)
-      (->> (lang.call :eval))))
+      (->> (lang.call :eval-str)
+           (lang.call :display-result))))
 
 (defn word []
-  (-> (extract.word)
-      (. :content)
-      (->> (lang.call :eval))))
+  (->> (extract.word)
+       (lang.call :eval-str)
+       (lang.call :display-result)))
+
+(defn file []
+  (->> (extract.file-path)
+       (lang.call :eval-file)
+       (lang.call :display-result)))
 
 ;; TODO file
 ;; TODO buffer
 ;; TODO selection
-;; TODO range (same as selection?)
+;; TODO range (maybe like selection but %ConjureEval will be good)
 ;; TODO given string
 ;; TODO motion
 

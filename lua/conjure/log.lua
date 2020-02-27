@@ -40,7 +40,7 @@ do
     local buf = nvim.fn.bufnr(lang.get("log-buf-name"))
     if (-1 == buf) then
       local buf0 = nvim.fn.bufadd(lang.get("log-buf-name"))
-      nvim.buf_set_lines(buf0, 0, 1, false, lang.get("welcome-message"))
+      nvim.buf_set_lines(buf0, 0, 1, false, lang.get("greeting-lines"))
       nvim.buf_set_option(buf0, "buftype", "nofile")
       nvim.buf_set_option(buf0, "bufhidden", "hide")
       nvim.buf_set_option(buf0, "swapfile", false)

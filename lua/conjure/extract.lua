@@ -154,7 +154,7 @@ do
   do
     local v_23_0_0 = nil
     local function word0()
-      return {content = nvim.fn.expand("<cword>")}
+      return nvim.fn.expand("<cword>")
     end
     v_23_0_0 = word0
     _0_0["word"] = v_23_0_0
@@ -162,5 +162,20 @@ do
   end
   _0_0["aniseed/locals"]["word"] = v_23_0_
   word = v_23_0_
+end
+local file_path = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function file_path0()
+      return nvim.fn.expand("%:p")
+    end
+    v_23_0_0 = file_path0
+    _0_0["file-path"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["file-path"] = v_23_0_
+  file_path = v_23_0_
 end
 return nil

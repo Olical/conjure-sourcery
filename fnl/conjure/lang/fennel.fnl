@@ -2,20 +2,29 @@
   {require {nvim conjure.aniseed.nvim
             ani conjure.aniseed.core
             str conjure.aniseed.string
-
-            ;; TODO Swap to global one?
-            ani-eval conjure.aniseed.eval
-
+            ani-eval aniseed.eval
             log conjure.log}})
 
-(def log-buf-name (.. "conjure-" (nvim.fn.getpid) ".fnl"))
-(def welcome-message [";; Welcome to Conjure, let's write some Fennel!"])
+(def log-buf-name (.. "conjure-aniseed-" (nvim.fn.getpid) ".fnl"))
+(def greeting-lines
+  [";; Welcome to Conjure, let's write some Fennel!"])
 
-;; TODO Split safe module loading into something reusable.
-;; TODO Use safe load to try and load Aniseed. Use built in if not there.
+(def- buf-header-length 20)
+(def- default-module-name "aniseed.user")
+(def- buf-module-pattern "[(]%s*module%s*(.-)[%s){]")
+(defn- buf-module-name []
+  (let [header (->> (nvim.buf_get_lines 0 0 buf-header-length false)
+                    (str.join "\n"))]
+    (or (string.match header buf-module-pattern)
+        default-module-name)))
 
-(defn- display-eval-result [ok? result]
-  ;; TODO Split result into lines.
+(defn eval-str [code]
+  (let [(ok? result) (-> (.. "(module " (buf-module-name) ")" code)
+                         (ani-eval.str))]
+    {:ok? ok?
+     :result result}))
+
+(defn display-result [{: ok? : result}]
   (let [result-str (if ok?
                      (ani.pr-str result)
                      result)
@@ -27,17 +36,3 @@
     (nvim.out_write
       (.. result-str
           "\n"))))
-
-(def- buffer-header-length 20)
-(def- default-module-name "aniseed.user")
-(def- buffer-module-pattern "[(]%s*module%s*(.-)[%s){]")
-(defn- buffer-module-name []
-  (let [header (->> (nvim.buf_get_lines 0 0 buffer-header-length false)
-                    (str.join "\n"))]
-    (or (string.match header buffer-module-pattern)
-        default-module-name)))
-
-(defn eval [code]
-  (-> (.. "(module " (buffer-module-name) ")" code)
-      (ani-eval.str)
-      (display-eval-result)))

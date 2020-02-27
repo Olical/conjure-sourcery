@@ -28,7 +28,7 @@ do
   do
     local v_23_0_0 = nil
     local function current_form0()
-      return lang.call("eval", extract.form({}).content)
+      return lang.call("display-result", lang.call("eval-str", extract.form({}).content))
     end
     v_23_0_0 = current_form0
     _0_0["current-form"] = v_23_0_0
@@ -43,7 +43,7 @@ do
   do
     local v_23_0_0 = nil
     local function root_form0()
-      return lang.call("eval", extract.form({["root?"] = true}).content)
+      return lang.call("display-result", lang.call("eval-str", extract.form({["root?"] = true}).content))
     end
     v_23_0_0 = root_form0
     _0_0["root-form"] = v_23_0_0
@@ -58,7 +58,7 @@ do
   do
     local v_23_0_0 = nil
     local function word0()
-      return lang.call("eval", extract.word().content)
+      return lang.call("display-result", lang.call("eval-str", extract.word()))
     end
     v_23_0_0 = word0
     _0_0["word"] = v_23_0_0
@@ -66,5 +66,20 @@ do
   end
   _0_0["aniseed/locals"]["word"] = v_23_0_
   word = v_23_0_
+end
+local file = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function file0()
+      return lang.call("display-result", lang.call("eval-file", extract["file-path"]()))
+    end
+    v_23_0_0 = file0
+    _0_0["file"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["file"] = v_23_0_
+  file = v_23_0_
 end
 return nil

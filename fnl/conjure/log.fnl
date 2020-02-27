@@ -10,7 +10,7 @@
   (let [buf (nvim.fn.bufnr (lang.get :log-buf-name))]
     (if (= -1 buf)
       (let [buf (nvim.fn.bufadd (lang.get :log-buf-name))]
-        (nvim.buf_set_lines buf 0 1 false (lang.get :welcome-message))
+        (nvim.buf_set_lines buf 0 1 false (lang.get :greeting-lines))
         (nvim.buf_set_option buf :buftype :nofile)
         (nvim.buf_set_option buf :bufhidden :hide)
         (nvim.buf_set_option buf :swapfile false)
