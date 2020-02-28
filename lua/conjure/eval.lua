@@ -82,4 +82,19 @@ do
   _0_0["aniseed/locals"]["file"] = v_23_0_
   file = v_23_0_
 end
+local buf = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function buf0()
+      return lang.call("display-result", lang.call("eval-str", extract.buf()))
+    end
+    v_23_0_0 = buf0
+    _0_0["buf"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["buf"] = v_23_0_
+  buf = v_23_0_
+end
 return nil

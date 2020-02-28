@@ -76,3 +76,6 @@
 
 (defn file-path []
   (nvim.fn.expand "%:p"))
+
+(defn buf []
+  (str.join "\n" (nvim.buf_get_lines 0 0 -1 false)))

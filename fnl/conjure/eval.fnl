@@ -24,8 +24,11 @@
        (lang.call :eval-file)
        (lang.call :display-result)))
 
-;; TODO file
-;; TODO buffer
+(defn buf []
+  (->> (extract.buf)
+       (lang.call :eval-str)
+       (lang.call :display-result)))
+
 ;; TODO selection
 ;; TODO range (maybe like selection but %ConjureEval will be good)
 ;; TODO given string

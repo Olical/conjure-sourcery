@@ -11,7 +11,9 @@
    :log-vsplit "lv"
    :eval-current-form "ee"
    :eval-root-form "er"
-   :eval-word "ew"})
+   :eval-word "ew"
+   :eval-file "ef"
+   :eval-buf "eb"})
 
 (defn filetypes []
   (ani.keys langs))

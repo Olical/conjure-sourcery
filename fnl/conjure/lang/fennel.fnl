@@ -18,11 +18,16 @@
     (or (string.match header buf-module-pattern)
         default-module-name)))
 
-(defn eval-str [code]
-  (let [(ok? result) (-> (.. "(module " (buf-module-name) ")" code)
-                         (ani-eval.str))]
+(defn- raw-eval [code opts]
+  (let [(ok? result) (ani-eval.str code opts)]
     {:ok? ok?
      :result result}))
+
+(defn eval-str [code opts]
+  (raw-eval (.. "(module " (buf-module-name) ")" code) opts))
+
+(defn eval-file [path]
+  (raw-eval (ani.slurp path) {:filename path}))
 
 (defn display-result [{: ok? : result}]
   (let [result-str (if ok?
