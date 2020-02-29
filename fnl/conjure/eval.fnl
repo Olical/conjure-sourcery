@@ -29,6 +29,7 @@
        (lang.call :eval-str)
        (lang.call :display-result)))
 
+;; TODO Replace buffer with a :%ConjureEval command. Should be used for visual too.
 ;; TODO selection
 ;; TODO range (maybe like selection but %ConjureEval will be good)
 ;; TODO given string

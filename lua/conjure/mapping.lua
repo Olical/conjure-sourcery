@@ -26,8 +26,8 @@ do local _ = ({nil, _0_0, nil})[2] end
 local viml__3elua = nil
 do
   local v_23_0_ = nil
-  local function viml__3elua0(m, f)
-    return ("lua require('" .. m .. "')['" .. f .. "']()")
+  local function viml__3elua0(m, f, opts)
+    return ("lua require('" .. m .. "')['" .. f .. "'](" .. (opts.args or "") .. ")")
   end
   v_23_0_ = viml__3elua0
   _0_0["aniseed/locals"]["viml->lua"] = v_23_0_
@@ -47,7 +47,7 @@ local map_plug = nil
 do
   local v_23_0_ = nil
   local function map_plug0(name, m, f)
-    return nvim.set_keymap("n", plug(name), (":" .. viml__3elua(m, f) .. "<cr>"), {noremap = true, silent = true})
+    return nvim.set_keymap("n", plug(name), (":" .. viml__3elua(m, f, {}) .. "<cr>"), {noremap = true, silent = true})
   end
   v_23_0_ = map_plug0
   _0_0["aniseed/locals"]["map-plug"] = v_23_0_
@@ -92,7 +92,7 @@ do
     local function setup_filetypes0(filetypes)
       nvim.ex.augroup("conjure_init_filetypes")
       nvim.ex.autocmd_()
-      nvim.ex.autocmd("FileType", str.join(",", filetypes), viml__3elua("conjure.mapping", "on-filetype"))
+      nvim.ex.autocmd("FileType", str.join(",", filetypes), viml__3elua("conjure.mapping", "on-filetype", {}))
       return nvim.ex.augroup("END")
     end
     v_23_0_0 = setup_filetypes0
@@ -101,6 +101,21 @@ do
   end
   _0_0["aniseed/locals"]["setup-filetypes"] = v_23_0_
   setup_filetypes = v_23_0_
+end
+local eval_command = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function eval_command0(line1, line2, args)
+      return print("eval:", line1, line2, args)
+    end
+    v_23_0_0 = eval_command0
+    _0_0["eval-command"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["eval-command"] = v_23_0_
+  eval_command = v_23_0_
 end
 local setup_plug_mappings = nil
 do
@@ -114,7 +129,8 @@ do
       map_plug("conjure_eval_root_form", "conjure.eval", "root-form")
       map_plug("conjure_eval_word", "conjure.eval", "word")
       map_plug("conjure_eval_file", "conjure.eval", "file")
-      return map_plug("conjure_eval_buf", "conjure.eval", "buf")
+      map_plug("conjure_eval_buf", "conjure.eval", "buf")
+      return nvim.ex.command_("-nargs=? -range ConjureEval", viml__3elua("conjure.mapping", "eval-command", {args = "'<line1>', '<line2>', '<args>'"}))
     end
     v_23_0_0 = setup_plug_mappings0
     _0_0["setup-plug-mappings"] = v_23_0_0
