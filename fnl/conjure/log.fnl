@@ -1,5 +1,5 @@
 (module conjure.log
-  {require {ani conjure.aniseed.core
+  {require {core conjure.aniseed.core
             nvim conjure.aniseed.nvim
             lang conjure.lang}})
 
@@ -27,7 +27,7 @@
       -1 -1 false lines)
 
     (let [new-lines (nvim.buf_line_count buf)]
-      (ani.run!
+      (core.run!
         (fn [win]
           (let [[row col] (nvim.win_get_cursor win)]
             (when (and (= buf (nvim.win_get_buf win))

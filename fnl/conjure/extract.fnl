@@ -1,5 +1,5 @@
 (module conjure.extract
-  {require {ani conjure.aniseed.core
+  {require {core conjure.aniseed.core
             nvim conjure.aniseed.nvim
             str conjure.aniseed.string}})
 
@@ -13,11 +13,11 @@
   (let [lines (nvim.buf_get_lines
                 0 (- srow 1) erow false)]
     (-> lines
-        (ani.update
+        (core.update
           (length lines)
           (fn [s]
             (string.sub s 0 ecol)))
-        (ani.update
+        (core.update
           1
           (fn [s]
             (string.sub s scol)))
@@ -67,8 +67,8 @@
 
     (when (and (not (nil-pos? start))
                (not (nil-pos? end)))
-      {:range {:start (ani.update start 2 ani.dec)
-               :end (ani.update end 2 ani.dec)}
+      {:range {:start (core.update start 2 core.dec)
+               :end (core.update end 2 core.dec)}
        :content (read-range start end)})))
 
 (defn word []
@@ -77,5 +77,8 @@
 (defn file-path []
   (nvim.fn.expand "%:p"))
 
+(defn range [start end]
+  (str.join "\n" (nvim.buf_get_lines 0 start end false)))
+
 (defn buf []
-  (str.join "\n" (nvim.buf_get_lines 0 0 -1 false)))
+  (range 0 -1))

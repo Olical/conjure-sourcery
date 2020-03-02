@@ -15,13 +15,16 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {config = "conjure.config", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string"}}
-  return {require("conjure.config"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string")}
+  _0_0["aniseed/local-fns"] = {require = {config = "conjure.config", core = "conjure.aniseed.core", eval = "conjure.eval", extract = "conjure.extract", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string"}}
+  return {require("conjure.config"), require("conjure.aniseed.core"), require("conjure.eval"), require("conjure.extract"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string")}
 end
 local _2_ = _1_(...)
 local config = _2_[1]
-local nvim = _2_[2]
-local str = _2_[3]
+local core = _2_[2]
+local eval = _2_[3]
+local extract = _2_[4]
+local nvim = _2_[5]
+local str = _2_[6]
 do local _ = ({nil, _0_0, nil})[2] end
 local viml__3elua = nil
 do
@@ -56,8 +59,8 @@ end
 local map_local__3eplug = nil
 do
   local v_23_0_ = nil
-  local function map_local__3eplug0(keys, name)
-    return nvim.buf_set_keymap(0, "n", (config.mappings.prefix .. keys), plug(name), {silent = true})
+  local function map_local__3eplug0(mode, keys, name)
+    return nvim.buf_set_keymap(0, mode, (config.mappings.prefix .. keys), plug(name), {silent = true})
   end
   v_23_0_ = map_local__3eplug0
   _0_0["aniseed/locals"]["map-local->plug"] = v_23_0_
@@ -69,13 +72,14 @@ do
   do
     local v_23_0_0 = nil
     local function on_filetype0()
-      map_local__3eplug(config.mappings["log-split"], "conjure_log_split")
-      map_local__3eplug(config.mappings["log-vsplit"], "conjure_log_vsplit")
-      map_local__3eplug(config.mappings["eval-current-form"], "conjure_eval_current_form")
-      map_local__3eplug(config.mappings["eval-root-form"], "conjure_eval_root_form")
-      map_local__3eplug(config.mappings["eval-word"], "conjure_eval_word")
-      map_local__3eplug(config.mappings["eval-file"], "conjure_eval_file")
-      return map_local__3eplug(config.mappings["eval-buf"], "conjure_eval_buf")
+      map_local__3eplug("n", config.mappings["log-split"], "conjure_log_split")
+      map_local__3eplug("n", config.mappings["log-vsplit"], "conjure_log_vsplit")
+      map_local__3eplug("n", config.mappings["eval-current-form"], "conjure_eval_current_form")
+      map_local__3eplug("n", config.mappings["eval-root-form"], "conjure_eval_root_form")
+      map_local__3eplug("n", config.mappings["eval-word"], "conjure_eval_word")
+      map_local__3eplug("n", config.mappings["eval-file"], "conjure_eval_file")
+      map_local__3eplug("n", config.mappings["eval-buf"], "conjure_eval_buf")
+      return map_local__3eplug("v", config.mappings["eval-visual"], "conjure_eval_visual")
     end
     v_23_0_0 = on_filetype0
     _0_0["on-filetype"] = v_23_0_0
@@ -107,8 +111,12 @@ do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
-    local function eval_command0(line1, line2, args)
-      return print("eval:", line1, line2, args)
+    local function eval_command0(start, _end, code)
+      if ("" == code) then
+        return eval.str(extract.range(core.dec(start), _end))
+      else
+        return eval.str(code)
+      end
     end
     v_23_0_0 = eval_command0
     _0_0["eval-command"] = v_23_0_0
@@ -130,7 +138,8 @@ do
       map_plug("conjure_eval_word", "conjure.eval", "word")
       map_plug("conjure_eval_file", "conjure.eval", "file")
       map_plug("conjure_eval_buf", "conjure.eval", "buf")
-      return nvim.ex.command_("-nargs=? -range ConjureEval", viml__3elua("conjure.mapping", "eval-command", {args = "'<line1>', '<line2>', '<args>'"}))
+      nvim.set_keymap("v", plug("conjure_eval_visual"), ":ConjureEval<cr>", {noremap = true, silent = true})
+      return nvim.ex.command_("-nargs=? -range ConjureEval", viml__3elua("conjure.mapping", "eval-command", {args = "<line1>, <line2>, <q-args>"}))
     end
     v_23_0_0 = setup_plug_mappings0
     _0_0["setup-plug-mappings"] = v_23_0_0

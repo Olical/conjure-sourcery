@@ -15,11 +15,11 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {ani = "conjure.aniseed.core", lang = "conjure.lang", nvim = "conjure.aniseed.nvim"}}
+  _0_0["aniseed/local-fns"] = {require = {core = "conjure.aniseed.core", lang = "conjure.lang", nvim = "conjure.aniseed.nvim"}}
   return {require("conjure.aniseed.core"), require("conjure.lang"), require("conjure.aniseed.nvim")}
 end
 local _2_ = _1_(...)
-local ani = _2_[1]
+local core = _2_[1]
 local lang = _2_[2]
 local nvim = _2_[3]
 do local _ = ({nil, _0_0, nil})[2] end
@@ -73,7 +73,7 @@ do
             return nvim.win_set_cursor(win, {new_lines, 0})
           end
         end
-        return ani["run!"](_3_, nvim.list_wins())
+        return core["run!"](_3_, nvim.list_wins())
       end
     end
     v_23_0_0 = append0

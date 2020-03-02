@@ -15,12 +15,12 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {["ani-eval"] = "aniseed.eval", ani = "conjure.aniseed.core", log = "conjure.log", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string"}}
-  return {require("conjure.aniseed.core"), require("aniseed.eval"), require("conjure.log"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string")}
+  _0_0["aniseed/local-fns"] = {require = {["ani-eval"] = "aniseed.eval", core = "conjure.aniseed.core", log = "conjure.log", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string"}}
+  return {require("aniseed.eval"), require("conjure.aniseed.core"), require("conjure.log"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string")}
 end
 local _2_ = _1_(...)
-local ani = _2_[1]
-local ani_eval = _2_[2]
+local ani_eval = _2_[1]
+local core = _2_[2]
 local log = _2_[3]
 local nvim = _2_[4]
 local str = _2_[5]
@@ -93,7 +93,7 @@ do
   do
     local v_23_0_0 = nil
     local function eval_str0(code, opts)
-      return raw_eval(("(module " .. buf_module_name() .. ")" .. code), opts)
+      return raw_eval(("(module " .. buf_module_name() .. ")" .. code), {filename = (opts and opts["file-path"])})
     end
     v_23_0_0 = eval_str0
     _0_0["eval-str"] = v_23_0_0
@@ -108,7 +108,7 @@ do
   do
     local v_23_0_0 = nil
     local function eval_file0(path)
-      return raw_eval(ani.slurp(path), {filename = path})
+      return raw_eval(core.slurp(path), {filename = path})
     end
     v_23_0_0 = eval_file0
     _0_0["eval-file"] = v_23_0_0
@@ -129,7 +129,7 @@ do
       do
         local result_str = nil
         if ok_3f then
-          result_str = ani["pr-str"](result)
+          result_str = core["pr-str"](result)
         else
           result_str = result
         end
@@ -141,7 +141,7 @@ do
             local function _6_(_241)
               return ("; " .. _241)
             end
-            return ani.map(_6_, result_lines)
+            return core.map(_6_, result_lines)
           end
         end
         log.append(_6_())

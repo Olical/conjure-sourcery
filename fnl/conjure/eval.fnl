@@ -26,13 +26,14 @@
 
 (defn buf []
   (->> (extract.buf)
+       (lang.call :eval-str {:file-path (extract.file-path)})
+       (lang.call :display-result)))
+
+(defn str [code]
+  (->> code
        (lang.call :eval-str)
        (lang.call :display-result)))
 
-;; TODO Replace buffer with a :%ConjureEval command. Should be used for visual too.
-;; TODO selection
-;; TODO range (maybe like selection but %ConjureEval will be good)
-;; TODO given string
 ;; TODO motion
 
 ;; TODO Lang specific: Tests in Aniseed + config for mapping.

@@ -88,7 +88,7 @@ do
   do
     local v_23_0_0 = nil
     local function buf0()
-      return lang.call("display-result", lang.call("eval-str", extract.buf()))
+      return lang.call("display-result", lang.call("eval-str", {["file-path"] = extract["file-path"]()}, extract.buf()))
     end
     v_23_0_0 = buf0
     _0_0["buf"] = v_23_0_0
@@ -96,5 +96,20 @@ do
   end
   _0_0["aniseed/locals"]["buf"] = v_23_0_
   buf = v_23_0_
+end
+local str = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function str0(code)
+      return lang.call("display-result", lang.call("eval-str", code))
+    end
+    v_23_0_0 = str0
+    _0_0["str"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["str"] = v_23_0_
+  str = v_23_0_
 end
 return nil

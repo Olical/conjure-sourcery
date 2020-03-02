@@ -1,7 +1,10 @@
 (module conjure.mapping
   {require {nvim conjure.aniseed.nvim
+            core conjure.aniseed.core
             str conjure.aniseed.string
-            config conjure.config}})
+            config conjure.config
+            extract conjure.extract
+            eval conjure.eval}})
 
 (defn- viml->lua [m f opts]
   (.. "lua require('" m "')['" f "'](" (or opts.args "") ")"))
@@ -16,27 +19,31 @@
     {:noremap true
      :silent true}))
 
-(defn- map-local->plug [keys name]
+(defn- map-local->plug [mode keys name]
   (nvim.buf_set_keymap
-    0 :n (.. config.mappings.prefix keys)
+    0 mode (.. config.mappings.prefix keys)
     (plug name)
     {:silent true}))
 
 (defn on-filetype []
   (map-local->plug
-    config.mappings.log-split :conjure_log_split)
+    :n config.mappings.log-split :conjure_log_split)
   (map-local->plug
-    config.mappings.log-vsplit :conjure_log_vsplit)
+    :n config.mappings.log-vsplit :conjure_log_vsplit)
   (map-local->plug
-    config.mappings.eval-current-form :conjure_eval_current_form)
+    :n config.mappings.eval-current-form :conjure_eval_current_form)
   (map-local->plug
-   config.mappings.eval-root-form :conjure_eval_root_form)
+    :n config.mappings.eval-root-form :conjure_eval_root_form)
   (map-local->plug
-   config.mappings.eval-word :conjure_eval_word)
+    :n config.mappings.eval-word :conjure_eval_word)
   (map-local->plug
-   config.mappings.eval-file :conjure_eval_file)
+    :n config.mappings.eval-file :conjure_eval_file)
   (map-local->plug
-   config.mappings.eval-buf :conjure_eval_buf))
+    :n config.mappings.eval-buf :conjure_eval_buf)
+  ; (map-local->plug
+  ;   :n config.mappings.eval-motion :conjure_eval_motion)
+  (map-local->plug
+    :v config.mappings.eval-visual :conjure_eval_visual))
 
 (defn setup-filetypes [filetypes]
   (nvim.ex.augroup :conjure_init_filetypes)
@@ -46,8 +53,10 @@
     (viml->lua :conjure.mapping :on-filetype {}))
   (nvim.ex.augroup :END))
 
-(defn eval-command [line1 line2 args]
-  (print "eval:" line1 line2 args))
+(defn eval-command [start end code]
+  (if (= "" code)
+    (eval.str (extract.range (core.dec start) end))
+    (eval.str code)))
 
 (defn setup-plug-mappings [filetypes]
   (map-plug :conjure_log_split :conjure.log :split)
@@ -57,9 +66,16 @@
   (map-plug :conjure_eval_word :conjure.eval :word)
   (map-plug :conjure_eval_file :conjure.eval :file)
   (map-plug :conjure_eval_buf :conjure.eval :buf)
+  ; (map-plug :conjure_eval_motion :conjure.eval :motion)
+
+  (nvim.set_keymap
+    :v (plug :conjure_eval_visual)
+    ":ConjureEval<cr>"
+    {:noremap true
+     :silent true})
 
   ;; TODO Add completion via -complete=custom,{func}
   ;; Requires completion implemented in Aniseed?
   (nvim.ex.command_ "-nargs=? -range ConjureEval"
                     (viml->lua :conjure.mapping :eval-command
-                               {:args "'<line1>', '<line2>', '<args>'"})))
+                               {:args "<line1>, <line2>, <q-args>"})))

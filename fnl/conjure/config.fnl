@@ -1,5 +1,5 @@
 (module conjure.config
-  {require {ani conjure.aniseed.core}})
+  {require {core conjure.aniseed.core}})
 
 (def langs
   {:clojure :conjure.lang.clojure
@@ -13,10 +13,12 @@
    :eval-root-form "er"
    :eval-word "ew"
    :eval-file "ef"
-   :eval-buf "eb"})
+   :eval-buf "eb"
+   :eval-visual "E"
+   :eval-motion "E"})
 
 (defn filetypes []
-  (ani.keys langs))
+  (core.keys langs))
 
 (defn filetype->module-name [filetype]
   (. langs filetype))

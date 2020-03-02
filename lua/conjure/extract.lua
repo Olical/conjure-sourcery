@@ -15,11 +15,11 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {ani = "conjure.aniseed.core", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string"}}
+  _0_0["aniseed/local-fns"] = {require = {core = "conjure.aniseed.core", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string"}}
   return {require("conjure.aniseed.core"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string")}
 end
 local _2_ = _1_(...)
-local ani = _2_[1]
+local core = _2_[1]
 local nvim = _2_[2]
 local str = _2_[3]
 do local _ = ({nil, _0_0, nil})[2] end
@@ -41,7 +41,7 @@ do
       local function _7_(s)
         return string.sub(s, scol)
       end
-      return str.join("\n", ani.update(ani.update(lines, #lines, _6_), 1, _7_))
+      return str.join("\n", core.update(core.update(lines, #lines, _6_), 1, _7_))
     end
   end
   v_23_0_ = read_range0
@@ -137,7 +137,7 @@ do
         end
         _end = nvim.fn.searchpairpos("(", "", ")", (flags .. _7_()), skip_match_3f_viml)
         if (not nil_pos_3f(start) and not nil_pos_3f(_end)) then
-          return {content = read_range(start, _end), range = {["end"] = ani.update(_end, 2, ani.dec), start = ani.update(start, 2, ani.dec)}}
+          return {content = read_range(start, _end), range = {["end"] = core.update(_end, 2, core.dec), start = core.update(start, 2, core.dec)}}
         end
       end
     end
@@ -178,13 +178,28 @@ do
   _0_0["aniseed/locals"]["file-path"] = v_23_0_
   file_path = v_23_0_
 end
+local range = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function range0(start, _end)
+      return str.join("\n", nvim.buf_get_lines(0, start, _end, false))
+    end
+    v_23_0_0 = range0
+    _0_0["range"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["range"] = v_23_0_
+  range = v_23_0_
+end
 local buf = nil
 do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
     local function buf0()
-      return str.join("\n", nvim.buf_get_lines(0, 0, -1, false))
+      return range(0, -1)
     end
     v_23_0_0 = buf0
     _0_0["buf"] = v_23_0_0

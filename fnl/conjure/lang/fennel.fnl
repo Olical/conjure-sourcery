@@ -1,6 +1,6 @@
 (module conjure.lang.fennel
   {require {nvim conjure.aniseed.nvim
-            ani conjure.aniseed.core
+            core conjure.aniseed.core
             str conjure.aniseed.string
             ani-eval aniseed.eval
             log conjure.log}})
@@ -24,20 +24,21 @@
      :result result}))
 
 (defn eval-str [code opts]
-  (raw-eval (.. "(module " (buf-module-name) ")" code) opts))
+  (raw-eval (.. "(module " (buf-module-name) ")" code)
+            {:filename (and opts opts.file-path)}))
 
 (defn eval-file [path]
-  (raw-eval (ani.slurp path) {:filename path}))
+  (raw-eval (core.slurp path) {:filename path}))
 
 (defn display-result [{: ok? : result}]
   (let [result-str (if ok?
-                     (ani.pr-str result)
+                     (core.pr-str result)
                      result)
         result-lines (str.split result-str "[^\n]+")]
     (log.append
       (if ok?
         result-lines
-        (ani.map #(.. "; " $1) result-lines)))
+        (core.map #(.. "; " $1) result-lines)))
     (nvim.out_write
       (.. result-str
           "\n"))))

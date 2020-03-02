@@ -15,11 +15,11 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {ani = "conjure.aniseed.core"}}
+  _0_0["aniseed/local-fns"] = {require = {core = "conjure.aniseed.core"}}
   return {require("conjure.aniseed.core")}
 end
 local _2_ = _1_(...)
-local ani = _2_[1]
+local core = _2_[1]
 do local _ = ({nil, _0_0, nil})[2] end
 local langs = nil
 do
@@ -36,7 +36,7 @@ local mappings = nil
 do
   local v_23_0_ = nil
   do
-    local v_23_0_0 = {["eval-buf"] = "eb", ["eval-current-form"] = "ee", ["eval-file"] = "ef", ["eval-root-form"] = "er", ["eval-word"] = "ew", ["log-split"] = "ls", ["log-vsplit"] = "lv", prefix = "<localleader>"}
+    local v_23_0_0 = {["eval-buf"] = "eb", ["eval-current-form"] = "ee", ["eval-file"] = "ef", ["eval-motion"] = "E", ["eval-root-form"] = "er", ["eval-visual"] = "E", ["eval-word"] = "ew", ["log-split"] = "ls", ["log-vsplit"] = "lv", prefix = "<localleader>"}
     _0_0["mappings"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
@@ -49,7 +49,7 @@ do
   do
     local v_23_0_0 = nil
     local function filetypes0()
-      return ani.keys(langs)
+      return core.keys(langs)
     end
     v_23_0_0 = filetypes0
     _0_0["filetypes"] = v_23_0_0
