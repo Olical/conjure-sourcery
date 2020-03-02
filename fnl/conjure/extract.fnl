@@ -1,6 +1,7 @@
 (module conjure.extract
   {require {core conjure.aniseed.core
             nvim conjure.aniseed.nvim
+            nu conjure.aniseed.nvim.util
             str conjure.aniseed.string}})
 
 ;; TODO form (root / current)
@@ -82,3 +83,21 @@
 
 (defn buf []
   (range 0 -1))
+
+(defn selection [type ...]
+  (let [sel-backup nvim.o.selection
+        [visual?] [...]]
+
+    (nvim.ex.let "g:aniseed_reg_backup = @@")
+    (set nvim.o.selection :inclusive)
+
+    (if
+      visual? (nu.normal (.. "`<" type "`>y"))
+      (= type :line) (nu.normal "'[V']y")
+      (= type :block) (nu.normal "`[`]y")
+      (nu.normal "`[v`]y"))
+
+    (let [selection (nvim.eval "@@")]
+      (set nvim.o.selection sel-backup)
+      (nvim.ex.let "@@ = g:aniseed_reg_backup")
+      selection)))

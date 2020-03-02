@@ -40,8 +40,8 @@
     :n config.mappings.eval-file :conjure_eval_file)
   (map-local->plug
     :n config.mappings.eval-buf :conjure_eval_buf)
-  ; (map-local->plug
-  ;   :n config.mappings.eval-motion :conjure_eval_motion)
+  (map-local->plug
+    :n config.mappings.eval-motion :conjure_eval_motion)
   (map-local->plug
     :v config.mappings.eval-visual :conjure_eval_visual))
 
@@ -53,10 +53,13 @@
     (viml->lua :conjure.mapping :on-filetype {}))
   (nvim.ex.augroup :END))
 
-(defn eval-command [start end code]
+(defn eval-ranged-command [start end code]
   (if (= "" code)
     (eval.str (extract.range (core.dec start) end))
     (eval.str code)))
+
+(defn eval-motion [kind]
+  (core.pr kind))
 
 (defn setup-plug-mappings [filetypes]
   (map-plug :conjure_log_split :conjure.log :split)
@@ -66,7 +69,10 @@
   (map-plug :conjure_eval_word :conjure.eval :word)
   (map-plug :conjure_eval_file :conjure.eval :file)
   (map-plug :conjure_eval_buf :conjure.eval :buf)
-  ; (map-plug :conjure_eval_motion :conjure.eval :motion)
+
+  ;; TODO Handle block and inline, not just whole lines.
+  ;; I think I need a range / command + a visual mapping that uses selection.
+  ;; That way the motion one can lean on the selection function while keeping ConjureEval simple.
 
   (nvim.set_keymap
     :v (plug :conjure_eval_visual)
@@ -74,8 +80,21 @@
     {:noremap true
      :silent true})
 
+  (nvim.ex.function_
+    (->> ["ConjureEvalMotion(kind)"
+          "call luaeval(\"require('conjure.mapping')['eval-motion'](_A)\", a:kind)"
+          "endfunction"]
+         (str.join "\n")))
+
+  (nvim.set_keymap
+    :n (plug :conjure_eval_motion)
+    ":set opfunc=ConjureEvalMotion<cr>g@"
+    {:noremap true
+     :silent true})
+
+
   ;; TODO Add completion via -complete=custom,{func}
   ;; Requires completion implemented in Aniseed?
   (nvim.ex.command_ "-nargs=? -range ConjureEval"
-                    (viml->lua :conjure.mapping :eval-command
+                    (viml->lua :conjure.mapping :eval-ranged-command
                                {:args "<line1>, <line2>, <q-args>"})))

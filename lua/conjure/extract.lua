@@ -15,13 +15,14 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {core = "conjure.aniseed.core", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string"}}
-  return {require("conjure.aniseed.core"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string")}
+  _0_0["aniseed/local-fns"] = {require = {core = "conjure.aniseed.core", nu = "conjure.aniseed.nvim.util", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string"}}
+  return {require("conjure.aniseed.core"), require("conjure.aniseed.nvim.util"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string")}
 end
 local _2_ = _1_(...)
 local core = _2_[1]
-local nvim = _2_[2]
-local str = _2_[3]
+local nu = _2_[2]
+local nvim = _2_[3]
+local str = _2_[4]
 do local _ = ({nil, _0_0, nil})[2] end
 local read_range = nil
 do
@@ -207,5 +208,39 @@ do
   end
   _0_0["aniseed/locals"]["buf"] = v_23_0_
   buf = v_23_0_
+end
+local selection = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function selection0(type, ...)
+      local sel_backup = nvim.o.selection
+      local _3_ = {...}
+      local visual_3f = _3_[1]
+      nvim.ex.let("g:aniseed_reg_backup = @@")
+      nvim.o.selection = "inclusive"
+      if visual_3f then
+        nu.normal(("`<" .. type .. "`>y"))
+      elseif (type == "line") then
+        nu.normal("'[V']y")
+      elseif (type == "block") then
+        nu.normal("`[\22`]y")
+      else
+        nu.normal("`[v`]y")
+      end
+      do
+        local selection1 = nvim.eval("@@")
+        nvim.o.selection = sel_backup
+        nvim.ex.let("@@ = g:aniseed_reg_backup")
+        return selection1
+      end
+    end
+    v_23_0_0 = selection0
+    _0_0["selection"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["selection"] = v_23_0_
+  selection = v_23_0_
 end
 return nil
