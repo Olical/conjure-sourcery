@@ -84,20 +84,18 @@
 (defn buf []
   (range 0 -1))
 
-(defn selection [type ...]
-  (let [sel-backup nvim.o.selection
-        [visual?] [...]]
-
-    (nvim.ex.let "g:aniseed_reg_backup = @@")
+(defn selection [{:kind kind :visual? visual?}]
+  (let [sel-backup nvim.o.selection]
+    (nvim.ex.let "g:conjure_selection_reg_backup = @@")
     (set nvim.o.selection :inclusive)
 
     (if
-      visual? (nu.normal (.. "`<" type "`>y"))
-      (= type :line) (nu.normal "'[V']y")
-      (= type :block) (nu.normal "`[`]y")
+      visual? (nu.normal (.. "`<" kind "`>y"))
+      (= kind :line) (nu.normal "'[V']y")
+      (= kind :block) (nu.normal "`[`]y")
       (nu.normal "`[v`]y"))
 
     (let [selection (nvim.eval "@@")]
       (set nvim.o.selection sel-backup)
-      (nvim.ex.let "@@ = g:aniseed_reg_backup")
+      (nvim.ex.let "@@ = g:conjure_selection_reg_backup")
       selection)))

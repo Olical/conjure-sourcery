@@ -12,9 +12,9 @@
 (defn- plug [name]
   (.. "<Plug>(" name ")"))
 
-(defn- map-plug [name m f]
+(defn- map-plug [mode name m f]
   (nvim.set_keymap
-    :n (plug name)
+    mode (plug name)
     (.. ":" (viml->lua m f {}) "<cr>")
     {:noremap true
      :silent true}))
@@ -58,31 +58,25 @@
     (eval.str (extract.range (core.dec start) end))
     (eval.str code)))
 
-(defn eval-motion [kind]
-  (core.pr kind))
+(defn eval-selection [kind]
+  (eval.str
+    (extract.selection
+      {:kind (or kind (nvim.fn.visualmode))
+       :visual? (not kind)})))
 
 (defn setup-plug-mappings [filetypes]
-  (map-plug :conjure_log_split :conjure.log :split)
-  (map-plug :conjure_log_vsplit :conjure.log :vsplit)
-  (map-plug :conjure_eval_current_form :conjure.eval :current-form)
-  (map-plug :conjure_eval_root_form :conjure.eval :root-form)
-  (map-plug :conjure_eval_word :conjure.eval :word)
-  (map-plug :conjure_eval_file :conjure.eval :file)
-  (map-plug :conjure_eval_buf :conjure.eval :buf)
-
-  ;; TODO Handle block and inline, not just whole lines.
-  ;; I think I need a range / command + a visual mapping that uses selection.
-  ;; That way the motion one can lean on the selection function while keeping ConjureEval simple.
-
-  (nvim.set_keymap
-    :v (plug :conjure_eval_visual)
-    ":ConjureEval<cr>"
-    {:noremap true
-     :silent true})
+  (map-plug :n :conjure_log_split :conjure.log :split)
+  (map-plug :n :conjure_log_vsplit :conjure.log :vsplit)
+  (map-plug :n :conjure_eval_current_form :conjure.eval :current-form)
+  (map-plug :n :conjure_eval_root_form :conjure.eval :root-form)
+  (map-plug :n :conjure_eval_word :conjure.eval :word)
+  (map-plug :n :conjure_eval_file :conjure.eval :file)
+  (map-plug :n :conjure_eval_buf :conjure.eval :buf)
+  (map-plug :v :conjure_eval_visual :conjure.mapping :eval-selection)
 
   (nvim.ex.function_
     (->> ["ConjureEvalMotion(kind)"
-          "call luaeval(\"require('conjure.mapping')['eval-motion'](_A)\", a:kind)"
+          "call luaeval(\"require('conjure.mapping')['eval-selection'](_A)\", a:kind)"
           "endfunction"]
          (str.join "\n")))
 
@@ -91,7 +85,6 @@
     ":set opfunc=ConjureEvalMotion<cr>g@"
     {:noremap true
      :silent true})
-
 
   ;; TODO Add completion via -complete=custom,{func}
   ;; Requires completion implemented in Aniseed?

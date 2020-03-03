@@ -49,8 +49,8 @@ end
 local map_plug = nil
 do
   local v_23_0_ = nil
-  local function map_plug0(name, m, f)
-    return nvim.set_keymap("n", plug(name), (":" .. viml__3elua(m, f, {}) .. "<cr>"), {noremap = true, silent = true})
+  local function map_plug0(mode, name, m, f)
+    return nvim.set_keymap(mode, plug(name), (":" .. viml__3elua(m, f, {}) .. "<cr>"), {noremap = true, silent = true})
   end
   v_23_0_ = map_plug0
   _0_0["aniseed/locals"]["map-plug"] = v_23_0_
@@ -126,20 +126,20 @@ do
   _0_0["aniseed/locals"]["eval-ranged-command"] = v_23_0_
   eval_ranged_command = v_23_0_
 end
-local eval_motion = nil
+local eval_selection = nil
 do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
-    local function eval_motion0(kind)
-      return core.pr(kind)
+    local function eval_selection0(kind)
+      return eval.str(extract.selection({["visual?"] = not kind, kind = (kind or nvim.fn.visualmode())}))
     end
-    v_23_0_0 = eval_motion0
-    _0_0["eval-motion"] = v_23_0_0
+    v_23_0_0 = eval_selection0
+    _0_0["eval-selection"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
-  _0_0["aniseed/locals"]["eval-motion"] = v_23_0_
-  eval_motion = v_23_0_
+  _0_0["aniseed/locals"]["eval-selection"] = v_23_0_
+  eval_selection = v_23_0_
 end
 local setup_plug_mappings = nil
 do
@@ -147,15 +147,15 @@ do
   do
     local v_23_0_0 = nil
     local function setup_plug_mappings0(filetypes)
-      map_plug("conjure_log_split", "conjure.log", "split")
-      map_plug("conjure_log_vsplit", "conjure.log", "vsplit")
-      map_plug("conjure_eval_current_form", "conjure.eval", "current-form")
-      map_plug("conjure_eval_root_form", "conjure.eval", "root-form")
-      map_plug("conjure_eval_word", "conjure.eval", "word")
-      map_plug("conjure_eval_file", "conjure.eval", "file")
-      map_plug("conjure_eval_buf", "conjure.eval", "buf")
-      nvim.set_keymap("v", plug("conjure_eval_visual"), ":ConjureEval<cr>", {noremap = true, silent = true})
-      nvim.ex.function_(str.join("\n", {"ConjureEvalMotion(kind)", "call luaeval(\"require('conjure.mapping')['eval-motion'](_A)\", a:kind)", "endfunction"}))
+      map_plug("n", "conjure_log_split", "conjure.log", "split")
+      map_plug("n", "conjure_log_vsplit", "conjure.log", "vsplit")
+      map_plug("n", "conjure_eval_current_form", "conjure.eval", "current-form")
+      map_plug("n", "conjure_eval_root_form", "conjure.eval", "root-form")
+      map_plug("n", "conjure_eval_word", "conjure.eval", "word")
+      map_plug("n", "conjure_eval_file", "conjure.eval", "file")
+      map_plug("n", "conjure_eval_buf", "conjure.eval", "buf")
+      map_plug("v", "conjure_eval_visual", "conjure.mapping", "eval-selection")
+      nvim.ex.function_(str.join("\n", {"ConjureEvalMotion(kind)", "call luaeval(\"require('conjure.mapping')['eval-selection'](_A)\", a:kind)", "endfunction"}))
       nvim.set_keymap("n", plug("conjure_eval_motion"), ":set opfunc=ConjureEvalMotion<cr>g@", {noremap = true, silent = true})
       return nvim.ex.command_("-nargs=? -range ConjureEval", viml__3elua("conjure.mapping", "eval-ranged-command", {args = "<line1>, <line2>, <q-args>"}))
     end

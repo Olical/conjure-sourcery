@@ -214,26 +214,29 @@ do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
-    local function selection0(type, ...)
-      local sel_backup = nvim.o.selection
-      local _3_ = {...}
-      local visual_3f = _3_[1]
-      nvim.ex.let("g:aniseed_reg_backup = @@")
-      nvim.o.selection = "inclusive"
-      if visual_3f then
-        nu.normal(("`<" .. type .. "`>y"))
-      elseif (type == "line") then
-        nu.normal("'[V']y")
-      elseif (type == "block") then
-        nu.normal("`[\22`]y")
-      else
-        nu.normal("`[v`]y")
-      end
+    local function selection0(_3_0)
+      local _4_ = _3_0
+      local visual_3f = _4_["visual?"]
+      local kind = _4_["kind"]
       do
-        local selection1 = nvim.eval("@@")
-        nvim.o.selection = sel_backup
-        nvim.ex.let("@@ = g:aniseed_reg_backup")
-        return selection1
+        local sel_backup = nvim.o.selection
+        nvim.ex.let("g:conjure_selection_reg_backup = @@")
+        nvim.o.selection = "inclusive"
+        if visual_3f then
+          nu.normal(("`<" .. kind .. "`>y"))
+        elseif (kind == "line") then
+          nu.normal("'[V']y")
+        elseif (kind == "block") then
+          nu.normal("`[\22`]y")
+        else
+          nu.normal("`[v`]y")
+        end
+        do
+          local selection1 = nvim.eval("@@")
+          nvim.o.selection = sel_backup
+          nvim.ex.let("@@ = g:conjure_selection_reg_backup")
+          return selection1
+        end
       end
     end
     v_23_0_0 = selection0

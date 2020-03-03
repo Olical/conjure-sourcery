@@ -76,16 +76,16 @@ do
   _0_0["aniseed/locals"]["buf-module-name"] = v_23_0_
   buf_module_name = v_23_0_
 end
-local raw_eval = nil
+local base_eval = nil
 do
   local v_23_0_ = nil
-  local function raw_eval0(code, opts)
-    local ok_3f, result = ani_eval.str(code, opts)
+  local function base_eval0(code, opts)
+    local ok_3f, result = ani_eval.str((code .. "\n"), opts)
     return {["ok?"] = ok_3f, result = result}
   end
-  v_23_0_ = raw_eval0
-  _0_0["aniseed/locals"]["raw-eval"] = v_23_0_
-  raw_eval = v_23_0_
+  v_23_0_ = base_eval0
+  _0_0["aniseed/locals"]["base-eval"] = v_23_0_
+  base_eval = v_23_0_
 end
 local eval_str = nil
 do
@@ -93,7 +93,7 @@ do
   do
     local v_23_0_0 = nil
     local function eval_str0(code, opts)
-      return raw_eval(("(module " .. buf_module_name() .. ")" .. code), {filename = (opts and opts["file-path"])})
+      return base_eval(("(module " .. buf_module_name() .. ")" .. code), {filename = (opts and opts["file-path"])})
     end
     v_23_0_0 = eval_str0
     _0_0["eval-str"] = v_23_0_0
@@ -108,7 +108,7 @@ do
   do
     local v_23_0_0 = nil
     local function eval_file0(path)
-      return raw_eval(core.slurp(path), {filename = path})
+      return base_eval(core.slurp(path), {filename = path})
     end
     v_23_0_0 = eval_file0
     _0_0["eval-file"] = v_23_0_0
