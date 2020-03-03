@@ -12,34 +12,28 @@
 (def- buf-header-length 20)
 (def- default-module-name "aniseed.user")
 (def- buf-module-pattern "[(]%s*module%s*(.-)[%s){]")
-(defn- buf-module-name []
+
+(defn buf-eval-context []
   (let [header (->> (nvim.buf_get_lines 0 0 buf-header-length false)
                     (str.join "\n"))]
     (or (string.match header buf-module-pattern)
         default-module-name)))
 
-(defn- base-eval [code opts]
-  (let [(ok? result) (ani-eval.str (.. code "\n") opts)]
+;; TODO Implement b:conjure_context override.
+;; TODO Log tools to display eval input and output.
+
+(defn eval-str [opts]
+  (let [code (.. (if opts.context
+                   (.. "(module " opts.context ") ")
+                   "")
+                 opts.code "\n")
+        (ok? result) (ani-eval.str code {:filename opts.file-path})]
     {:ok? ok?
      :result result}))
 
-;; so every eval needs to be one map
-;; opts map contains: code, module / namespace, file-path and any extra things
-;; module lookup will be called for you, is optional
-;; eval-file may be simpler but also take a map containing file-path
-;; so buf-module-name becomes open but it can be set but b:conjure_module or whatever
-;; the contract between eval and display result is lang dependant, core keys are shared protocol
-;; offer log tools to display code snippets for eval-str / eval-file etc, but it's up to you to choose
-
-;; allows creative freedom with log output, need to implement breaks for trimming too
-
-(defn eval-str [opts]
-  (base-eval (.. "(module " (buf-module-name) ")" opts.code)
-             {:filename opts.file-path}))
-
 (defn eval-file [opts]
-  (base-eval (core.slurp opts.file-path)
-             {:filename opts.file-path}))
+  (set opts.code (core.slurp opts.file-path))
+  (eval-str opts))
 
 (defn display-result [{: ok? : result}]
   (let [result-str (if ok?

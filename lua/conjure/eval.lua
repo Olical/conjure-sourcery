@@ -27,6 +27,7 @@ do
   local v_23_0_ = nil
   local function eval_str0(code, opts)
     opts.code = code
+    opts.context = lang.call("buf-eval-context")
     return lang.call("display-result", lang.call("eval-str", opts))
   end
   v_23_0_ = eval_str0

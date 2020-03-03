@@ -65,27 +65,21 @@ do
   _0_0["aniseed/locals"]["buf-module-pattern"] = v_23_0_
   buf_module_pattern = v_23_0_
 end
-local buf_module_name = nil
+local buf_eval_context = nil
 do
   local v_23_0_ = nil
-  local function buf_module_name0()
-    local header = str.join("\n", nvim.buf_get_lines(0, 0, buf_header_length, false))
-    return (string.match(header, buf_module_pattern) or default_module_name)
+  do
+    local v_23_0_0 = nil
+    local function buf_eval_context0()
+      local header = str.join("\n", nvim.buf_get_lines(0, 0, buf_header_length, false))
+      return (string.match(header, buf_module_pattern) or default_module_name)
+    end
+    v_23_0_0 = buf_eval_context0
+    _0_0["buf-eval-context"] = v_23_0_0
+    v_23_0_ = v_23_0_0
   end
-  v_23_0_ = buf_module_name0
-  _0_0["aniseed/locals"]["buf-module-name"] = v_23_0_
-  buf_module_name = v_23_0_
-end
-local base_eval = nil
-do
-  local v_23_0_ = nil
-  local function base_eval0(code, opts)
-    local ok_3f, result = ani_eval.str((code .. "\n"), opts)
-    return {["ok?"] = ok_3f, result = result}
-  end
-  v_23_0_ = base_eval0
-  _0_0["aniseed/locals"]["base-eval"] = v_23_0_
-  base_eval = v_23_0_
+  _0_0["aniseed/locals"]["buf-eval-context"] = v_23_0_
+  buf_eval_context = v_23_0_
 end
 local eval_str = nil
 do
@@ -93,7 +87,17 @@ do
   do
     local v_23_0_0 = nil
     local function eval_str0(opts)
-      return base_eval(("(module " .. buf_module_name() .. ")" .. opts.code), {filename = opts["file-path"]})
+      local code = nil
+      local function _3_()
+        if opts.context then
+          return ("(module " .. opts.context .. ") ")
+        else
+          return ""
+        end
+      end
+      code = (_3_() .. opts.code .. "\n")
+      local ok_3f, result = ani_eval.str(code, {filename = opts["file-path"]})
+      return {["ok?"] = ok_3f, result = result}
     end
     v_23_0_0 = eval_str0
     _0_0["eval-str"] = v_23_0_0
@@ -108,7 +112,8 @@ do
   do
     local v_23_0_0 = nil
     local function eval_file0(opts)
-      return base_eval(core.slurp(opts["file-path"]), {filename = opts["file-path"]})
+      opts.code = core.slurp(opts["file-path"])
+      return eval_str(opts)
     end
     v_23_0_0 = eval_file0
     _0_0["eval-file"] = v_23_0_0

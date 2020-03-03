@@ -4,6 +4,7 @@
 
 (defn- eval-str [code opts]
   (set opts.code code)
+  (set opts.context (lang.call :buf-eval-context))
   (->> opts
        (lang.call :eval-str)
        (lang.call :display-result)))
