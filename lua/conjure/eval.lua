@@ -15,19 +15,20 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {extract = "conjure.extract", lang = "conjure.lang"}}
-  return {require("conjure.extract"), require("conjure.lang")}
+  _0_0["aniseed/local-fns"] = {require = {extract = "conjure.extract", lang = "conjure.lang", nvim = "conjure.aniseed.nvim"}}
+  return {require("conjure.extract"), require("conjure.lang"), require("conjure.aniseed.nvim")}
 end
 local _2_ = _1_(...)
 local extract = _2_[1]
 local lang = _2_[2]
+local nvim = _2_[3]
 do local _ = ({nil, _0_0, nil})[2] end
 local eval_str = nil
 do
   local v_23_0_ = nil
   local function eval_str0(code, opts)
     opts.code = code
-    opts.context = lang.call("buf-eval-context")
+    opts.context = (nvim.b.conjure_context or lang.call("buf-context"))
     return lang.call("display-result", lang.call("eval-str", opts))
   end
   v_23_0_ = eval_str0

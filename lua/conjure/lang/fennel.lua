@@ -65,21 +65,21 @@ do
   _0_0["aniseed/locals"]["buf-module-pattern"] = v_23_0_
   buf_module_pattern = v_23_0_
 end
-local buf_eval_context = nil
+local buf_context = nil
 do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
-    local function buf_eval_context0()
+    local function buf_context0()
       local header = str.join("\n", nvim.buf_get_lines(0, 0, buf_header_length, false))
       return (string.match(header, buf_module_pattern) or default_module_name)
     end
-    v_23_0_0 = buf_eval_context0
-    _0_0["buf-eval-context"] = v_23_0_0
+    v_23_0_0 = buf_context0
+    _0_0["buf-context"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
-  _0_0["aniseed/locals"]["buf-eval-context"] = v_23_0_
-  buf_eval_context = v_23_0_
+  _0_0["aniseed/locals"]["buf-context"] = v_23_0_
+  buf_context = v_23_0_
 end
 local eval_str = nil
 do

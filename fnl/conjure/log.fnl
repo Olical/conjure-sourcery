@@ -19,6 +19,9 @@
       buf)))
 
 ;; TODO Implement trimming using a marker so as not to cut forms in half.
+;; TODO Log tools to display eval input and output.
+;; TODO Floating window log output display.
+
 (defn append [lines]
   (let [buf (upsert-buf)
         old-lines (nvim.buf_line_count buf)]

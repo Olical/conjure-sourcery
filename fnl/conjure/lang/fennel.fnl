@@ -13,14 +13,11 @@
 (def- default-module-name "aniseed.user")
 (def- buf-module-pattern "[(]%s*module%s*(.-)[%s){]")
 
-(defn buf-eval-context []
+(defn buf-context []
   (let [header (->> (nvim.buf_get_lines 0 0 buf-header-length false)
                     (str.join "\n"))]
     (or (string.match header buf-module-pattern)
         default-module-name)))
-
-;; TODO Implement b:conjure_context override.
-;; TODO Log tools to display eval input and output.
 
 (defn eval-str [opts]
   (let [code (.. (if opts.context
