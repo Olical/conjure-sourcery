@@ -23,12 +23,23 @@
     {:ok? ok?
      :result result}))
 
-(defn eval-str [code opts]
-  (base-eval (.. "(module " (buf-module-name) ")" code)
-             {:filename (and opts opts.file-path)}))
+;; so every eval needs to be one map
+;; opts map contains: code, module / namespace, file-path and any extra things
+;; module lookup will be called for you, is optional
+;; eval-file may be simpler but also take a map containing file-path
+;; so buf-module-name becomes open but it can be set but b:conjure_module or whatever
+;; the contract between eval and display result is lang dependant, core keys are shared protocol
+;; offer log tools to display code snippets for eval-str / eval-file etc, but it's up to you to choose
 
-(defn eval-file [path]
-  (base-eval (core.slurp path) {:filename path}))
+;; allows creative freedom with log output, need to implement breaks for trimming too
+
+(defn eval-str [opts]
+  (base-eval (.. "(module " (buf-module-name) ")" opts.code)
+             {:filename opts.file-path}))
+
+(defn eval-file [opts]
+  (base-eval (core.slurp opts.file-path)
+             {:filename opts.file-path}))
 
 (defn display-result [{: ok? : result}]
   (let [result-str (if ok?

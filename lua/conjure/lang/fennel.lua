@@ -92,8 +92,8 @@ do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
-    local function eval_str0(code, opts)
-      return base_eval(("(module " .. buf_module_name() .. ")" .. code), {filename = (opts and opts["file-path"])})
+    local function eval_str0(opts)
+      return base_eval(("(module " .. buf_module_name() .. ")" .. opts.code), {filename = opts["file-path"]})
     end
     v_23_0_0 = eval_str0
     _0_0["eval-str"] = v_23_0_0
@@ -107,8 +107,8 @@ do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
-    local function eval_file0(path)
-      return base_eval(core.slurp(path), {filename = path})
+    local function eval_file0(opts)
+      return base_eval(core.slurp(opts["file-path"]), {filename = opts["file-path"]})
     end
     v_23_0_0 = eval_file0
     _0_0["eval-file"] = v_23_0_0

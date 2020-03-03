@@ -2,38 +2,35 @@
   {require {extract conjure.extract
             lang conjure.lang}})
 
-(defn current-form []
-  (-> (extract.form {})
-      (. :content)
-      (->> (lang.call :eval-str)
-           (lang.call :display-result))))
-
-(defn root-form []
-  (-> (extract.form {:root? true})
-      (. :content)
-      (->> (lang.call :eval-str)
-           (lang.call :display-result))))
-
-(defn word []
-  (->> (extract.word)
+(defn- eval-str [code opts]
+  (set opts.code code)
+  (->> opts
        (lang.call :eval-str)
        (lang.call :display-result)))
 
+(defn current-form []
+  (eval-str
+    (. (extract.form {}) :content)
+    {}))
+
+(defn root-form []
+  (eval-str
+    (. (extract.form {:root? true}) :content)
+    {}))
+
+(defn word []
+  (eval-str (extract.word) {}))
+
 (defn file []
-  (->> (extract.file-path)
-       (lang.call :eval-file)
+  (->> (lang.call :eval-file {:file-path (extract.file-path)})
        (lang.call :display-result)))
 
 (defn buf []
-  (->> (extract.buf)
-       (lang.call :eval-str {:file-path (extract.file-path)})
-       (lang.call :display-result)))
+  (eval-str
+    (extract.buf)
+    {:file-path (extract.file-path)}))
 
 (defn str [code]
-  (->> code
-       (lang.call :eval-str)
-       (lang.call :display-result)))
-
-;; TODO motion
+  (eval-str code {}))
 
 ;; TODO Lang specific: Tests in Aniseed + config for mapping.

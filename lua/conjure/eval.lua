@@ -22,13 +22,24 @@ local _2_ = _1_(...)
 local extract = _2_[1]
 local lang = _2_[2]
 do local _ = ({nil, _0_0, nil})[2] end
+local eval_str = nil
+do
+  local v_23_0_ = nil
+  local function eval_str0(code, opts)
+    opts.code = code
+    return lang.call("display-result", lang.call("eval-str", opts))
+  end
+  v_23_0_ = eval_str0
+  _0_0["aniseed/locals"]["eval-str"] = v_23_0_
+  eval_str = v_23_0_
+end
 local current_form = nil
 do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
     local function current_form0()
-      return lang.call("display-result", lang.call("eval-str", extract.form({}).content))
+      return eval_str(extract.form({}).content, {})
     end
     v_23_0_0 = current_form0
     _0_0["current-form"] = v_23_0_0
@@ -43,7 +54,7 @@ do
   do
     local v_23_0_0 = nil
     local function root_form0()
-      return lang.call("display-result", lang.call("eval-str", extract.form({["root?"] = true}).content))
+      return eval_str(extract.form({["root?"] = true}).content, {})
     end
     v_23_0_0 = root_form0
     _0_0["root-form"] = v_23_0_0
@@ -58,7 +69,7 @@ do
   do
     local v_23_0_0 = nil
     local function word0()
-      return lang.call("display-result", lang.call("eval-str", extract.word()))
+      return eval_str(extract.word(), {})
     end
     v_23_0_0 = word0
     _0_0["word"] = v_23_0_0
@@ -73,7 +84,7 @@ do
   do
     local v_23_0_0 = nil
     local function file0()
-      return lang.call("display-result", lang.call("eval-file", extract["file-path"]()))
+      return lang.call("display-result", lang.call("eval-file", {["file-path"] = extract["file-path"]()}))
     end
     v_23_0_0 = file0
     _0_0["file"] = v_23_0_0
@@ -88,7 +99,7 @@ do
   do
     local v_23_0_0 = nil
     local function buf0()
-      return lang.call("display-result", lang.call("eval-str", {["file-path"] = extract["file-path"]()}, extract.buf()))
+      return eval_str(extract.buf(), {["file-path"] = extract["file-path"]()})
     end
     v_23_0_0 = buf0
     _0_0["buf"] = v_23_0_0
@@ -103,7 +114,7 @@ do
   do
     local v_23_0_0 = nil
     local function str0(code)
-      return lang.call("display-result", lang.call("eval-str", code))
+      return eval_str(code, {})
     end
     v_23_0_0 = str0
     _0_0["str"] = v_23_0_0
