@@ -36,17 +36,6 @@ do
   _0_0["aniseed/locals"]["log-buf-name"] = v_23_0_
   log_buf_name = v_23_0_
 end
-local greeting_lines = nil
-do
-  local v_23_0_ = nil
-  do
-    local v_23_0_0 = {";; Welcome to Conjure, let's write some Fennel!"}
-    _0_0["greeting-lines"] = v_23_0_0
-    v_23_0_ = v_23_0_0
-  end
-  _0_0["aniseed/locals"]["greeting-lines"] = v_23_0_
-  greeting_lines = v_23_0_
-end
 local buf_header_length = nil
 do
   local v_23_0_ = 20
@@ -113,7 +102,9 @@ do
     local v_23_0_0 = nil
     local function eval_file0(opts)
       opts.code = core.slurp(opts["file-path"])
-      return eval_str(opts)
+      if opts.code then
+        return eval_str(opts)
+      end
     end
     v_23_0_0 = eval_file0
     _0_0["eval-file"] = v_23_0_0
@@ -127,11 +118,11 @@ do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
-    local function display_result0(_3_0)
-      local _4_ = _3_0
-      local result = _4_["result"]
-      local ok_3f = _4_["ok?"]
-      do
+    local function display_result0(opts)
+      if opts then
+        local _3_ = opts
+        local result = _3_["result"]
+        local ok_3f = _3_["ok?"]
         local result_str = nil
         if ok_3f then
           result_str = core["pr-str"](result)
@@ -139,17 +130,17 @@ do
           result_str = result
         end
         local result_lines = str.split(result_str, "[^\n]+")
-        local function _6_()
+        local function _5_()
           if ok_3f then
             return result_lines
           else
-            local function _6_(_241)
+            local function _5_(_241)
               return ("; " .. _241)
             end
-            return core.map(_6_, result_lines)
+            return core.map(_5_, result_lines)
           end
         end
-        log.append(_6_())
+        log.append(_5_())
         return nvim.out_write((result_str .. "\n"))
       end
     end

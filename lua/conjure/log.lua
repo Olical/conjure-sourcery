@@ -40,7 +40,6 @@ do
     local buf = nvim.fn.bufnr(lang.get("log-buf-name"))
     if (-1 == buf) then
       local buf0 = nvim.fn.bufadd(lang.get("log-buf-name"))
-      nvim.buf_set_lines(buf0, 0, 1, false, lang.get("greeting-lines"))
       nvim.buf_set_option(buf0, "buftype", "nofile")
       nvim.buf_set_option(buf0, "bufhidden", "hide")
       nvim.buf_set_option(buf0, "swapfile", false)
@@ -62,18 +61,24 @@ do
     local function append0(lines)
       local buf = upsert_buf()
       local old_lines = nvim.buf_line_count(buf)
-      nvim.buf_set_lines(buf, -1, -1, false, lines)
+      local _3_
+      if ((old_lines <= 1) and (0 == core.count(core.first(nvim.buf_get_lines(buf, 0, -1, false))))) then
+        _3_ = 0
+      else
+        _3_ = -1
+      end
+      nvim.buf_set_lines(buf, _3_, -1, false, lines)
       do
         local new_lines = nvim.buf_line_count(buf)
-        local function _3_(win)
-          local _4_ = nvim.win_get_cursor(win)
-          local row = _4_[1]
-          local col = _4_[2]
+        local function _5_(win)
+          local _6_ = nvim.win_get_cursor(win)
+          local row = _6_[1]
+          local col = _6_[2]
           if ((buf == nvim.win_get_buf(win)) and (col == 0) and (old_lines == row)) then
             return nvim.win_set_cursor(win, {new_lines, 0})
           end
         end
-        return core["run!"](_3_, nvim.list_wins())
+        return core["run!"](_5_, nvim.list_wins())
       end
     end
     v_23_0_0 = append0

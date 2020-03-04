@@ -6,8 +6,6 @@
             log conjure.log}})
 
 (def log-buf-name (.. "conjure-aniseed-" (nvim.fn.getpid) ".fnl"))
-(def greeting-lines
-  [";; Welcome to Conjure, let's write some Fennel!"])
 
 (def- buf-header-length 20)
 (def- default-module-name "aniseed.user")
@@ -30,17 +28,20 @@
 
 (defn eval-file [opts]
   (set opts.code (core.slurp opts.file-path))
-  (eval-str opts))
+  (when opts.code
+    (eval-str opts)))
 
-(defn display-result [{: ok? : result}]
-  (let [result-str (if ok?
-                     (core.pr-str result)
-                     result)
-        result-lines (str.split result-str "[^\n]+")]
-    (log.append
-      (if ok?
-        result-lines
-        (core.map #(.. "; " $1) result-lines)))
-    (nvim.out_write
-      (.. result-str
-          "\n"))))
+(defn display-result [opts]
+  (when opts
+    (let [{: ok? : result} opts
+          result-str (if ok?
+                       (core.pr-str result)
+                       result)
+          result-lines (str.split result-str "[^\n]+")]
+      (log.append
+        (if ok?
+          result-lines
+          (core.map #(.. "; " $1) result-lines)))
+      (nvim.out_write
+        (.. result-str
+            "\n")))))
