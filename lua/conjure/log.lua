@@ -53,6 +53,16 @@ do
   _0_0["aniseed/locals"]["upsert-buf"] = v_23_0_
   upsert_buf = v_23_0_
 end
+local buf_empty_3f = nil
+do
+  local v_23_0_ = nil
+  local function buf_empty_3f0(buf)
+    return ((nvim.buf_line_count(buf) <= 1) and (0 == core.count(core.first(nvim.buf_get_lines(buf, 0, -1, false)))))
+  end
+  v_23_0_ = buf_empty_3f0
+  _0_0["aniseed/locals"]["buf-empty?"] = v_23_0_
+  buf_empty_3f = v_23_0_
+end
 local append = nil
 do
   local v_23_0_ = nil
@@ -62,7 +72,7 @@ do
       local buf = upsert_buf()
       local old_lines = nvim.buf_line_count(buf)
       local _3_
-      if ((old_lines <= 1) and (0 == core.count(core.first(nvim.buf_get_lines(buf, 0, -1, false))))) then
+      if buf_empty_3f(buf) then
         _3_ = 0
       else
         _3_ = -1

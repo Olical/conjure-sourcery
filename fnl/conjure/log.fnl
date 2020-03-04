@@ -21,16 +21,17 @@
 ;; TODO Log tools to display eval input and output.
 ;; TODO Floating window log output display.
 
+(defn- buf-empty? [buf]
+  (and (<= (nvim.buf_line_count buf) 1)
+       (= 0 (core.count (core.first (nvim.buf_get_lines buf 0 -1 false))))))
+
 (defn append [lines]
   (let [buf (upsert-buf)
         old-lines (nvim.buf_line_count buf)]
 
     (nvim.buf_set_lines
       buf
-      (if (and (<= old-lines 1)
-               (= 0 (core.count (core.first (nvim.buf_get_lines buf 0 -1 false)))))
-        0
-        -1)
+      (if (buf-empty? buf) 0 -1)
       -1 false lines)
 
     (let [new-lines (nvim.buf_line_count buf)]
