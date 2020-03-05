@@ -55,14 +55,11 @@
 
 (defn eval-ranged-command [start end code]
   (if (= "" code)
-    (eval.str (extract.range (core.dec start) end))
-    (eval.str code)))
+    (eval.range (core.dec start) end)
+    (eval.command code)))
 
 (defn eval-selection [kind]
-  (eval.str
-    (extract.selection
-      {:kind (or kind (nvim.fn.visualmode))
-       :visual? (not kind)})))
+  (eval.selection kind))
 
 (defn setup-plug-mappings [filetypes]
   (map-plug :n :conjure_log_split :conjure.log :split)

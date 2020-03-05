@@ -15,73 +15,15 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {extract = "conjure.extract", lang = "conjure.lang", nvim = "conjure.aniseed.nvim"}}
-  return {require("conjure.extract"), require("conjure.lang"), require("conjure.aniseed.nvim")}
+  _0_0["aniseed/local-fns"] = {require = {core = "conjure.aniseed.core", extract = "conjure.extract", lang = "conjure.lang", nvim = "conjure.aniseed.nvim"}}
+  return {require("conjure.aniseed.core"), require("conjure.extract"), require("conjure.lang"), require("conjure.aniseed.nvim")}
 end
 local _2_ = _1_(...)
-local extract = _2_[1]
-local lang = _2_[2]
-local nvim = _2_[3]
+local core = _2_[1]
+local extract = _2_[2]
+local lang = _2_[3]
+local nvim = _2_[4]
 do local _ = ({nil, _0_0, nil})[2] end
-local eval_str = nil
-do
-  local v_23_0_ = nil
-  local function eval_str0(code, opts)
-    opts.code = code
-    opts.action = "eval"
-    opts.context = (nvim.b.conjure_context or lang.call("buf-context"))
-    lang.call("display-request", opts)
-    return lang.call("display-result", lang.call("eval-str", opts))
-  end
-  v_23_0_ = eval_str0
-  _0_0["aniseed/locals"]["eval-str"] = v_23_0_
-  eval_str = v_23_0_
-end
-local current_form = nil
-do
-  local v_23_0_ = nil
-  do
-    local v_23_0_0 = nil
-    local function current_form0()
-      return eval_str(extract.form({}).content, {origin = "current-form"})
-    end
-    v_23_0_0 = current_form0
-    _0_0["current-form"] = v_23_0_0
-    v_23_0_ = v_23_0_0
-  end
-  _0_0["aniseed/locals"]["current-form"] = v_23_0_
-  current_form = v_23_0_
-end
-local root_form = nil
-do
-  local v_23_0_ = nil
-  do
-    local v_23_0_0 = nil
-    local function root_form0()
-      return eval_str(extract.form({["root?"] = true}).content, {origin = "root-form"})
-    end
-    v_23_0_0 = root_form0
-    _0_0["root-form"] = v_23_0_0
-    v_23_0_ = v_23_0_0
-  end
-  _0_0["aniseed/locals"]["root-form"] = v_23_0_
-  root_form = v_23_0_
-end
-local word = nil
-do
-  local v_23_0_ = nil
-  do
-    local v_23_0_0 = nil
-    local function word0()
-      return eval_str(extract.word(), {origin = "word"})
-    end
-    v_23_0_0 = word0
-    _0_0["word"] = v_23_0_0
-    v_23_0_ = v_23_0_0
-  end
-  _0_0["aniseed/locals"]["word"] = v_23_0_
-  word = v_23_0_
-end
 local file = nil
 do
   local v_23_0_ = nil
@@ -99,13 +41,84 @@ do
   _0_0["aniseed/locals"]["file"] = v_23_0_
   file = v_23_0_
 end
+local eval_str = nil
+do
+  local v_23_0_ = nil
+  local function eval_str0(opts)
+    opts.action = "eval"
+    opts.context = (nvim.b.conjure_context or lang.call("buf-context"))
+    opts["file-path"] = extract["file-path"]()
+    lang.call("display-request", opts)
+    return lang.call("display-result", lang.call("eval-str", opts))
+  end
+  v_23_0_ = eval_str0
+  _0_0["aniseed/locals"]["eval-str"] = v_23_0_
+  eval_str = v_23_0_
+end
+local current_form = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function current_form0()
+      local _3_ = extract.form({})
+      local range = _3_["range"]
+      local content = _3_["content"]
+      return eval_str({code = content, origin = "current-form", range = range})
+    end
+    v_23_0_0 = current_form0
+    _0_0["current-form"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["current-form"] = v_23_0_
+  current_form = v_23_0_
+end
+local root_form = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function root_form0()
+      local _3_ = extract.form({["root?"] = true})
+      local range = _3_["range"]
+      local content = _3_["content"]
+      return eval_str({code = content, origin = "root-form", range = range})
+    end
+    v_23_0_0 = root_form0
+    _0_0["root-form"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["root-form"] = v_23_0_
+  root_form = v_23_0_
+end
+local word = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function word0()
+      local _3_ = extract.word()
+      local range = _3_["range"]
+      local content = _3_["content"]
+      return eval_str({code = content, origin = "word", range = range})
+    end
+    v_23_0_0 = word0
+    _0_0["word"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["word"] = v_23_0_
+  word = v_23_0_
+end
 local buf = nil
 do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
     local function buf0()
-      return eval_str(extract.buf(), {["file-path"] = extract["file-path"](), origin = "buf"})
+      local _3_ = extract.buf()
+      local range = _3_["range"]
+      local content = _3_["content"]
+      return eval_str({code = content, origin = "buf", range = range})
     end
     v_23_0_0 = buf0
     _0_0["buf"] = v_23_0_0
@@ -114,19 +127,55 @@ do
   _0_0["aniseed/locals"]["buf"] = v_23_0_
   buf = v_23_0_
 end
-local str = nil
+local range = nil
 do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
-    local function str0(code)
-      return eval_str(code, {origin = "user"})
+    local function range0(start, _end)
+      local _3_ = extract.range(start, _end)
+      local range1 = _3_["range"]
+      local content = _3_["content"]
+      return eval_str({code = content, origin = "range", range = range1})
     end
-    v_23_0_0 = str0
-    _0_0["str"] = v_23_0_0
+    v_23_0_0 = range0
+    _0_0["range"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
-  _0_0["aniseed/locals"]["str"] = v_23_0_
-  str = v_23_0_
+  _0_0["aniseed/locals"]["range"] = v_23_0_
+  range = v_23_0_
+end
+local command = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function command0(code)
+      return eval_str({code = code, origin = "command"})
+    end
+    v_23_0_0 = command0
+    _0_0["command"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["command"] = v_23_0_
+  command = v_23_0_
+end
+local selection = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function selection0(kind)
+      local _3_ = extract.selection({["visual?"] = not kind, kind = (kind or nvim.fn.visualmode())})
+      local range0 = _3_["range"]
+      local content = _3_["content"]
+      return eval_str({code = content, origin = "selection", range = range0})
+    end
+    v_23_0_0 = selection0
+    _0_0["selection"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["selection"] = v_23_0_
+  selection = v_23_0_
 end
 return nil

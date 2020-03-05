@@ -155,7 +155,7 @@ do
   do
     local v_23_0_0 = nil
     local function word0()
-      return nvim.fn.expand("<cword>")
+      return {content = nvim.fn.expand("<cword>"), range = {["end"] = nvim.win_get_cursor(0), start = nvim.win_get_cursor(0)}}
     end
     v_23_0_0 = word0
     _0_0["word"] = v_23_0_0
@@ -179,13 +179,23 @@ do
   _0_0["aniseed/locals"]["file-path"] = v_23_0_
   file_path = v_23_0_
 end
+local buf_last_line_length = nil
+do
+  local v_23_0_ = nil
+  local function buf_last_line_length0(buf)
+    return core.count(core.first(nvim.buf_get_lines(buf, core.dec(nvim.buf_line_count(buf)), -1, false)))
+  end
+  v_23_0_ = buf_last_line_length0
+  _0_0["aniseed/locals"]["buf-last-line-length"] = v_23_0_
+  buf_last_line_length = v_23_0_
+end
 local range = nil
 do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
     local function range0(start, _end)
-      return str.join("\n", nvim.buf_get_lines(0, start, _end, false))
+      return {content = str.join("\n", nvim.buf_get_lines(0, start, _end, false)), range = {["end"] = {_end, buf_last_line_length(0)}, start = {start, 0}}}
     end
     v_23_0_0 = range0
     _0_0["range"] = v_23_0_0
@@ -208,6 +218,21 @@ do
   end
   _0_0["aniseed/locals"]["buf"] = v_23_0_
   buf = v_23_0_
+end
+local getpos = nil
+do
+  local v_23_0_ = nil
+  local function getpos0(expr)
+    local _3_ = nvim.fn.getpos(expr)
+    local _ = _3_[1]
+    local start = _3_[2]
+    local _end = _3_[3]
+    local _0 = _3_[4]
+    return {start, _end}
+  end
+  v_23_0_ = getpos0
+  _0_0["aniseed/locals"]["getpos"] = v_23_0_
+  getpos = v_23_0_
 end
 local selection = nil
 do
@@ -232,10 +257,10 @@ do
           nu.normal("`[v`]y")
         end
         do
-          local selection1 = nvim.eval("@@")
+          local content = nvim.eval("@@")
           nvim.o.selection = sel_backup
           nvim.ex.let("@@ = g:conjure_selection_reg_backup")
-          return selection1
+          return {content = content, range = {["end"] = getpos("'>"), start = getpos("'<")}}
         end
       end
     end

@@ -15,8 +15,8 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {["ani-eval"] = "aniseed.eval", code = "conjure.code", core = "conjure.aniseed.core", log = "conjure.log", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string"}}
-  return {require("aniseed.eval"), require("conjure.code"), require("conjure.aniseed.core"), require("conjure.log"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string")}
+  _0_0["aniseed/local-fns"] = {require = {["ani-eval"] = "aniseed.eval", code = "conjure.code", core = "conjure.aniseed.core", log = "conjure.log", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", view = "conjure.aniseed.view"}}
+  return {require("aniseed.eval"), require("conjure.code"), require("conjure.aniseed.core"), require("conjure.log"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.aniseed.view")}
 end
 local _2_ = _1_(...)
 local ani_eval = _2_[1]
@@ -25,6 +25,7 @@ local core = _2_[3]
 local log = _2_[4]
 local nvim = _2_[5]
 local str = _2_[6]
+local view = _2_[7]
 do local _ = ({nil, _0_0, nil})[2] end
 local log_buf_name = nil
 do
@@ -148,7 +149,7 @@ do
         local ok_3f = _3_["ok?"]
         local result_str = nil
         if ok_3f then
-          result_str = core["pr-str"](result)
+          result_str = view.serialise(result)
         else
           result_str = result
         end

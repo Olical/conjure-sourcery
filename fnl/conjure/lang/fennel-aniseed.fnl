@@ -2,6 +2,7 @@
   {require {nvim conjure.aniseed.nvim
             core conjure.aniseed.core
             str conjure.aniseed.string
+            view conjure.aniseed.view
             ani-eval aniseed.eval
             code conjure.code
             log conjure.log}})
@@ -43,7 +44,7 @@
   (when opts
     (let [{: ok? : result} opts
           result-str (if ok?
-                       (core.pr-str result)
+                       (view.serialise result)
                        result)
           result-lines (str.split result-str "[^\n]+")]
       (log.append

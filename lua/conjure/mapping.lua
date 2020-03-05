@@ -114,9 +114,9 @@ do
     local v_23_0_0 = nil
     local function eval_ranged_command0(start, _end, code)
       if ("" == code) then
-        return eval.str(extract.range(core.dec(start), _end))
+        return eval.range(core.dec(start), _end)
       else
-        return eval.str(code)
+        return eval.command(code)
       end
     end
     v_23_0_0 = eval_ranged_command0
@@ -132,7 +132,7 @@ do
   do
     local v_23_0_0 = nil
     local function eval_selection0(kind)
-      return eval.str(extract.selection({["visual?"] = not kind, kind = (kind or nvim.fn.visualmode())}))
+      return eval.selection(kind)
     end
     v_23_0_0 = eval_selection0
     _0_0["eval-selection"] = v_23_0_0

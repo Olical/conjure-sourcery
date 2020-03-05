@@ -4,12 +4,6 @@
             nu conjure.aniseed.nvim.util
             str conjure.aniseed.string}})
 
-;; TODO form (root / current)
-
-;; May be language dependant.
-;; TODO element
-;; TODO namespace
-
 (defn- read-range [[srow scol] [erow ecol]]
   (let [lines (nvim.buf_get_lines
                 0 (- srow 1) erow false)]
@@ -73,16 +67,29 @@
        :content (read-range start end)})))
 
 (defn word []
-  (nvim.fn.expand "<cword>"))
+  {:content (nvim.fn.expand "<cword>")
+
+   ;; This is wrong but that's okay. I hope.
+   :range {:start (nvim.win_get_cursor 0)
+           :end (nvim.win_get_cursor 0)}})
 
 (defn file-path []
   (nvim.fn.expand "%:p"))
 
+(defn- buf-last-line-length [buf]
+  (core.count (core.first (nvim.buf_get_lines buf (core.dec (nvim.buf_line_count buf)) -1 false))))
+
 (defn range [start end]
-  (str.join "\n" (nvim.buf_get_lines 0 start end false)))
+  {:content (str.join "\n" (nvim.buf_get_lines 0 start end false))
+   :range {:start [start 0]
+           :end [end (buf-last-line-length 0)]}})
 
 (defn buf []
   (range 0 -1))
+
+(defn- getpos [expr]
+  (let [[_ start end _] (nvim.fn.getpos expr)]
+    [start end]))
 
 (defn selection [{:kind kind :visual? visual?}]
   (let [sel-backup nvim.o.selection]
@@ -95,7 +102,9 @@
       (= kind :block) (nu.normal "`[`]y")
       (nu.normal "`[v`]y"))
 
-    (let [selection (nvim.eval "@@")]
+    (let [content (nvim.eval "@@")]
       (set nvim.o.selection sel-backup)
       (nvim.ex.let "@@ = g:conjure_selection_reg_backup")
-      selection)))
+      {:content content
+       :range {:start (getpos "'<")
+               :end (getpos "'>")}})))
