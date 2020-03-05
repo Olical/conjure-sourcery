@@ -4,6 +4,9 @@
             lang conjure.lang}})
 
 (defn- unlist [buf]
+  "The buflisted attribute is reset when a new window is opened. Since the
+  buffer upsert is decoupled from the window we have to run this whenever we
+  split the buffer into some new window."
   (nvim.buf_set_option buf :buflisted false))
 
 (defn- upsert-buf []
@@ -18,7 +21,6 @@
       buf)))
 
 ;; TODO Implement trimming using a marker so as not to cut forms in half.
-;; TODO Log tools to display eval input and output.
 ;; TODO Floating window log output display.
 
 (defn- buf-empty? [buf]
@@ -45,10 +47,12 @@
         (nvim.list_wins)))))
 
 (defn- create-win [split-fn]
-  (let [buf (upsert-buf)]
+  (let [buf (upsert-buf)
+        win (split-fn (lang.get :log-buf-name))]
     (nvim.win_set_cursor
-      (split-fn (lang.get :log-buf-name))
+      win
       [(nvim.buf_line_count buf) 0])
+    (nvim.win_set_option win :wrap false)
     (unlist buf)))
 
 (defn split []

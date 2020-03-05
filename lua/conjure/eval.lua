@@ -28,7 +28,9 @@ do
   local v_23_0_ = nil
   local function eval_str0(code, opts)
     opts.code = code
+    opts.action = "eval"
     opts.context = (nvim.b.conjure_context or lang.call("buf-context"))
+    lang.call("display-request", opts)
     return lang.call("display-result", lang.call("eval-str", opts))
   end
   v_23_0_ = eval_str0
@@ -41,7 +43,7 @@ do
   do
     local v_23_0_0 = nil
     local function current_form0()
-      return eval_str(extract.form({}).content, {})
+      return eval_str(extract.form({}).content, {origin = "current-form"})
     end
     v_23_0_0 = current_form0
     _0_0["current-form"] = v_23_0_0
@@ -56,7 +58,7 @@ do
   do
     local v_23_0_0 = nil
     local function root_form0()
-      return eval_str(extract.form({["root?"] = true}).content, {})
+      return eval_str(extract.form({["root?"] = true}).content, {origin = "root-form"})
     end
     v_23_0_0 = root_form0
     _0_0["root-form"] = v_23_0_0
@@ -71,7 +73,7 @@ do
   do
     local v_23_0_0 = nil
     local function word0()
-      return eval_str(extract.word(), {})
+      return eval_str(extract.word(), {origin = "word"})
     end
     v_23_0_0 = word0
     _0_0["word"] = v_23_0_0
@@ -86,7 +88,9 @@ do
   do
     local v_23_0_0 = nil
     local function file0()
-      return lang.call("display-result", lang.call("eval-file", {["file-path"] = extract["file-path"]()}))
+      local opts = {["file-path"] = extract["file-path"](), action = "eval", origin = "file"}
+      lang.call("display-request", opts)
+      return lang.call("display-result", lang.call("eval-file", opts))
     end
     v_23_0_0 = file0
     _0_0["file"] = v_23_0_0
@@ -101,7 +105,7 @@ do
   do
     local v_23_0_0 = nil
     local function buf0()
-      return eval_str(extract.buf(), {["file-path"] = extract["file-path"]()})
+      return eval_str(extract.buf(), {["file-path"] = extract["file-path"](), origin = "buf"})
     end
     v_23_0_0 = buf0
     _0_0["buf"] = v_23_0_0
@@ -116,7 +120,7 @@ do
   do
     local v_23_0_0 = nil
     local function str0(code)
-      return eval_str(code, {})
+      return eval_str(code, {origin = "user"})
     end
     v_23_0_0 = str0
     _0_0["str"] = v_23_0_0

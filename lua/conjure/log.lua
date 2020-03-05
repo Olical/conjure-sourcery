@@ -103,7 +103,9 @@ do
   local v_23_0_ = nil
   local function create_win0(split_fn)
     local buf = upsert_buf()
-    nvim.win_set_cursor(split_fn(lang.get("log-buf-name")), {nvim.buf_line_count(buf), 0})
+    local win = split_fn(lang.get("log-buf-name"))
+    nvim.win_set_cursor(win, {nvim.buf_line_count(buf), 0})
+    nvim.win_set_option(win, "wrap", false)
     return unlist(buf)
   end
   v_23_0_ = create_win0

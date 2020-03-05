@@ -1,6 +1,6 @@
 local _0_0 = nil
 do
-  local name_23_0_ = "conjure.lang.fennel"
+  local name_23_0_ = "conjure.lang.fennel-aniseed"
   local loaded_23_0_ = package.loaded[name_23_0_]
   local module_23_0_ = nil
   if ("table" == type(loaded_23_0_)) then
@@ -15,15 +15,16 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {["ani-eval"] = "aniseed.eval", core = "conjure.aniseed.core", log = "conjure.log", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string"}}
-  return {require("aniseed.eval"), require("conjure.aniseed.core"), require("conjure.log"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string")}
+  _0_0["aniseed/local-fns"] = {require = {["ani-eval"] = "aniseed.eval", code = "conjure.code", core = "conjure.aniseed.core", log = "conjure.log", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string"}}
+  return {require("aniseed.eval"), require("conjure.code"), require("conjure.aniseed.core"), require("conjure.log"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string")}
 end
 local _2_ = _1_(...)
 local ani_eval = _2_[1]
-local core = _2_[2]
-local log = _2_[3]
-local nvim = _2_[4]
-local str = _2_[5]
+local code = _2_[2]
+local core = _2_[3]
+local log = _2_[4]
+local nvim = _2_[5]
+local str = _2_[6]
 do local _ = ({nil, _0_0, nil})[2] end
 local log_buf_name = nil
 do
@@ -70,13 +71,35 @@ do
   _0_0["aniseed/locals"]["buf-context"] = v_23_0_
   buf_context = v_23_0_
 end
+local display_request = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function display_request0(opts)
+      local function _3_()
+        if (("file" == opts.origin) or ("buf" == opts.origin)) then
+          return opts["file-path"]
+        else
+          return code.sample(opts.code, 64)
+        end
+      end
+      return log.append({(";; " .. opts.action .. " (" .. opts.origin .. "): " .. _3_())})
+    end
+    v_23_0_0 = display_request0
+    _0_0["display-request"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["display-request"] = v_23_0_
+  display_request = v_23_0_
+end
 local eval_str = nil
 do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
     local function eval_str0(opts)
-      local code = nil
+      local code0 = nil
       local function _3_()
         if opts.context then
           return ("(module " .. opts.context .. ") ")
@@ -84,8 +107,8 @@ do
           return ""
         end
       end
-      code = (_3_() .. opts.code .. "\n")
-      local ok_3f, result = ani_eval.str(code, {filename = opts["file-path"]})
+      code0 = (_3_() .. opts.code .. "\n")
+      local ok_3f, result = ani_eval.str(code0, {filename = opts["file-path"]})
       return {["ok?"] = ok_3f, result = result}
     end
     v_23_0_0 = eval_str0

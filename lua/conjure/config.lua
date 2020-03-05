@@ -25,7 +25,7 @@ local langs = nil
 do
   local v_23_0_ = nil
   do
-    local v_23_0_0 = {clojure = "conjure.lang.clojure", fennel = "conjure.lang.fennel"}
+    local v_23_0_0 = {fennel = "conjure.lang.fennel-aniseed"}
     _0_0["langs"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end

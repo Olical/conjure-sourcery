@@ -1,8 +1,9 @@
-(module conjure.lang.fennel
+(module conjure.lang.fennel-aniseed
   {require {nvim conjure.aniseed.nvim
             core conjure.aniseed.core
             str conjure.aniseed.string
             ani-eval aniseed.eval
+            code conjure.code
             log conjure.log}})
 
 (def log-buf-name (.. "conjure-aniseed-" (nvim.fn.getpid) ".fnl"))
@@ -16,6 +17,13 @@
                     (str.join "\n"))]
     (or (string.match header buf-module-pattern)
         default-module-name)))
+
+(defn display-request [opts]
+  (log.append
+    [(.. ";; " opts.action " (" opts.origin "): "
+       (if (or (= :file opts.origin) (= :buf opts.origin))
+         opts.file-path
+         (code.sample opts.code 64)))]))
 
 (defn eval-str [opts]
   (let [code (.. (if opts.context

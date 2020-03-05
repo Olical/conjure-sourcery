@@ -2,8 +2,7 @@
   {require {core conjure.aniseed.core}})
 
 (def langs
-  {:clojure :conjure.lang.clojure
-   :fennel :conjure.lang.fennel})
+  {:fennel :conjure.lang.fennel-aniseed})
 
 (def mappings
   {:prefix "<localleader>"
