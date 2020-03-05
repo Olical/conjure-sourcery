@@ -30,7 +30,6 @@
        :range range
        :origin :current-form})))
 
-;; TODO This is always returning nil.
 (defn root-form []
   (let [{: content : range} (extract.form {:root? true})]
     (eval-str
