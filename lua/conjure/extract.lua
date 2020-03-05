@@ -84,13 +84,17 @@ do
       local _3_ = nvim.win_get_cursor(0)
       local row = _3_[1]
       local col = _3_[2]
-      local stack = nvim.fn.synstack(row, col)
+      local stack = nvim.fn.synstack(row, core.inc(col))
       local stack_size = #stack
       local function _4_()
         local name = nvim.fn.synIDattr(stack[stack_size], "name")
         return (name:find("Comment$") or name:find("String$") or name:find("Regexp$"))
       end
-      return ((stack_size > 0) and _4_())
+      if ("number" == type(((stack_size > 0) and _4_()))) then
+        return 1
+      else
+        return 0
+      end
     end
     v_23_0_0 = skip_match_3f0
     _0_0["skip-match?"] = v_23_0_0

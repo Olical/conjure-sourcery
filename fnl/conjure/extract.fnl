@@ -30,15 +30,18 @@
 
 (defn skip-match? []
   (let [[row col] (nvim.win_get_cursor 0)
-        stack (nvim.fn.synstack row col)
+        stack (nvim.fn.synstack row (core.inc col))
         stack-size (length stack)]
-    (and (> stack-size 0)
-         (let [name (nvim.fn.synIDattr (. stack stack-size) :name)]
-           (or (name:find "Comment$")
-               (name:find "String$")
-               (name:find "Regexp$"))))))
+    (if (= :number
+           (type
+             (and (> stack-size 0)
+                  (let [name (nvim.fn.synIDattr (. stack stack-size) :name)]
+                    (or (name:find "Comment$")
+                        (name:find "String$")
+                        (name:find "Regexp$"))))))
+      1
+      0)))
 
-;; TODO Handle [] and {} pairs, including matching inner or outer most pair.
 (defn form [{: root?}]
   (let [;; 'W' don't Wrap around the end of the file
         ;; 'n' do Not move the cursor

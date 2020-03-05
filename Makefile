@@ -11,4 +11,4 @@ compile:
 
 test:
 	rm -rf test/lua
-	PREFIX="-c 'syntax on'" deps/aniseed/scripts/test.sh
+	deps/aniseed/scripts/test.sh
