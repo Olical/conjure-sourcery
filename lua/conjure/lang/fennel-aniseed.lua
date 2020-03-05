@@ -38,12 +38,6 @@ do
   _0_0["aniseed/locals"]["log-buf-name"] = v_23_0_
   log_buf_name = v_23_0_
 end
-local buf_header_length = nil
-do
-  local v_23_0_ = 20
-  _0_0["aniseed/locals"]["buf-header-length"] = v_23_0_
-  buf_header_length = v_23_0_
-end
 local default_module_name = nil
 do
   local v_23_0_ = "aniseed.user"
@@ -56,13 +50,24 @@ do
   _0_0["aniseed/locals"]["buf-module-pattern"] = v_23_0_
   buf_module_pattern = v_23_0_
 end
+local config = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = {["buf-header-length"] = 20, ["log-sample-limit"] = 64}
+    _0_0["config"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["config"] = v_23_0_
+  config = v_23_0_
+end
 local buf_context = nil
 do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
     local function buf_context0()
-      local header = str.join("\n", nvim.buf_get_lines(0, 0, buf_header_length, false))
+      local header = str.join("\n", nvim.buf_get_lines(0, 0, config["buf-header-length"], false))
       return (string.match(header, buf_module_pattern) or default_module_name)
     end
     v_23_0_0 = buf_context0
@@ -82,7 +87,7 @@ do
         if (("file" == opts.origin) or ("buf" == opts.origin)) then
           return opts["file-path"]
         else
-          return code.sample(opts.code, 64)
+          return code.sample(opts.code, config["log-sample-limit"])
         end
       end
       return log.append({(";; " .. opts.action .. " (" .. opts.origin .. "): " .. _3_())})

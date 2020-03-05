@@ -9,12 +9,15 @@
 
 (def log-buf-name (.. "conjure-aniseed-" (nvim.fn.getpid) ".fnl"))
 
-(def- buf-header-length 20)
 (def- default-module-name "aniseed.user")
 (def- buf-module-pattern "[(]%s*module%s*(.-)[%s){]")
 
+(def config
+  {:log-sample-limit 64
+   :buf-header-length 20})
+
 (defn buf-context []
-  (let [header (->> (nvim.buf_get_lines 0 0 buf-header-length false)
+  (let [header (->> (nvim.buf_get_lines 0 0 config.buf-header-length false)
                     (str.join "\n"))]
     (or (string.match header buf-module-pattern)
         default-module-name)))
@@ -22,9 +25,9 @@
 (defn display-request [opts]
   (log.append
     [(.. ";; " opts.action " (" opts.origin "): "
-       (if (or (= :file opts.origin) (= :buf opts.origin))
-         opts.file-path
-         (code.sample opts.code 64)))]))
+         (if (or (= :file opts.origin) (= :buf opts.origin))
+           opts.file-path
+           (code.sample opts.code config.log-sample-limit)))]))
 
 (defn eval-str [opts]
   (let [code (.. (if opts.context
