@@ -10,7 +10,7 @@
   (nvim.buf_set_option buf :buflisted false))
 
 (defn- log-buf-name []
-  (.. "conjure-" (lang.get :filetype) "-" (nvim.fn.getpid) ".log"))
+  (.. "conjure-log-" (nvim.fn.getpid) "." (lang.get :extension)))
 
 (defn- upsert-buf []
   (let [buf-name (log-buf-name)
@@ -20,7 +20,6 @@
         (nvim.buf_set_option buf :buftype :nofile)
         (nvim.buf_set_option buf :bufhidden :hide)
         (nvim.buf_set_option buf :swapfile false)
-        (nvim.buf_set_option buf :filetype (lang.get :filetype))
         (unlist buf)
         buf)
       buf)))

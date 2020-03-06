@@ -7,7 +7,7 @@
             code conjure.code
             log conjure.log}})
 
-(def filetype :fennel)
+(def extension :fnl)
 
 (def- default-module-name "aniseed.user")
 (def- buf-module-pattern "[(]%s*module%s*(.-)[%s){]")
