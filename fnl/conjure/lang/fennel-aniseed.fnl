@@ -7,7 +7,7 @@
             code conjure.code
             log conjure.log}})
 
-(def log-buf-name (.. "conjure-aniseed-" (nvim.fn.getpid) ".fnl"))
+(def filetype :fennel)
 
 (def- default-module-name "aniseed.user")
 (def- buf-module-pattern "[(]%s*module%s*(.-)[%s){]")
@@ -24,7 +24,7 @@
 
 (defn display-request [opts]
   (log.append
-    [(.. ";; " opts.action " (" opts.origin "): "
+    [(.. "; " opts.action " (" opts.origin "): "
          (if (or (= :file opts.origin) (= :buf opts.origin))
            opts.file-path
            (code.sample opts.code config.log-sample-limit)))]))

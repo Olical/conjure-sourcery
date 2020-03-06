@@ -33,16 +33,28 @@ do
   _0_0["aniseed/locals"]["unlist"] = v_23_0_
   unlist = v_23_0_
 end
+local log_buf_name = nil
+do
+  local v_23_0_ = nil
+  local function log_buf_name0()
+    return ("conjure-" .. lang.get("filetype") .. "-" .. nvim.fn.getpid() .. ".log")
+  end
+  v_23_0_ = log_buf_name0
+  _0_0["aniseed/locals"]["log-buf-name"] = v_23_0_
+  log_buf_name = v_23_0_
+end
 local upsert_buf = nil
 do
   local v_23_0_ = nil
   local function upsert_buf0()
-    local buf = nvim.fn.bufnr(lang.get("log-buf-name"))
+    local buf_name = log_buf_name()
+    local buf = nvim.fn.bufnr(buf_name)
     if (-1 == buf) then
-      local buf0 = nvim.fn.bufadd(lang.get("log-buf-name"))
+      local buf0 = nvim.fn.bufadd(buf_name)
       nvim.buf_set_option(buf0, "buftype", "nofile")
       nvim.buf_set_option(buf0, "bufhidden", "hide")
       nvim.buf_set_option(buf0, "swapfile", false)
+      nvim.buf_set_option(buf0, "filetype", lang.get("filetype"))
       unlist(buf0)
       return buf0
     else
@@ -103,7 +115,7 @@ do
   local v_23_0_ = nil
   local function create_win0(split_fn)
     local buf = upsert_buf()
-    local win = split_fn(lang.get("log-buf-name"))
+    local win = split_fn(log_buf_name())
     nvim.win_set_cursor(win, {nvim.buf_line_count(buf), 0})
     nvim.win_set_option(win, "wrap", false)
     return unlist(buf)

@@ -9,13 +9,18 @@
   split the buffer into some new window."
   (nvim.buf_set_option buf :buflisted false))
 
+(defn- log-buf-name []
+  (.. "conjure-" (lang.get :filetype) "-" (nvim.fn.getpid) ".log"))
+
 (defn- upsert-buf []
-  (let [buf (nvim.fn.bufnr (lang.get :log-buf-name))]
+  (let [buf-name (log-buf-name)
+        buf (nvim.fn.bufnr buf-name)]
     (if (= -1 buf)
-      (let [buf (nvim.fn.bufadd (lang.get :log-buf-name))]
+      (let [buf (nvim.fn.bufadd buf-name)]
         (nvim.buf_set_option buf :buftype :nofile)
         (nvim.buf_set_option buf :bufhidden :hide)
         (nvim.buf_set_option buf :swapfile false)
+        (nvim.buf_set_option buf :filetype (lang.get :filetype))
         (unlist buf)
         buf)
       buf)))
@@ -48,7 +53,7 @@
 
 (defn- create-win [split-fn]
   (let [buf (upsert-buf)
-        win (split-fn (lang.get :log-buf-name))]
+        win (split-fn (log-buf-name))]
     (nvim.win_set_cursor
       win
       [(nvim.buf_line_count buf) 0])

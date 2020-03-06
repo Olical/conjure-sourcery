@@ -27,16 +27,16 @@ local nvim = _2_[5]
 local str = _2_[6]
 local view = _2_[7]
 do local _ = ({nil, _0_0, nil})[2] end
-local log_buf_name = nil
+local filetype = nil
 do
   local v_23_0_ = nil
   do
-    local v_23_0_0 = ("conjure-aniseed-" .. nvim.fn.getpid() .. ".fnl")
-    _0_0["log-buf-name"] = v_23_0_0
+    local v_23_0_0 = "fennel"
+    _0_0["filetype"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
-  _0_0["aniseed/locals"]["log-buf-name"] = v_23_0_
-  log_buf_name = v_23_0_
+  _0_0["aniseed/locals"]["filetype"] = v_23_0_
+  filetype = v_23_0_
 end
 local default_module_name = nil
 do
@@ -90,7 +90,7 @@ do
           return code.sample(opts.code, config["log-sample-limit"])
         end
       end
-      return log.append({(";; " .. opts.action .. " (" .. opts.origin .. "): " .. _3_())})
+      return log.append({("; " .. opts.action .. " (" .. opts.origin .. "): " .. _3_())})
     end
     v_23_0_0 = display_request0
     _0_0["display-request"] = v_23_0_0
