@@ -21,17 +21,27 @@ end
 local _2_ = _1_(...)
 local core = _2_[1]
 do local _ = ({nil, _0_0, nil})[2] end
+local trim = nil
+do
+  local v_23_0_ = nil
+  local function trim0(s)
+    return string.gsub(s, "^%s*(.-)%s*$", "%1")
+  end
+  v_23_0_ = trim0
+  _0_0["aniseed/locals"]["trim"] = v_23_0_
+  trim = v_23_0_
+end
 local sample = nil
 do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
     local function sample0(s, limit)
-      local flat = string.gsub(string.gsub(s, "\n", " "), "%s+", " ")
+      local flat = trim(string.gsub(string.gsub(s, "\n", " "), "%s+", " "))
       if (limit >= core.count(flat)) then
         return flat
       else
-        return (string.sub(flat, 0, limit) .. "\226\128\166")
+        return (string.sub(flat, 0, core.dec(limit)) .. "\226\128\166")
       end
     end
     v_23_0_0 = sample0
