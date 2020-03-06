@@ -27,16 +27,16 @@ local nvim = _2_[5]
 local str = _2_[6]
 local view = _2_[7]
 do local _ = ({nil, _0_0, nil})[2] end
-local filetype = nil
+local buf_suffix = nil
 do
   local v_23_0_ = nil
   do
-    local v_23_0_0 = "fennel"
-    _0_0["filetype"] = v_23_0_0
+    local v_23_0_0 = ".fnl"
+    _0_0["buf-suffix"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
-  _0_0["aniseed/locals"]["filetype"] = v_23_0_
-  filetype = v_23_0_
+  _0_0["aniseed/locals"]["buf-suffix"] = v_23_0_
+  buf_suffix = v_23_0_
 end
 local default_module_name = nil
 do

@@ -10,7 +10,7 @@
   (nvim.buf_set_option buf :buflisted false))
 
 (defn- log-buf-name []
-  (.. "conjure-log-" (nvim.fn.getpid) "." (lang.get :extension)))
+  (.. "conjure-log-" (nvim.fn.getpid) (lang.get :buf-suffix)))
 
 (defn- upsert-buf []
   (let [buf-name (log-buf-name)

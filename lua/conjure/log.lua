@@ -37,7 +37,7 @@ local log_buf_name = nil
 do
   local v_23_0_ = nil
   local function log_buf_name0()
-    return ("conjure-" .. lang.get("filetype") .. "-" .. nvim.fn.getpid() .. ".log")
+    return ("conjure-log-" .. nvim.fn.getpid() .. lang.get("buf-suffix"))
   end
   v_23_0_ = log_buf_name0
   _0_0["aniseed/locals"]["log-buf-name"] = v_23_0_
@@ -54,7 +54,6 @@ do
       nvim.buf_set_option(buf0, "buftype", "nofile")
       nvim.buf_set_option(buf0, "bufhidden", "hide")
       nvim.buf_set_option(buf0, "swapfile", false)
-      nvim.buf_set_option(buf0, "filetype", lang.get("filetype"))
       unlist(buf0)
       return buf0
     else

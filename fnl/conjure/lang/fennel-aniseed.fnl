@@ -7,7 +7,7 @@
             code conjure.code
             log conjure.log}})
 
-(def extension :fnl)
+(def buf-suffix ".fnl")
 
 (def- default-module-name "aniseed.user")
 (def- buf-module-pattern "[(]%s*module%s*(.-)[%s){]")
