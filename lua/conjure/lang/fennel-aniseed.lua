@@ -90,7 +90,7 @@ do
           return code.sample(opts.code, config["log-sample-limit"])
         end
       end
-      return log.append({("; " .. opts.action .. " (" .. opts.origin .. "): " .. _3_())})
+      return log.append({lines = {("; " .. opts.action .. " (" .. opts.origin .. "): " .. _3_())}})
     end
     v_23_0_0 = display_request0
     _0_0["display-request"] = v_23_0_0
@@ -159,17 +159,16 @@ do
           result_str = result
         end
         local result_lines = str.split(result_str, "[^\n]+")
-        local function _5_()
-          if ok_3f then
-            return result_lines
-          else
-            local function _5_(_241)
-              return ("; " .. _241)
-            end
-            return core.map(_5_, result_lines)
+        local _5_
+        if ok_3f then
+          _5_ = result_lines
+        else
+          local function _6_(_241)
+            return ("; " .. _241)
           end
+          _5_ = core.map(_6_, result_lines)
         end
-        log.append(_5_())
+        log.append({lines = _5_})
         return nvim.out_write((result_str .. "\n"))
       end
     end

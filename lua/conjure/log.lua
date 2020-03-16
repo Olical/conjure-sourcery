@@ -15,24 +15,15 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {core = "conjure.aniseed.core", lang = "conjure.lang", nvim = "conjure.aniseed.nvim"}}
-  return {require("conjure.aniseed.core"), require("conjure.lang"), require("conjure.aniseed.nvim")}
+  _0_0["aniseed/local-fns"] = {require = {buffer = "conjure.buffer", core = "conjure.aniseed.core", lang = "conjure.lang", nvim = "conjure.aniseed.nvim"}}
+  return {require("conjure.buffer"), require("conjure.aniseed.core"), require("conjure.lang"), require("conjure.aniseed.nvim")}
 end
 local _2_ = _1_(...)
-local core = _2_[1]
-local lang = _2_[2]
-local nvim = _2_[3]
+local buffer = _2_[1]
+local core = _2_[2]
+local lang = _2_[3]
+local nvim = _2_[4]
 do local _ = ({nil, _0_0, nil})[2] end
-local unlist = nil
-do
-  local v_23_0_ = nil
-  local function unlist0(buf)
-    return nvim.buf_set_option(buf, "buflisted", false)
-  end
-  v_23_0_ = unlist0
-  _0_0["aniseed/locals"]["unlist"] = v_23_0_
-  unlist = v_23_0_
-end
 local log_buf_name = nil
 do
   local v_23_0_ = nil
@@ -47,18 +38,7 @@ local upsert_buf = nil
 do
   local v_23_0_ = nil
   local function upsert_buf0()
-    local buf_name = log_buf_name()
-    local buf = nvim.fn.bufnr(buf_name)
-    if (-1 == buf) then
-      local buf0 = nvim.fn.bufadd(buf_name)
-      nvim.buf_set_option(buf0, "buftype", "nofile")
-      nvim.buf_set_option(buf0, "bufhidden", "hide")
-      nvim.buf_set_option(buf0, "swapfile", false)
-      unlist(buf0)
-      return buf0
-    else
-      return buf
-    end
+    return buffer["upsert-hidden"](log_buf_name())
   end
   v_23_0_ = upsert_buf0
   _0_0["aniseed/locals"]["upsert-buf"] = v_23_0_
@@ -79,27 +59,31 @@ do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
-    local function append0(lines)
-      local buf = upsert_buf()
-      local old_lines = nvim.buf_line_count(buf)
-      local _3_
-      if buf_empty_3f(buf) then
-        _3_ = 0
-      else
-        _3_ = -1
-      end
-      nvim.buf_set_lines(buf, _3_, -1, false, lines)
+    local function append0(_3_0)
+      local _4_ = _3_0
+      local lines = _4_["lines"]
       do
-        local new_lines = nvim.buf_line_count(buf)
-        local function _5_(win)
-          local _6_ = nvim.win_get_cursor(win)
-          local row = _6_[1]
-          local col = _6_[2]
-          if ((buf == nvim.win_get_buf(win)) and (col == 0) and (old_lines == row)) then
-            return nvim.win_set_cursor(win, {new_lines, 0})
-          end
+        local buf = upsert_buf()
+        local old_lines = nvim.buf_line_count(buf)
+        local _5_
+        if buf_empty_3f(buf) then
+          _5_ = 0
+        else
+          _5_ = -1
         end
-        return core["run!"](_5_, nvim.list_wins())
+        nvim.buf_set_lines(buf, _5_, -1, false, lines)
+        do
+          local new_lines = nvim.buf_line_count(buf)
+          local function _7_(win)
+            local _8_ = nvim.win_get_cursor(win)
+            local row = _8_[1]
+            local col = _8_[2]
+            if ((buf == nvim.win_get_buf(win)) and (col == 0) and (old_lines == row)) then
+              return nvim.win_set_cursor(win, {new_lines, 0})
+            end
+          end
+          return core["run!"](_7_, nvim.list_wins())
+        end
       end
     end
     v_23_0_0 = append0
@@ -117,7 +101,7 @@ do
     local win = split_fn(log_buf_name())
     nvim.win_set_cursor(win, {nvim.buf_line_count(buf), 0})
     nvim.win_set_option(win, "wrap", false)
-    return unlist(buf)
+    return buffer.unlist(buf)
   end
   v_23_0_ = create_win0
   _0_0["aniseed/locals"]["create-win"] = v_23_0_

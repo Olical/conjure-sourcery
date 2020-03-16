@@ -1,28 +1,14 @@
 (module conjure.log
   {require {core conjure.aniseed.core
             nvim conjure.aniseed.nvim
+            buffer conjure.buffer
             lang conjure.lang}})
-
-(defn- unlist [buf]
-  "The buflisted attribute is reset when a new window is opened. Since the
-  buffer upsert is decoupled from the window we have to run this whenever we
-  split the buffer into some new window."
-  (nvim.buf_set_option buf :buflisted false))
 
 (defn- log-buf-name []
   (.. "conjure-log-" (nvim.fn.getpid) (lang.get :buf-suffix)))
 
 (defn- upsert-buf []
-  (let [buf-name (log-buf-name)
-        buf (nvim.fn.bufnr buf-name)]
-    (if (= -1 buf)
-      (let [buf (nvim.fn.bufadd buf-name)]
-        (nvim.buf_set_option buf :buftype :nofile)
-        (nvim.buf_set_option buf :bufhidden :hide)
-        (nvim.buf_set_option buf :swapfile false)
-        (unlist buf)
-        buf)
-      buf)))
+  (buffer.upsert-hidden (log-buf-name)))
 
 ;; TODO Implement trimming using a marker so as not to cut forms in half.
 ;; TODO Floating window log output display.
@@ -31,7 +17,7 @@
   (and (<= (nvim.buf_line_count buf) 1)
        (= 0 (core.count (core.first (nvim.buf_get_lines buf 0 -1 false))))))
 
-(defn append [lines]
+(defn append [{: lines}]
   (let [buf (upsert-buf)
         old-lines (nvim.buf_line_count buf)]
 
@@ -57,7 +43,7 @@
       win
       [(nvim.buf_line_count buf) 0])
     (nvim.win_set_option win :wrap false)
-    (unlist buf)))
+    (buffer.unlist buf)))
 
 (defn split []
   (create-win nvim.ex.split))

@@ -24,10 +24,11 @@
 
 (defn display-request [opts]
   (log.append
-    [(.. "; " opts.action " (" opts.origin "): "
-         (if (or (= :file opts.origin) (= :buf opts.origin))
-           opts.file-path
-           (code.sample opts.code config.log-sample-limit)))]))
+    {:lines
+     [(.. "; " opts.action " (" opts.origin "): "
+          (if (or (= :file opts.origin) (= :buf opts.origin))
+            opts.file-path
+            (code.sample opts.code config.log-sample-limit)))]}))
 
 (defn eval-str [opts]
   (let [code (.. (if opts.context
@@ -51,9 +52,10 @@
                        result)
           result-lines (str.split result-str "[^\n]+")]
       (log.append
-        (if ok?
-          result-lines
-          (core.map #(.. "; " $1) result-lines)))
+        {:lines
+         (if ok?
+           result-lines
+           (core.map #(.. "; " $1) result-lines))})
       (nvim.out_write
         (.. result-str
             "\n")))))
