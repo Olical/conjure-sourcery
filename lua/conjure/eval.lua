@@ -46,7 +46,7 @@ do
   local v_23_0_ = nil
   local function eval_str0(opts)
     opts.action = "eval"
-    opts.context = (nvim.b.conjure_context or lang.call("buf-context"))
+    opts.context = (nvim.b.conjure_context or lang.call("context"))
     opts["file-path"] = extract["file-path"]()
     lang.call("display-request", opts)
     return lang.call("display-result", lang.call("eval-str", opts))

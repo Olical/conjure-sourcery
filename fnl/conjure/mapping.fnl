@@ -4,6 +4,7 @@
             str conjure.aniseed.string
             config conjure.config
             extract conjure.extract
+            hud conjure.hud
             eval conjure.eval}})
 
 (defn- viml->lua [m f opts]
@@ -43,7 +44,9 @@
   (map-local->plug
     :n config.mappings.eval-motion :conjure_eval_motion)
   (map-local->plug
-    :v config.mappings.eval-visual :conjure_eval_visual))
+    :v config.mappings.eval-visual :conjure_eval_visual)
+  (map-local->plug
+    :n config.mappings.close-hud :conjure_close_hud))
 
 (defn setup-filetypes [filetypes]
   (nvim.ex.augroup :conjure_init_filetypes)
@@ -70,6 +73,7 @@
   (map-plug :n :conjure_eval_file :conjure.eval :file)
   (map-plug :n :conjure_eval_buf :conjure.eval :buf)
   (map-plug :v :conjure_eval_visual :conjure.mapping :eval-selection)
+  (map-plug :n :conjure_close_hud :conjure.hud :close)
 
   (nvim.ex.function_
     (->> ["ConjureEvalMotion(kind)"

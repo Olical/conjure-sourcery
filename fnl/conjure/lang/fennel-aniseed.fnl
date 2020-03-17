@@ -5,6 +5,7 @@
             view conjure.aniseed.view
             ani-eval aniseed.eval
             code conjure.code
+            hud conjure.hud
             log conjure.log}})
 
 (def buf-suffix ".fnl")
@@ -16,19 +17,21 @@
   {:log-sample-limit 64
    :buf-header-length 20})
 
-(defn buf-context []
+(defn context []
   (let [header (->> (nvim.buf_get_lines 0 0 config.buf-header-length false)
                     (str.join "\n"))]
     (or (string.match header buf-module-pattern)
         default-module-name)))
 
 (defn display-request [opts]
-  (log.append
-    {:lines
-     [(.. "; " opts.action " (" opts.origin "): "
-          (if (or (= :file opts.origin) (= :buf opts.origin))
-            opts.file-path
-            (code.sample opts.code config.log-sample-limit)))]}))
+  (let [display-opts
+        {:lines
+         [(.. "; " opts.action " (" opts.origin "): "
+              (if (or (= :file opts.origin) (= :buf opts.origin))
+                opts.file-path
+                (code.sample opts.code config.log-sample-limit)))]}]
+    (hud.display display-opts)
+    (log.append display-opts)))
 
 (defn eval-str [opts]
   (let [code (.. (if opts.context
@@ -50,12 +53,10 @@
           result-str (if ok?
                        (view.serialise result)
                        result)
-          result-lines (str.split result-str "[^\n]+")]
-      (log.append
-        {:lines
-         (if ok?
-           result-lines
-           (core.map #(.. "; " $1) result-lines))})
-      (nvim.out_write
-        (.. result-str
-            "\n")))))
+          result-lines (str.split result-str "[^\n]+")
+          display-opts {:lines
+                        (if ok?
+                          result-lines
+                          (core.map #(.. "; " $1) result-lines))}]
+      (hud.display display-opts)
+      (log.append display-opts))))

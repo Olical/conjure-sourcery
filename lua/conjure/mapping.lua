@@ -15,16 +15,17 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {config = "conjure.config", core = "conjure.aniseed.core", eval = "conjure.eval", extract = "conjure.extract", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string"}}
-  return {require("conjure.config"), require("conjure.aniseed.core"), require("conjure.eval"), require("conjure.extract"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string")}
+  _0_0["aniseed/local-fns"] = {require = {config = "conjure.config", core = "conjure.aniseed.core", eval = "conjure.eval", extract = "conjure.extract", hud = "conjure.hud", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string"}}
+  return {require("conjure.config"), require("conjure.aniseed.core"), require("conjure.eval"), require("conjure.extract"), require("conjure.hud"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string")}
 end
 local _2_ = _1_(...)
 local config = _2_[1]
 local core = _2_[2]
 local eval = _2_[3]
 local extract = _2_[4]
-local nvim = _2_[5]
-local str = _2_[6]
+local hud = _2_[5]
+local nvim = _2_[6]
+local str = _2_[7]
 do local _ = ({nil, _0_0, nil})[2] end
 local viml__3elua = nil
 do
@@ -80,7 +81,8 @@ do
       map_local__3eplug("n", config.mappings["eval-file"], "conjure_eval_file")
       map_local__3eplug("n", config.mappings["eval-buf"], "conjure_eval_buf")
       map_local__3eplug("n", config.mappings["eval-motion"], "conjure_eval_motion")
-      return map_local__3eplug("v", config.mappings["eval-visual"], "conjure_eval_visual")
+      map_local__3eplug("v", config.mappings["eval-visual"], "conjure_eval_visual")
+      return map_local__3eplug("n", config.mappings["close-hud"], "conjure_close_hud")
     end
     v_23_0_0 = on_filetype0
     _0_0["on-filetype"] = v_23_0_0
@@ -155,6 +157,7 @@ do
       map_plug("n", "conjure_eval_file", "conjure.eval", "file")
       map_plug("n", "conjure_eval_buf", "conjure.eval", "buf")
       map_plug("v", "conjure_eval_visual", "conjure.mapping", "eval-selection")
+      map_plug("n", "conjure_close_hud", "conjure.hud", "close")
       nvim.ex.function_(str.join("\n", {"ConjureEvalMotion(kind)", "call luaeval(\"require('conjure.mapping')['eval-selection'](_A)\", a:kind)", "endfunction"}))
       nvim.set_keymap("n", plug("conjure_eval_motion"), ":set opfunc=ConjureEvalMotion<cr>g@", {noremap = true, silent = true})
       return nvim.ex.command_("-nargs=? -range ConjureEval", viml__3elua("conjure.mapping", "eval-ranged-command", {args = "<line1>, <line2>, <q-args>"}))

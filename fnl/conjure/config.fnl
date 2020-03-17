@@ -14,7 +14,12 @@
    :eval-file "ef"
    :eval-buf "eb"
    :eval-visual "E"
-   :eval-motion "E"})
+   :eval-motion "E"
+   :close-hud "q"})
+
+(def hud
+  {:max-width 80
+   :max-height 10})
 
 (defn filetypes []
   (core.keys langs))

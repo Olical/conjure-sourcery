@@ -2,7 +2,8 @@
   {require {nvim conjure.aniseed.nvim
             core conjure.aniseed.core
             buffer conjure.buffer
-            lang conjure.lang}})
+            lang conjure.lang
+            config conjure.config}})
 
 ;; Much like conjure.log this can be used to display messages, although only one at a time.
 ;; It maintains a floating window, maybe viewing a bit of the log?
@@ -28,10 +29,9 @@
               :relative :editor
               :row 0
               :col 424242
-              :anchor :NE
 
-              :width (math.min 80 max-line-length)
-              :height (math.min 10 line-count)
+              :width (math.min config.hud.max-width max-line-length)
+              :height (math.min config.hud.max-height line-count)
               :focusable false
               :style :minimal}]
     (nvim.buf_set_lines buf 0 -1 false lines)

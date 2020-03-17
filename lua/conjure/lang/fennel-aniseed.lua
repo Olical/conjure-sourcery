@@ -15,17 +15,18 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {["ani-eval"] = "aniseed.eval", code = "conjure.code", core = "conjure.aniseed.core", log = "conjure.log", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", view = "conjure.aniseed.view"}}
-  return {require("aniseed.eval"), require("conjure.code"), require("conjure.aniseed.core"), require("conjure.log"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.aniseed.view")}
+  _0_0["aniseed/local-fns"] = {require = {["ani-eval"] = "aniseed.eval", code = "conjure.code", core = "conjure.aniseed.core", hud = "conjure.hud", log = "conjure.log", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", view = "conjure.aniseed.view"}}
+  return {require("aniseed.eval"), require("conjure.code"), require("conjure.aniseed.core"), require("conjure.hud"), require("conjure.log"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.aniseed.view")}
 end
 local _2_ = _1_(...)
 local ani_eval = _2_[1]
 local code = _2_[2]
 local core = _2_[3]
-local log = _2_[4]
-local nvim = _2_[5]
-local str = _2_[6]
-local view = _2_[7]
+local hud = _2_[4]
+local log = _2_[5]
+local nvim = _2_[6]
+local str = _2_[7]
+local view = _2_[8]
 do local _ = ({nil, _0_0, nil})[2] end
 local buf_suffix = nil
 do
@@ -61,21 +62,21 @@ do
   _0_0["aniseed/locals"]["config"] = v_23_0_
   config = v_23_0_
 end
-local buf_context = nil
+local context = nil
 do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
-    local function buf_context0()
+    local function context0()
       local header = str.join("\n", nvim.buf_get_lines(0, 0, config["buf-header-length"], false))
       return (string.match(header, buf_module_pattern) or default_module_name)
     end
-    v_23_0_0 = buf_context0
-    _0_0["buf-context"] = v_23_0_0
+    v_23_0_0 = context0
+    _0_0["context"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
-  _0_0["aniseed/locals"]["buf-context"] = v_23_0_
-  buf_context = v_23_0_
+  _0_0["aniseed/locals"]["context"] = v_23_0_
+  context = v_23_0_
 end
 local display_request = nil
 do
@@ -83,6 +84,7 @@ do
   do
     local v_23_0_0 = nil
     local function display_request0(opts)
+      local display_opts = nil
       local function _3_()
         if (("file" == opts.origin) or ("buf" == opts.origin)) then
           return opts["file-path"]
@@ -90,7 +92,9 @@ do
           return code.sample(opts.code, config["log-sample-limit"])
         end
       end
-      return log.append({lines = {("; " .. opts.action .. " (" .. opts.origin .. "): " .. _3_())}})
+      display_opts = {lines = {("; " .. opts.action .. " (" .. opts.origin .. "): " .. _3_())}}
+      hud.display(display_opts)
+      return log.append(display_opts)
     end
     v_23_0_0 = display_request0
     _0_0["display-request"] = v_23_0_0
@@ -159,6 +163,7 @@ do
           result_str = result
         end
         local result_lines = str.split(result_str, "[^\n]+")
+        local display_opts = nil
         local _5_
         if ok_3f then
           _5_ = result_lines
@@ -168,8 +173,9 @@ do
           end
           _5_ = core.map(_6_, result_lines)
         end
-        log.append({lines = _5_})
-        return nvim.out_write((result_str .. "\n"))
+        display_opts = {lines = _5_}
+        hud.display(display_opts)
+        return log.append(display_opts)
       end
     end
     v_23_0_0 = display_result0
