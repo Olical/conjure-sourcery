@@ -42,6 +42,10 @@
       1
       0)))
 
+;; TODO Maybe try [] and {} if no matches for ().
+;; This may be good for when you want to eval a top level data form.
+;; On the other hand, it may be extremely confusing.
+;; Just supporting () forms may be the simplest and best solution.
 (defn form [{: root?}]
   (let [;; 'W' don't Wrap around the end of the file
         ;; 'n' do Not move the cursor
