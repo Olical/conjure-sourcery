@@ -5,6 +5,7 @@
             config conjure.config
             extract conjure.extract
             hud conjure.hud
+            lang conjure.lang
             eval conjure.eval}})
 
 (defn- viml->lua [m f opts]
@@ -13,14 +14,14 @@
 (defn- plug [name]
   (.. "<Plug>(" name ")"))
 
-(defn- map-plug [mode name m f]
+(defn map-plug [mode name m f]
   (nvim.set_keymap
     mode (plug name)
     (.. ":" (viml->lua m f {}) "<cr>")
     {:noremap true
      :silent true}))
 
-(defn- map-local->plug [mode keys name]
+(defn map-local->plug [mode keys name]
   (nvim.buf_set_keymap
     0 mode (.. config.mappings.prefix keys)
     (plug name)
@@ -46,7 +47,8 @@
   (map-local->plug
     :v config.mappings.eval-visual :conjure_eval_visual)
   (map-local->plug
-    :n config.mappings.close-hud :conjure_close_hud))
+    :n config.mappings.close-hud :conjure_close_hud)
+  (lang.call :on-filetype))
 
 (defn setup-filetypes [filetypes]
   (nvim.ex.augroup :conjure_init_filetypes)
@@ -64,7 +66,7 @@
 (defn eval-selection [kind]
   (eval.selection kind))
 
-(defn setup-plug-mappings [filetypes]
+(defn setup-plug-mappings []
   (map-plug :n :conjure_log_split :conjure.log :split)
   (map-plug :n :conjure_log_vsplit :conjure.log :vsplit)
   (map-plug :n :conjure_eval_current_form :conjure.eval :current-form)

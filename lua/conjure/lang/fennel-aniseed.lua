@@ -15,18 +15,20 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {["ani-eval"] = "aniseed.eval", code = "conjure.code", core = "conjure.aniseed.core", hud = "conjure.hud", log = "conjure.log", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", view = "conjure.aniseed.view"}}
-  return {require("aniseed.eval"), require("conjure.code"), require("conjure.aniseed.core"), require("conjure.hud"), require("conjure.log"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.aniseed.view")}
+  _0_0["aniseed/local-fns"] = {require = {["ani-eval"] = "aniseed.eval", ["ani-test"] = "aniseed.test", code = "conjure.code", core = "conjure.aniseed.core", hud = "conjure.hud", log = "conjure.log", mapping = "conjure.mapping", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", view = "conjure.aniseed.view"}}
+  return {require("aniseed.eval"), require("aniseed.test"), require("conjure.code"), require("conjure.aniseed.core"), require("conjure.hud"), require("conjure.log"), require("conjure.mapping"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.aniseed.view")}
 end
 local _2_ = _1_(...)
 local ani_eval = _2_[1]
-local code = _2_[2]
-local core = _2_[3]
-local hud = _2_[4]
-local log = _2_[5]
-local nvim = _2_[6]
-local str = _2_[7]
-local view = _2_[8]
+local ani_test = _2_[2]
+local code = _2_[3]
+local core = _2_[4]
+local hud = _2_[5]
+local log = _2_[6]
+local mapping = _2_[7]
+local nvim = _2_[8]
+local str = _2_[9]
+local view = _2_[10]
 do local _ = ({nil, _0_0, nil})[2] end
 local buf_suffix = nil
 do
@@ -55,7 +57,7 @@ local config = nil
 do
   local v_23_0_ = nil
   do
-    local v_23_0_0 = {["buf-header-length"] = 20, ["log-sample-limit"] = 64}
+    local v_23_0_0 = {["buf-header-length"] = 20, ["log-sample-limit"] = 64, mappings = {["run-all-tests"] = "ta", ["run-buf-tests"] = "tt"}}
     _0_0["config"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
@@ -185,4 +187,51 @@ do
   _0_0["aniseed/locals"]["display-result"] = v_23_0_
   display_result = v_23_0_
 end
-return nil
+local run_buf_tests = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function run_buf_tests0()
+      return ani_test.run(context())
+    end
+    v_23_0_0 = run_buf_tests0
+    _0_0["run-buf-tests"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["run-buf-tests"] = v_23_0_
+  run_buf_tests = v_23_0_
+end
+local run_all_tests = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function run_all_tests0()
+      return ani_test["run-all"]()
+    end
+    v_23_0_0 = run_all_tests0
+    _0_0["run-all-tests"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["run-all-tests"] = v_23_0_
+  run_all_tests = v_23_0_
+end
+local on_filetype = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function on_filetype0()
+      mapping["map-local->plug"]("n", config.mappings["run-buf-tests"], "conjure_lang_fennel_aniseed_run_buf_tests")
+      return mapping["map-local->plug"]("n", config.mappings["run-all-tests"], "conjure_lang_fennel_aniseed_run_all_tests")
+    end
+    v_23_0_0 = on_filetype0
+    _0_0["on-filetype"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["on-filetype"] = v_23_0_
+  on_filetype = v_23_0_
+end
+mapping["map-plug"]("n", "conjure_lang_fennel_aniseed_run_buf_tests", "conjure.lang.fennel-aniseed", "run-buf-tests")
+return mapping["map-plug"]("n", "conjure_lang_fennel_aniseed_run_all_tests", "conjure.lang.fennel-aniseed", "run-all-tests")

@@ -4,6 +4,8 @@
             str conjure.aniseed.string
             view conjure.aniseed.view
             ani-eval aniseed.eval
+            ani-test aniseed.test
+            mapping conjure.mapping
             code conjure.code
             hud conjure.hud
             log conjure.log}})
@@ -15,7 +17,9 @@
 
 (def config
   {:log-sample-limit 64
-   :buf-header-length 20})
+   :buf-header-length 20
+   :mappings {:run-buf-tests "tt"
+              :run-all-tests "ta"}})
 
 (defn context []
   (let [header (->> (nvim.buf_get_lines 0 0 config.buf-header-length false)
@@ -60,3 +64,29 @@
                           (core.map #(.. "; " $1) result-lines))}]
       (hud.display display-opts)
       (log.append display-opts))))
+
+;; TODO Refactor testing to return the text as data.
+;; I can then display in hud and log if there is no error.
+;; Maybe I can just have a core.with-out-str?
+
+(defn run-buf-tests []
+  (ani-test.run (context)))
+
+(defn run-all-tests []
+  (ani-test.run-all))
+
+(defn on-filetype []
+  (mapping.map-local->plug
+    :n config.mappings.run-buf-tests
+    :conjure_lang_fennel_aniseed_run_buf_tests)
+  (mapping.map-local->plug
+    :n config.mappings.run-all-tests
+    :conjure_lang_fennel_aniseed_run_all_tests))
+
+(mapping.map-plug
+  :n :conjure_lang_fennel_aniseed_run_buf_tests
+  :conjure.lang.fennel-aniseed :run-buf-tests)
+
+(mapping.map-plug
+  :n :conjure_lang_fennel_aniseed_run_all_tests
+  :conjure.lang.fennel-aniseed :run-all-tests)
