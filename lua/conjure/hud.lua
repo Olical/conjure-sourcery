@@ -37,7 +37,7 @@ do
 end
 local open_win = nil
 do
-  local v_23_0_ = (_0_0["aniseed/locals"]["open-win"] or nil)
+  local v_23_0_ = (_0_0["aniseed/locals"]["open-win"] or {id = nil})
   _0_0["aniseed/locals"]["open-win"] = v_23_0_
   open_win = v_23_0_
 end
@@ -47,9 +47,9 @@ do
   do
     local v_23_0_0 = nil
     local function close0()
-      if open_win then
-        nvim.win_close(open_win, true)
-        open_win = nil
+      if open_win.id then
+        nvim.win_close(open_win.id, true)
+        open_win.id = nil
         return nil
       end
     end
@@ -73,10 +73,10 @@ do
         local buf = buffer["upsert-hidden"](hud_buf_name())
         local max_line_length = math.max(unpack(core.map(core.count, lines)))
         local line_count = core.count(lines)
-        local opts = {col = 424242, focusable = false, height = math.min(config.hud["max-height"], line_count), relative = "editor", row = 0, style = "minimal", width = math.min(config.hud["max-width"], max_line_length)}
+        local opts = {anchor = "NW", col = 424242, focusable = false, height = math.min(config.hud["max-height"], line_count), relative = "editor", row = 0, style = "minimal", width = math.min(config.hud["max-width"], max_line_length)}
         nvim.buf_set_lines(buf, 0, -1, false, lines)
-        open_win = nvim.open_win(buf, false, opts)
-        return nvim.win_set_option(open_win, "wrap", false)
+        open_win.id = nvim.open_win(buf, false, opts)
+        return nvim.win_set_option(open_win.id, "wrap", false)
       end
     end
     v_23_0_0 = display0
@@ -86,5 +86,4 @@ do
   _0_0["aniseed/locals"]["display"] = v_23_0_
   display = v_23_0_
 end
-              -- (display table: 0x41136220) (display table: 0x41da0c68) (close)
 return nil

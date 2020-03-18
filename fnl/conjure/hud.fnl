@@ -13,13 +13,15 @@
 (defn- hud-buf-name []
   (.. "conjure-hud-" (nvim.fn.getpid) (lang.get :buf-suffix)))
 
-(defonce- open-win nil)
+(defonce- open-win {:id nil})
 
 (defn close []
-  (when open-win
-    (nvim.win_close open-win true)
-    (set open-win nil)))
+  (when open-win.id
+    (nvim.win_close open-win.id true)
+    (set open-win.id nil)))
 
+;; TODO Consider centering at top or bottom / moving if it obscures the cursor.
+;; Keeping it simple and in the top right for now.
 (defn display [{: lines}]
   (close)
   (let [buf (buffer.upsert-hidden (hud-buf-name))
@@ -29,19 +31,12 @@
               :relative :editor
               :row 0
               :col 424242
+              :anchor :NW
 
               :width (math.min config.hud.max-width max-line-length)
               :height (math.min config.hud.max-height line-count)
               :focusable false
               :style :minimal}]
     (nvim.buf_set_lines buf 0 -1 false lines)
-    (set open-win (nvim.open_win buf false opts))
-    (nvim.win_set_option open-win :wrap false)))
-
-(comment
-  (display
-    {:lines ["foooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo000000000000000000000000000" "bar"
-             "(+ 1 2 3)"
-             "1" "2" "3" "4" "5" "6" "7" "8" "9" "10"]})
-  (display {:lines [";; This is small."]})
-  (close))
+    (set open-win.id (nvim.open_win buf false opts))
+    (nvim.win_set_option open-win.id :wrap false)))
