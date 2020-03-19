@@ -17,16 +17,16 @@
   {:id nil
    :timer nil})
 
+(defn clear-passive-timer []
+  (when state.timer
+    (state.timer:close)
+    (set state.timer nil)))
+
 (defn close []
   (clear-passive-timer)
   (when state.id
     (nvim.win_close state.id true)
     (set state.id nil)))
-
-(defn clear-passive-timer []
-  (when state.timer
-    (state.timer:close)
-    (set state.timer nil)))
 
 (defn close-passive []
   (when (not state.timer)

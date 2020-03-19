@@ -1,8 +1,9 @@
 (module conjure.eval
   {require {nvim conjure.aniseed.nvim
+            core conjure.aniseed.core
             extract conjure.extract
             lang conjure.lang
-            core conjure.aniseed.core}})
+            hud conjure.hud}})
 
 (defn file []
   (let [opts {:file-path (extract.file-path)
@@ -69,6 +70,7 @@
         (extract.selection
           {:kind (or kind (nvim.fn.visualmode))
            :visual? (not kind)})]
+    (vim.schedule hud.clear-passive-timer)
     (eval-str
       {:code content
        :range range
