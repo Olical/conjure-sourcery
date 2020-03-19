@@ -13,17 +13,35 @@
 (defn- hud-buf-name []
   (.. "conjure-hud-" (nvim.fn.getpid) (lang.get :buf-suffix)))
 
-(defonce- open-win {:id nil})
+(defonce- state
+  {:id nil
+   :timer nil})
 
 (defn close []
-  (when open-win.id
-    (nvim.win_close open-win.id true)
-    (set open-win.id nil)))
+  (when state.id
+    (nvim.win_close state.id true)
+    (set state.id nil)))
+
+(defn close-passive []
+  (when (not state.timer)
+    (set state.timer (vim.loop.new_timer))
+    (state.timer:start
+      config.hud.passive-close-duration 0
+      (vim.schedule_wrap
+        (fn []
+          (clear-passive-timer)
+          (close))))))
+
+(defn clear-passive-timer []
+  (when state.timer
+    (state.timer:close)
+    (set state.timer nil)))
 
 ;; TODO Consider centering at top or bottom / moving if it obscures the cursor.
 ;; Keeping it simple and in the top right for now.
 (defn display [{: lines}]
   (close)
+  (clear-passive-timer)
   (let [buf (buffer.upsert-hidden (hud-buf-name))
         max-line-length (math.max (unpack (core.map core.count lines)))
         line-count (core.count lines)
@@ -38,5 +56,5 @@
               :focusable false
               :style :minimal}]
     (nvim.buf_set_lines buf 0 -1 false lines)
-    (set open-win.id (nvim.open_win buf false opts))
-    (nvim.win_set_option open-win.id :wrap false)))
+    (set state.id (nvim.open_win buf false opts))
+    (nvim.win_set_option state.id :wrap false)))

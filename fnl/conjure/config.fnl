@@ -19,7 +19,8 @@
 
 (def hud
   {:max-width 80
-   :max-height 10})
+   :max-height 10
+   :passive-close-duration 500})
 
 (defn filetypes []
   (core.keys langs))

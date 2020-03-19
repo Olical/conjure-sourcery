@@ -94,6 +94,8 @@ do
       map_local__3eplug("n", config.mappings["eval-motion"], "conjure_eval_motion")
       map_local__3eplug("v", config.mappings["eval-visual"], "conjure_eval_visual")
       map_local__3eplug("n", config.mappings["close-hud"], "conjure_close_hud")
+      nvim.ex.autocmd("CursorMoved", "<buffer>", viml__3elua("conjure.hud", "close-passive", {}))
+      nvim.ex.autocmd("CursorMovedI", "<buffer>", viml__3elua("conjure.hud", "close-passive", {}))
       return lang.call("on-filetype")
     end
     v_23_0_0 = on_filetype0
