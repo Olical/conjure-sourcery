@@ -25,11 +25,11 @@
 (defn close []
   (clear-passive-timer)
   (when state.id
-    (nvim.win_close state.id true)
+    (pcall (fn [] (nvim.win_close state.id true)))
     (set state.id nil)))
 
 (defn close-passive []
-  (when (not state.timer)
+  (when (and (not state.timer) state.id)
     (set state.timer (vim.loop.new_timer))
     (state.timer:start
       config.hud.passive-close-duration 0

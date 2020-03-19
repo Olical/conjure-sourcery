@@ -53,17 +53,18 @@
        :range range
        :origin :buf})))
 
-(defn range [start end]
-  (let [{: content : range} (extract.range start end)]
-    (eval-str
-      {:code content
-       :range range
-       :origin :range})))
-
 (defn command [code]
   (eval-str
     {:code code
      :origin :command}))
+
+(defn range [start end]
+  (let [{: content : range} (extract.range start end)]
+    (vim.schedule hud.clear-passive-timer)
+    (eval-str
+      {:code content
+       :range range
+       :origin :range})))
 
 (defn selection [kind]
   (let [{: content : range}

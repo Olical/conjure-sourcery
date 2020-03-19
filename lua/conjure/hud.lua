@@ -68,7 +68,10 @@ do
     local function close0()
       clear_passive_timer()
       if state.id then
-        nvim.win_close(state.id, true)
+        local function _3_()
+          return nvim.win_close(state.id, true)
+        end
+        pcall(_3_)
         state.id = nil
         return nil
       end
@@ -86,7 +89,7 @@ do
   do
     local v_23_0_0 = nil
     local function close_passive0()
-      if not state.timer then
+      if (not state.timer and state.id) then
         state.timer = vim.loop.new_timer()
         return (state.timer):start(config.hud["passive-close-duration"], 0, vim.schedule_wrap(close))
       end

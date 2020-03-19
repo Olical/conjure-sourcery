@@ -128,24 +128,6 @@ do
   _0_0["aniseed/locals"]["buf"] = v_23_0_
   buf = v_23_0_
 end
-local range = nil
-do
-  local v_23_0_ = nil
-  do
-    local v_23_0_0 = nil
-    local function range0(start, _end)
-      local _3_ = extract.range(start, _end)
-      local range1 = _3_["range"]
-      local content = _3_["content"]
-      return eval_str({code = content, origin = "range", range = range1})
-    end
-    v_23_0_0 = range0
-    _0_0["range"] = v_23_0_0
-    v_23_0_ = v_23_0_0
-  end
-  _0_0["aniseed/locals"]["range"] = v_23_0_
-  range = v_23_0_
-end
 local command = nil
 do
   local v_23_0_ = nil
@@ -160,6 +142,25 @@ do
   end
   _0_0["aniseed/locals"]["command"] = v_23_0_
   command = v_23_0_
+end
+local range = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function range0(start, _end)
+      local _3_ = extract.range(start, _end)
+      local range1 = _3_["range"]
+      local content = _3_["content"]
+      vim.schedule(hud["clear-passive-timer"])
+      return eval_str({code = content, origin = "range", range = range1})
+    end
+    v_23_0_0 = range0
+    _0_0["range"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["range"] = v_23_0_
+  range = v_23_0_
 end
 local selection = nil
 do
