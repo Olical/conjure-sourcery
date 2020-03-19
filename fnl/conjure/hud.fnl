@@ -18,30 +18,27 @@
    :timer nil})
 
 (defn close []
+  (clear-passive-timer)
   (when state.id
     (nvim.win_close state.id true)
     (set state.id nil)))
-
-(defn close-passive []
-  (when (not state.timer)
-    (set state.timer (vim.loop.new_timer))
-    (state.timer:start
-      config.hud.passive-close-duration 0
-      (vim.schedule_wrap
-        (fn []
-          (clear-passive-timer)
-          (close))))))
 
 (defn clear-passive-timer []
   (when state.timer
     (state.timer:close)
     (set state.timer nil)))
 
+(defn close-passive []
+  (when (not state.timer)
+    (set state.timer (vim.loop.new_timer))
+    (state.timer:start
+      config.hud.passive-close-duration 0
+      (vim.schedule_wrap close))))
+
 ;; TODO Consider centering at top or bottom / moving if it obscures the cursor.
 ;; Keeping it simple and in the top right for now.
 (defn display [{: lines}]
   (close)
-  (clear-passive-timer)
   (let [buf (buffer.upsert-hidden (hud-buf-name))
         max-line-length (math.max (unpack (core.map core.count lines)))
         line-count (core.count lines)

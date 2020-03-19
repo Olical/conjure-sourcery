@@ -17,6 +17,7 @@
 
 (def config
   {:log-sample-limit 64
+   :hud-sample-limit 24
    :buf-header-length 20
    :mappings {:run-buf-tests "tt"
               :run-all-tests "ta"}})
@@ -27,13 +28,17 @@
     (or (string.match header buf-module-pattern)
         default-module-name)))
 
+(defn- preview [{: sample-limit : opts}]
+  (.. "; " opts.action " (" opts.origin "): "
+      (if (or (= :file opts.origin) (= :buf opts.origin))
+        (code.right-sample opts.file-path sample-limit)
+        (code.left-sample opts.code sample-limit))))
+
 (defn display-request [opts]
   (let [display-opts
-        {:lines
-         [(.. "; " opts.action " (" opts.origin "): "
-              (if (or (= :file opts.origin) (= :buf opts.origin))
-                opts.file-path
-                (code.sample opts.code config.log-sample-limit)))]}]
+        {:lines [(preview
+                   {:opts opts
+                    :sample-limit config.log-sample-limit})]}]
     (hud.display display-opts)
     (log.append display-opts)))
 
@@ -43,8 +48,9 @@
                    "")
                  opts.code "\n")
         (ok? result) (ani-eval.str code {:filename opts.file-path})]
-    {:ok? ok?
-     :result result}))
+    (set opts.ok? ok?)
+    (set opts.result result)
+    opts))
 
 (defn eval-file [opts]
   (set opts.code (core.slurp opts.file-path))
@@ -58,12 +64,14 @@
                        (view.serialise result)
                        result)
           result-lines (str.split result-str "[^\n]+")
-          display-opts {:lines
-                        (if ok?
-                          result-lines
-                          (core.map #(.. "; " $1) result-lines))}]
-      (hud.display display-opts)
-      (log.append display-opts))))
+          prefixed-result-lines (if ok?
+                                  result-lines
+                                  (core.map #(.. "; " $1) result-lines))]
+      (hud.display {:lines [(preview
+                              {:opts opts
+                               :sample-limit config.hud-sample-limit})
+                            (unpack prefixed-result-lines)]})
+      (log.append {:lines prefixed-result-lines}))))
 
 ;; TODO Refactor testing to return the text as data.
 ;; I can then display in hud and log if there is no error.

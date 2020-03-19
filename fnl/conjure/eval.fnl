@@ -9,7 +9,8 @@
               :origin :file
               :action :eval}]
     (lang.call :display-request opts)
-    (->> (lang.call :eval-file opts)
+    (->> opts
+         (lang.call :eval-file)
          (lang.call :display-result))))
 
 (defn- eval-str [opts]

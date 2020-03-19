@@ -47,6 +47,7 @@ do
   do
     local v_23_0_0 = nil
     local function close0()
+      __fnl_global__clear_2dpassive_2dtimer()
       if state.id then
         nvim.win_close(state.id, true)
         state.id = nil
@@ -59,28 +60,6 @@ do
   end
   _0_0["aniseed/locals"]["close"] = v_23_0_
   close = v_23_0_
-end
-local close_passive = nil
-do
-  local v_23_0_ = nil
-  do
-    local v_23_0_0 = nil
-    local function close_passive0()
-      if not state.timer then
-        state.timer = vim.loop.new_timer()
-        local function _3_()
-          __fnl_global__clear_2dpassive_2dtimer()
-          return close()
-        end
-        return (state.timer):start(config.hud["passive-close-duration"], 0, vim.schedule_wrap(_3_))
-      end
-    end
-    v_23_0_0 = close_passive0
-    _0_0["close-passive"] = v_23_0_0
-    v_23_0_ = v_23_0_0
-  end
-  _0_0["aniseed/locals"]["close-passive"] = v_23_0_
-  close_passive = v_23_0_
 end
 local clear_passive_timer = nil
 do
@@ -101,6 +80,24 @@ do
   _0_0["aniseed/locals"]["clear-passive-timer"] = v_23_0_
   clear_passive_timer = v_23_0_
 end
+local close_passive = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function close_passive0()
+      if not state.timer then
+        state.timer = vim.loop.new_timer()
+        return (state.timer):start(config.hud["passive-close-duration"], 0, vim.schedule_wrap(close))
+      end
+    end
+    v_23_0_0 = close_passive0
+    _0_0["close-passive"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["close-passive"] = v_23_0_
+  close_passive = v_23_0_
+end
 local display = nil
 do
   local v_23_0_ = nil
@@ -110,7 +107,6 @@ do
       local _4_ = _3_0
       local lines = _4_["lines"]
       close()
-      clear_passive_timer()
       do
         local buf = buffer["upsert-hidden"](hud_buf_name())
         local max_line_length = math.max(unpack(core.map(core.count, lines)))
