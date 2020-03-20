@@ -3,7 +3,8 @@
             str conjure.aniseed.string
             code conjure.code
             hud conjure.hud
-            log conjure.log}})
+            log conjure.log
+            bencode conjure.bencode}})
 
 ;; Similarities to Fennel that could do with extracting:
 ;;  * context extraction

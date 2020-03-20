@@ -15,15 +15,16 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {code = "conjure.code", hud = "conjure.hud", log = "conjure.log", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string"}}
-  return {require("conjure.code"), require("conjure.hud"), require("conjure.log"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string")}
+  _0_0["aniseed/local-fns"] = {require = {bencode = "conjure.bencode", code = "conjure.code", hud = "conjure.hud", log = "conjure.log", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string"}}
+  return {require("conjure.bencode"), require("conjure.code"), require("conjure.hud"), require("conjure.log"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string")}
 end
 local _2_ = _1_(...)
-local code = _2_[1]
-local hud = _2_[2]
-local log = _2_[3]
-local nvim = _2_[4]
-local str = _2_[5]
+local bencode = _2_[1]
+local code = _2_[2]
+local hud = _2_[3]
+local log = _2_[4]
+local nvim = _2_[5]
+local str = _2_[6]
 do local _ = ({nil, _0_0, nil})[2] end
 local buf_suffix = nil
 do
