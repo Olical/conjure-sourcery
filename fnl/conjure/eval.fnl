@@ -15,6 +15,7 @@
          (lang.call :display-result))))
 
 (defn- eval-str [opts]
+  (vim.schedule hud.clear-passive-timer)
   (set opts.action :eval)
   (set opts.context
        (or nvim.b.conjure_context
@@ -60,7 +61,6 @@
 
 (defn range [start end]
   (let [{: content : range} (extract.range start end)]
-    (vim.schedule hud.clear-passive-timer)
     (eval-str
       {:code content
        :range range
@@ -71,7 +71,6 @@
         (extract.selection
           {:kind (or kind (nvim.fn.visualmode))
            :visual? (not kind)})]
-    (vim.schedule hud.clear-passive-timer)
     (eval-str
       {:code content
        :range range

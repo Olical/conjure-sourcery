@@ -46,6 +46,7 @@ local eval_str = nil
 do
   local v_23_0_ = nil
   local function eval_str0(opts)
+    vim.schedule(hud["clear-passive-timer"])
     opts.action = "eval"
     opts.context = (nvim.b.conjure_context or lang.call("context"))
     opts["file-path"] = extract["file-path"]()
@@ -152,7 +153,6 @@ do
       local _3_ = extract.range(start, _end)
       local range1 = _3_["range"]
       local content = _3_["content"]
-      vim.schedule(hud["clear-passive-timer"])
       return eval_str({code = content, origin = "range", range = range1})
     end
     v_23_0_0 = range0
@@ -171,7 +171,6 @@ do
       local _3_ = extract.selection({["visual?"] = not kind, kind = (kind or nvim.fn.visualmode())})
       local range0 = _3_["range"]
       local content = _3_["content"]
-      vim.schedule(hud["clear-passive-timer"])
       return eval_str({code = content, origin = "selection", range = range0})
     end
     v_23_0_0 = selection0

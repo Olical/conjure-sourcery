@@ -29,29 +29,30 @@
     (set state.id nil)))
 
 (defn close-passive []
-  (when (and (not state.timer) state.id)
+  (when (and (not state.timer)
+             config.hud.close-passive?
+             state.id)
     (set state.timer (vim.loop.new_timer))
     (state.timer:start
-      config.hud.passive-close-duration 0
+      config.hud.close-passive-timeout 0
       (vim.schedule_wrap close))))
 
-;; TODO Consider centering at top or bottom / moving if it obscures the cursor.
-;; Keeping it simple and in the top right for now.
 (defn display [{: lines}]
-  (close)
-  (let [buf (buffer.upsert-hidden (hud-buf-name))
-        max-line-length (math.max (unpack (core.map core.count lines)))
-        line-count (core.count lines)
-        opts {;; Ensure it always sticks to the top right.
-              :relative :editor
-              :row 0
-              :col 424242
-              :anchor :NW
+  (when config.hud.enabled?
+    (close)
+    (let [buf (buffer.upsert-hidden (hud-buf-name))
+          max-line-length (math.max (unpack (core.map core.count lines)))
+          line-count (core.count lines)
+          opts {;; Ensure it always sticks to the top right.
+                :relative :editor
+                :row 0
+                :col 424242
+                :anchor :NW
 
-              :width (math.min config.hud.max-width max-line-length)
-              :height (math.min config.hud.max-height line-count)
-              :focusable false
-              :style :minimal}]
-    (nvim.buf_set_lines buf 0 -1 false lines)
-    (set state.id (nvim.open_win buf false opts))
-    (nvim.win_set_option state.id :wrap false)))
+                :width (math.min config.hud.max-width max-line-length)
+                :height (math.min config.hud.max-height line-count)
+                :focusable false
+                :style :minimal}]
+      (nvim.buf_set_lines buf 0 -1 false lines)
+      (set state.id (nvim.open_win buf false opts))
+      (nvim.win_set_option state.id :wrap false))))

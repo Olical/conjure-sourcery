@@ -47,7 +47,7 @@ local hud = nil
 do
   local v_23_0_ = nil
   do
-    local v_23_0_0 = {["max-height"] = 10, ["max-width"] = 80, ["passive-close-duration"] = 500}
+    local v_23_0_0 = {["close-passive-timeout"] = 500, ["close-passive?"] = true, ["enabled?"] = true, ["max-height"] = 20, ["max-width"] = 80}
     _0_0["hud"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end

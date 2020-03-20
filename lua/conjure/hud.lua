@@ -89,9 +89,9 @@ do
   do
     local v_23_0_0 = nil
     local function close_passive0()
-      if (not state.timer and state.id) then
+      if (not state.timer and config.hud["close-passive?"] and state.id) then
         state.timer = vim.loop.new_timer()
-        return (state.timer):start(config.hud["passive-close-duration"], 0, vim.schedule_wrap(close))
+        return (state.timer):start(config.hud["close-passive-timeout"], 0, vim.schedule_wrap(close))
       end
     end
     v_23_0_0 = close_passive0
@@ -109,15 +109,17 @@ do
     local function display0(_3_0)
       local _4_ = _3_0
       local lines = _4_["lines"]
-      close()
-      do
-        local buf = buffer["upsert-hidden"](hud_buf_name())
-        local max_line_length = math.max(unpack(core.map(core.count, lines)))
-        local line_count = core.count(lines)
-        local opts = {anchor = "NW", col = 424242, focusable = false, height = math.min(config.hud["max-height"], line_count), relative = "editor", row = 0, style = "minimal", width = math.min(config.hud["max-width"], max_line_length)}
-        nvim.buf_set_lines(buf, 0, -1, false, lines)
-        state.id = nvim.open_win(buf, false, opts)
-        return nvim.win_set_option(state.id, "wrap", false)
+      if config.hud["enabled?"] then
+        close()
+        do
+          local buf = buffer["upsert-hidden"](hud_buf_name())
+          local max_line_length = math.max(unpack(core.map(core.count, lines)))
+          local line_count = core.count(lines)
+          local opts = {anchor = "NW", col = 424242, focusable = false, height = math.min(config.hud["max-height"], line_count), relative = "editor", row = 0, style = "minimal", width = math.min(config.hud["max-width"], max_line_length)}
+          nvim.buf_set_lines(buf, 0, -1, false, lines)
+          state.id = nvim.open_win(buf, false, opts)
+          return nvim.win_set_option(state.id, "wrap", false)
+        end
       end
     end
     v_23_0_0 = display0
