@@ -8,6 +8,8 @@
             lang conjure.lang
             eval conjure.eval}})
 
+;; TODO Simplify how mappings are made so that langs can do it easily too.
+
 (defn- viml->lua [m f opts]
   (.. "lua require('" m "')['" f "'](" (or opts.args "") ")"))
 
