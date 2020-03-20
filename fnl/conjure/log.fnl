@@ -11,7 +11,6 @@
   (buffer.upsert-hidden (log-buf-name)))
 
 ;; TODO Implement trimming using a marker so as not to cut forms in half.
-;; TODO Floating window log output display.
 
 (defn- buf-empty? [buf]
   (and (<= (nvim.buf_line_count buf) 1)
