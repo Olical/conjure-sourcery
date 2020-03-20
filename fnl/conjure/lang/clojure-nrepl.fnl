@@ -1,5 +1,6 @@
 (module conjure.lang.clojure-nrepl
   {require {nvim conjure.aniseed.nvim
+            core conjure.aniseed.core
             str conjure.aniseed.string
             code conjure.code
             hud conjure.hud
@@ -49,3 +50,36 @@
 
 (defn display-result [opts]
   nil)
+
+(defonce- state {})
+
+(defn disconnect []
+  (when state.sock
+    (state.sock:close)
+    (set state.sock nil)))
+
+(defn connect []
+  (disconnect)
+  (let [port (-?> (core.slurp ".nrepl-port") (tonumber))]
+    (if port
+      (do
+        (set state.sock (vim.loop.new_tcp))
+        (state.sock:connect "127.0.0.1" port
+                            (fn [...]
+                              (core.pr "===" ...))
+                            (fn [...]
+                              (core.pr "---" ...))
+                            (fn [...]
+                              (core.pr "+++" ...)))
+        (log.append {:lines [";; Connected!"]}))
+      (log.append {:lines [";; No port file found."]}))))
+
+;; Will need to change how evals happen.
+;; Let the lang decide if it's sync or async.
+;; Really Conjure passes code and context to the lang then it can decide if it displays the results.
+;; This gives the lang more freedom.
+
+(comment
+  (state.sock:write (bencode.encode {:op "eval" :code "(+ 2 3)"}))
+  (connect)
+  (disconnect))

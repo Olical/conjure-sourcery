@@ -4,3 +4,4 @@
 /test/lua/
 /.cpcache/
 /.cljs_node_repl/
+/.nrepl-port
