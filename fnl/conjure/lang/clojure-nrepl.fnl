@@ -64,14 +64,21 @@
     (if port
       (do
         (set state.sock (vim.loop.new_tcp))
-        (state.sock:connect "127.0.0.1" port
-                            (fn [...]
-                              (core.pr "===" ...))
-                            (fn [...]
-                              (core.pr "---" ...))
-                            (fn [...]
-                              (core.pr "+++" ...)))
-        (log.append {:lines [";; Connected!"]}))
+        (state.sock:connect
+          "127.0.0.1" port
+          (vim.schedule_wrap
+            (fn [err]
+              (when err
+                (log.append {:lines [";; Error! " err]}))
+
+              (state.sock:read_start
+                (vim.schedule_wrap
+                  (fn [err chunk]
+                    (log.append
+                      {:lines [(if err
+                                 (.. ";; err " err)
+                                 (core.pr-str (bencode.decode chunk)))]}))))
+              (log.append {:lines [";; Connected!"]})))))
       (log.append {:lines [";; No port file found."]}))))
 
 ;; Will need to change how evals happen.
@@ -80,6 +87,7 @@
 ;; This gives the lang more freedom.
 
 (comment
-  (state.sock:write (bencode.encode {:op "eval" :code "(+ 2 3)"}))
   (connect)
+  (state.sock:write (bencode.encode {:op "eval" :code "(/ 10 0)"}))
+  (state.sock:write (bencode.encode {:op "eval" :code "(require 'clojure.repl) (clojure.repl/doc +)"}))
   (disconnect))

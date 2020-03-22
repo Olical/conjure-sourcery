@@ -119,7 +119,7 @@ local function decode_list(s, index)
   local t = {}
   while sub(s, index, index) ~= "e" do
     local obj, ev
-    obj, index, ev = decode(s, index)
+    obj, index, ev = bencode.decode(s, index)
     if not obj then return obj, index, ev end
     insert(t, obj)
   end
@@ -132,10 +132,10 @@ local function decode_dictionary(s, index)
   while sub(s, index, index) ~= "e" do
     local obj1, obj2, ev
 
-    obj1, index, ev = decode(s, index)
+    obj1, index, ev = bencode.decode(s, index)
     if not obj1 then return obj1, index, ev end
 
-    obj2, index, ev = decode(s, index)
+    obj2, index, ev = bencode.decode(s, index)
     if not obj2 then return obj2, index, ev end
 
     t[obj1] = obj2

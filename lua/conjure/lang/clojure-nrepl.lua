@@ -15,16 +15,17 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {bencode = "conjure.bencode", code = "conjure.code", hud = "conjure.hud", log = "conjure.log", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string"}}
-  return {require("conjure.bencode"), require("conjure.code"), require("conjure.hud"), require("conjure.log"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string")}
+  _0_0["aniseed/local-fns"] = {require = {bencode = "conjure.bencode", code = "conjure.code", core = "conjure.aniseed.core", hud = "conjure.hud", log = "conjure.log", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string"}}
+  return {require("conjure.bencode"), require("conjure.code"), require("conjure.aniseed.core"), require("conjure.hud"), require("conjure.log"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string")}
 end
 local _2_ = _1_(...)
 local bencode = _2_[1]
 local code = _2_[2]
-local hud = _2_[3]
-local log = _2_[4]
-local nvim = _2_[5]
-local str = _2_[6]
+local core = _2_[3]
+local hud = _2_[4]
+local log = _2_[5]
+local nvim = _2_[6]
+local str = _2_[7]
 do local _ = ({nil, _0_0, nil})[2] end
 local buf_suffix = nil
 do
@@ -158,4 +159,79 @@ do
   _0_0["aniseed/locals"]["display-result"] = v_23_0_
   display_result = v_23_0_
 end
+local state = nil
+do
+  local v_23_0_ = (_0_0["aniseed/locals"].state or {})
+  _0_0["aniseed/locals"]["state"] = v_23_0_
+  state = v_23_0_
+end
+local disconnect = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function disconnect0()
+      if state.sock then
+        do end (state.sock):close()
+        state.sock = nil
+        return nil
+      end
+    end
+    v_23_0_0 = disconnect0
+    _0_0["disconnect"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["disconnect"] = v_23_0_
+  disconnect = v_23_0_
+end
+local connect = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function connect0()
+      disconnect()
+      do
+        local port = nil
+        do
+          local _3_0 = core.slurp(".nrepl-port")
+          if _3_0 then
+            port = tonumber(_3_0)
+          else
+            port = _3_0
+          end
+        end
+        if port then
+          state.sock = vim.loop.new_tcp()
+          local function _4_(err)
+            if err then
+              log.append({lines = {";; Error! ", err}})
+            end
+            local function _6_(err0, chunk)
+              local function _7_()
+                if err0 then
+                  return (";; err " .. err0)
+                else
+                  return core["pr-str"](bencode.decode(chunk))
+                end
+              end
+              return log.append({lines = {_7_()}})
+            end
+            do end (state.sock):read_start(vim.schedule_wrap(_6_))
+            return log.append({lines = {";; Connected!"}})
+          end
+          return (state.sock):connect("127.0.0.1", port, vim.schedule_wrap(_4_))
+        else
+          return log.append({lines = {";; No port file found."}})
+        end
+      end
+    end
+    v_23_0_0 = connect0
+    _0_0["connect"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["connect"] = v_23_0_
+  connect = v_23_0_
+end
+              -- (connect) (state.sock:write (bencode.encode table: 0x419d7798)) (state.sock:write (bencode.encode table: 0x419d9108)) (disconnect)
 return nil
