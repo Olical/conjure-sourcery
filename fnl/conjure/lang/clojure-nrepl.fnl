@@ -5,7 +5,9 @@
             code conjure.code
             hud conjure.hud
             log conjure.log
-            bencode conjure.bencode}})
+            lang conjure.lang
+            bencode conjure.bencode
+            uuid conjure.uuid}})
 
 ;; Similarities to Fennel that could do with extracting:
 ;;  * context extraction
@@ -51,43 +53,88 @@
 (defn display-result [opts]
   nil)
 
-(defonce- state {})
+(defonce state
+  {:conns {}})
 
-(defn disconnect []
-  (when state.sock
-    (state.sock:close)
-    (set state.sock nil)))
+(defn display [opts]
+  (lang.with-filetype
+    :clojure
+    (fn []
+      (hud.display opts)
+      (log.append opts))))
 
-(defn connect []
-  (disconnect)
-  (let [port (-?> (core.slurp ".nrepl-port") (tonumber))]
-    (if port
-      (do
-        (set state.sock (vim.loop.new_tcp))
-        (state.sock:connect
-          "127.0.0.1" port
-          (vim.schedule_wrap
-            (fn [err]
-              (when err
-                (log.append {:lines [";; Error! " err]}))
+(defn display-conn-status [conn status]
+  (display
+    {:lines [(.. ";; " conn.host ":" conn.port " (" status ")")]}))
 
-              (state.sock:read_start
+(defn remove-conn [{: id}]
+  (let [conn (. state.conns id)]
+    (when conn
+      (when (not (conn.sock:is_closing))
+        (conn.sock:close))
+      (tset state.conns id nil)
+      (display-conn-status conn :disconnected))))
+
+(defn remove-all-conns []
+  (core.run! remove-conn (core.vals state.conns)))
+
+(defn send [conn msg cb]
+  (let [msg-id (uuid.v4)]
+    (tset msg :id msg-id)
+    (tset conn.msgs msg-id {:msg msg :cb cb})
+    (conn.sock:write (bencode.encode msg))))
+
+(defn add-conn [{: host : port}]
+  (let [conn {:sock (vim.loop.new_tcp)
+              :id (uuid.v4)
+              :host host
+              :port port
+              :msgs {}}]
+    (tset state.conns conn.id conn)
+    (conn.sock:connect
+      host port
+      (vim.schedule_wrap
+        (fn [err]
+          (if err
+            (do
+              (display-conn-status conn err)
+              (remove-conn conn))
+
+            (do
+              (conn.sock:read_start
                 (vim.schedule_wrap
                   (fn [err chunk]
-                    (log.append
-                      {:lines [(if err
-                                 (.. ";; err " err)
-                                 (core.pr-str (bencode.decode chunk)))]}))))
-              (log.append {:lines [";; Connected!"]})))))
-      (log.append {:lines [";; No port file found."]}))))
+                    (if err
+                      (display-conn-status conn err)
+                      (let [result (bencode.decode chunk)
+                            cb (. (. conn.msgs result.id) :cb)
+                            (ok? err) (pcall cb result)]
+                        (when (not ok?)
+                          (print (.. "conjure.lang.clojure-nrepl error: " err)))
+                        (when result.status
+                          (tset conn.msgs result.id nil)))))))
+              (display-conn-status conn :connected))))))
+    conn))
+
+(defn try-nrepl-port-file []
+  (let [port (-?> (core.slurp ".nrepl-port") (tonumber))]
+    (when port
+      (add-conn
+        {:host "127.0.0.1"
+         :port port}))))
 
 ;; Will need to change how evals happen.
 ;; Let the lang decide if it's sync or async.
 ;; Really Conjure passes code and context to the lang then it can decide if it displays the results.
 ;; This gives the lang more freedom.
 
+;; TODO Sessions.
+;; TODO Auto remove completed messages.
+
 (comment
-  (connect)
-  (state.sock:write (bencode.encode {:op "eval" :code "(/ 10 0)"}))
-  (state.sock:write (bencode.encode {:op "eval" :code "(require 'clojure.repl) (clojure.repl/doc +)"}))
-  (disconnect))
+  (def c (try-nrepl-port-file))
+  (remove-conn c)
+  (remove-all-conns)
+  state.conns
+
+  (send c {:op :eval :code "(/ 10 2)"} core.pr))
