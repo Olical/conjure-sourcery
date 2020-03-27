@@ -1,6 +1,6 @@
 local _0_0 = nil
 do
-  local name_23_0_ = "conjure.code"
+  local name_23_0_ = "conjure.text"
   local loaded_23_0_ = package.loaded[name_23_0_]
   local module_23_0_ = nil
   if ("table" == type(loaded_23_0_)) then
@@ -15,11 +15,12 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {a = "conjure.aniseed.core"}}
-  return {require("conjure.aniseed.core")}
+  _0_0["aniseed/local-fns"] = {require = {a = "conjure.aniseed.core", str = "conjure.aniseed.string"}}
+  return {require("conjure.aniseed.core"), require("conjure.aniseed.string")}
 end
 local _2_ = _1_(...)
 local a = _2_[1]
+local str = _2_[2]
 do local _ = ({nil, _0_0, nil})[2] end
 local trim = nil
 do
@@ -65,5 +66,23 @@ do
   end
   _0_0["aniseed/locals"]["right-sample"] = v_23_0_
   right_sample = v_23_0_
+end
+local prefixed_lines = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function prefixed_lines0(s, prefix)
+      local function _3_(line)
+        return (prefix .. line)
+      end
+      return a.map(_3_, str.split(s, "[^\n]+"))
+    end
+    v_23_0_0 = prefixed_lines0
+    _0_0["prefixed-lines"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["prefixed-lines"] = v_23_0_
+  prefixed_lines = v_23_0_
 end
 return nil

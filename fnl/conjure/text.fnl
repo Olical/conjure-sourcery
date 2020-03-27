@@ -1,5 +1,6 @@
-(module conjure.code
-  {:require {a conjure.aniseed.core}})
+(module conjure.text
+  {:require {a conjure.aniseed.core
+             str conjure.aniseed.string}})
 
 (defn- trim [s]
   (string.gsub s "^%s*(.-)%s*$" "%1"))
@@ -14,3 +15,8 @@
 
 (defn right-sample [s limit]
   (string.reverse (left-sample (string.reverse s) limit)))
+
+(defn prefixed-lines [s prefix]
+  (->> (str.split s "[^\n]+")
+       (a.map (fn [line]
+                (.. prefix line)))))

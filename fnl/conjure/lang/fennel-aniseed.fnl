@@ -3,10 +3,11 @@
             a conjure.aniseed.core
             str conjure.aniseed.string
             view conjure.aniseed.view
+            ani-core aniseed.core
             ani-eval aniseed.eval
             ani-test aniseed.test
             mapping conjure.mapping
-            code conjure.code
+            text conjure.text
             hud conjure.hud
             log conjure.log}})
 
@@ -31,16 +32,18 @@
 (defn- preview [{: sample-limit : opts}]
   (.. "; " opts.action " (" opts.origin "): "
       (if (or (= :file opts.origin) (= :buf opts.origin))
-        (code.right-sample opts.file-path sample-limit)
-        (code.left-sample opts.code sample-limit))))
+        (text.right-sample opts.file-path sample-limit)
+        (text.left-sample opts.code sample-limit))))
+
+(defn- display [opts]
+  (hud.display opts)
+  (log.append opts))
 
 (defn display-request [opts]
-  (let [display-opts
-        {:lines [(preview
-                   {:opts opts
-                    :sample-limit config.log-sample-limit})]}]
-    (hud.display display-opts)
-    (log.append display-opts)))
+  (display
+    {:lines [(preview
+               {:opts opts
+                :sample-limit config.log-sample-limit})]}))
 
 (defn eval-str [opts]
   (let [code (.. (if opts.context
@@ -75,13 +78,24 @@
 
 ;; TODO Refactor testing to return the text as data.
 ;; I can then display in hud and log if there is no error.
-;; Maybe I can just have a a.with-out-str?
+
+(defn- wrapped-test [req f]
+  (display {:lines req})
+  (let [res (ani-core.with-out-str f)
+        lines (-> (if (= "" res)
+                    "No results."
+                    res)
+                  (text.prefixed-lines "; "))]
+    (hud.display {:lines (a.concat req lines)})
+    (log.append {:lines lines})))
 
 (defn run-buf-tests []
-  (ani-test.run (context)))
+  (let [c (context)
+        req [(.. "; run-buf-tests (" c ")")]]
+    (wrapped-test req #(ani-test.run c))))
 
 (defn run-all-tests []
-  (ani-test.run-all))
+  (wrapped-test ["; run-all-tests"] ani-test.run-all))
 
 (defn on-filetype []
   (mapping.map-local->plug

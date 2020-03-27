@@ -116,9 +116,11 @@ do
           local max_line_length = math.max(unpack(a.map(a.count, lines)))
           local line_count = a.count(lines)
           local opts = {anchor = "NW", col = 424242, focusable = false, height = math.min(config.hud["max-height"], line_count), relative = "editor", row = 0, style = "minimal", width = math.min(config.hud["max-width"], max_line_length)}
-          nvim.buf_set_lines(buf, 0, -1, false, lines)
-          state.id = nvim.open_win(buf, false, opts)
-          return nvim.win_set_option(state.id, "wrap", false)
+          if (line_count > 0) then
+            nvim.buf_set_lines(buf, 0, -1, false, lines)
+            state.id = nvim.open_win(buf, false, opts)
+            return nvim.win_set_option(state.id, "wrap", false)
+          end
         end
       end
     end

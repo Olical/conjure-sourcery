@@ -2,7 +2,7 @@
   {require {nvim conjure.aniseed.nvim
             a conjure.aniseed.core
             str conjure.aniseed.string
-            code conjure.code
+            text conjure.text
             hud conjure.hud
             log conjure.log
             lang conjure.lang
@@ -33,8 +33,8 @@
 (defn- preview [{: sample-limit : opts}]
   (.. "; " opts.action " (" opts.origin "): "
       (if (or (= :file opts.origin) (= :buf opts.origin))
-        (code.right-sample opts.file-path sample-limit)
-        (code.left-sample opts.code sample-limit))))
+        (text.right-sample opts.file-path sample-limit)
+        (text.left-sample opts.code sample-limit))))
 
 (defn display-request [opts]
   (let [display-opts

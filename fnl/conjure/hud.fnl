@@ -33,7 +33,7 @@
       (vim.schedule_wrap close))))
 
 (defn display [{: lines}]
-  (when config.hud.enabled?
+  (when (and config.hud.enabled?)
     (close)
     (let [buf (buffer.upsert-hidden (hud-buf-name))
           max-line-length (math.max (unpack (a.map a.count lines)))
@@ -48,6 +48,7 @@
                 :height (math.min config.hud.max-height line-count)
                 :focusable false
                 :style :minimal}]
-      (nvim.buf_set_lines buf 0 -1 false lines)
-      (set state.id (nvim.open_win buf false opts))
-      (nvim.win_set_option state.id :wrap false))))
+      (when (> line-count 0)
+        (nvim.buf_set_lines buf 0 -1 false lines)
+        (set state.id (nvim.open_win buf false opts))
+        (nvim.win_set_option state.id :wrap false)))))

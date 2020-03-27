@@ -15,18 +15,18 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {a = "conjure.aniseed.core", bencode = "conjure.bencode", code = "conjure.code", hud = "conjure.hud", lang = "conjure.lang", log = "conjure.log", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", uuid = "conjure.uuid"}}
-  return {require("conjure.aniseed.core"), require("conjure.bencode"), require("conjure.code"), require("conjure.hud"), require("conjure.lang"), require("conjure.log"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.uuid")}
+  _0_0["aniseed/local-fns"] = {require = {a = "conjure.aniseed.core", bencode = "conjure.bencode", hud = "conjure.hud", lang = "conjure.lang", log = "conjure.log", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", text = "conjure.text", uuid = "conjure.uuid"}}
+  return {require("conjure.aniseed.core"), require("conjure.bencode"), require("conjure.hud"), require("conjure.lang"), require("conjure.log"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.text"), require("conjure.uuid")}
 end
 local _2_ = _1_(...)
 local a = _2_[1]
 local bencode = _2_[2]
-local code = _2_[3]
-local hud = _2_[4]
-local lang = _2_[5]
-local log = _2_[6]
-local nvim = _2_[7]
-local str = _2_[8]
+local hud = _2_[3]
+local lang = _2_[4]
+local log = _2_[5]
+local nvim = _2_[6]
+local str = _2_[7]
+local text = _2_[8]
 local uuid = _2_[9]
 do local _ = ({nil, _0_0, nil})[2] end
 local buf_suffix = nil
@@ -88,9 +88,9 @@ do
     local opts = _4_["opts"]
     local function _5_()
       if (("file" == opts.origin) or ("buf" == opts.origin)) then
-        return code["right-sample"](opts["file-path"], sample_limit)
+        return text["right-sample"](opts["file-path"], sample_limit)
       else
-        return code["left-sample"](opts.code, sample_limit)
+        return text["left-sample"](opts.code, sample_limit)
       end
     end
     return ("; " .. opts.action .. " (" .. opts.origin .. "): " .. _5_())
@@ -339,5 +339,5 @@ do
   _0_0["aniseed/locals"]["try-nrepl-port-file"] = v_23_0_
   try_nrepl_port_file = v_23_0_
 end
-              -- (def c (try-nrepl-port-file)) (remove-conn c) (remove-all-conns) state.conns (send c table: 0x40f67bf0 a.pr)
+              -- (def c (try-nrepl-port-file)) (remove-conn c) (remove-all-conns) state.conns (send c table: 0x41c77058 a.pr)
 return nil

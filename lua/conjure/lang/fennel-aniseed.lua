@@ -15,20 +15,21 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {["ani-eval"] = "aniseed.eval", ["ani-test"] = "aniseed.test", a = "conjure.aniseed.core", code = "conjure.code", hud = "conjure.hud", log = "conjure.log", mapping = "conjure.mapping", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", view = "conjure.aniseed.view"}}
-  return {require("conjure.aniseed.core"), require("aniseed.eval"), require("aniseed.test"), require("conjure.code"), require("conjure.hud"), require("conjure.log"), require("conjure.mapping"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.aniseed.view")}
+  _0_0["aniseed/local-fns"] = {require = {["ani-core"] = "aniseed.core", ["ani-eval"] = "aniseed.eval", ["ani-test"] = "aniseed.test", a = "conjure.aniseed.core", hud = "conjure.hud", log = "conjure.log", mapping = "conjure.mapping", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", text = "conjure.text", view = "conjure.aniseed.view"}}
+  return {require("conjure.aniseed.core"), require("aniseed.core"), require("aniseed.eval"), require("aniseed.test"), require("conjure.hud"), require("conjure.log"), require("conjure.mapping"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.text"), require("conjure.aniseed.view")}
 end
 local _2_ = _1_(...)
 local a = _2_[1]
-local ani_eval = _2_[2]
-local ani_test = _2_[3]
-local code = _2_[4]
+local ani_core = _2_[2]
+local ani_eval = _2_[3]
+local ani_test = _2_[4]
 local hud = _2_[5]
 local log = _2_[6]
 local mapping = _2_[7]
 local nvim = _2_[8]
 local str = _2_[9]
-local view = _2_[10]
+local text = _2_[10]
+local view = _2_[11]
 do local _ = ({nil, _0_0, nil})[2] end
 local buf_suffix = nil
 do
@@ -89,9 +90,9 @@ do
     local opts = _4_["opts"]
     local function _5_()
       if (("file" == opts.origin) or ("buf" == opts.origin)) then
-        return code["right-sample"](opts["file-path"], sample_limit)
+        return text["right-sample"](opts["file-path"], sample_limit)
       else
-        return code["left-sample"](opts.code, sample_limit)
+        return text["left-sample"](opts.code, sample_limit)
       end
     end
     return ("; " .. opts.action .. " (" .. opts.origin .. "): " .. _5_())
@@ -100,15 +101,24 @@ do
   _0_0["aniseed/locals"]["preview"] = v_23_0_
   preview = v_23_0_
 end
+local display = nil
+do
+  local v_23_0_ = nil
+  local function display0(opts)
+    hud.display(opts)
+    return log.append(opts)
+  end
+  v_23_0_ = display0
+  _0_0["aniseed/locals"]["display"] = v_23_0_
+  display = v_23_0_
+end
 local display_request = nil
 do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
     local function display_request0(opts)
-      local display_opts = {lines = {preview({["sample-limit"] = config["log-sample-limit"], opts = opts})}}
-      hud.display(display_opts)
-      return log.append(display_opts)
+      return display({lines = {preview({["sample-limit"] = config["log-sample-limit"], opts = opts})}})
     end
     v_23_0_0 = display_request0
     _0_0["display-request"] = v_23_0_0
@@ -123,7 +133,7 @@ do
   do
     local v_23_0_0 = nil
     local function eval_str0(opts)
-      local code0 = nil
+      local code = nil
       local function _3_()
         if opts.context then
           return ("(module " .. opts.context .. ") ")
@@ -131,8 +141,8 @@ do
           return ""
         end
       end
-      code0 = (_3_() .. opts.code .. "\n")
-      local ok_3f, result = ani_eval.str(code0, {filename = opts["file-path"]})
+      code = (_3_() .. opts.code .. "\n")
+      local ok_3f, result = ani_eval.str(code, {filename = opts["file-path"]})
       opts["ok?"] = ok_3f
       opts.result = result
       return opts
@@ -199,13 +209,41 @@ do
   _0_0["aniseed/locals"]["display-result"] = v_23_0_
   display_result = v_23_0_
 end
+local wrapped_test = nil
+do
+  local v_23_0_ = nil
+  local function wrapped_test0(req, f)
+    display({lines = req})
+    do
+      local res = ani_core["with-out-str"](f)
+      local lines = nil
+      local _3_
+      if ("" == res) then
+        _3_ = "No results."
+      else
+        _3_ = res
+      end
+      lines = text["prefixed-lines"](_3_, "; ")
+      hud.display({lines = a.concat(req, lines)})
+      return log.append({lines = lines})
+    end
+  end
+  v_23_0_ = wrapped_test0
+  _0_0["aniseed/locals"]["wrapped-test"] = v_23_0_
+  wrapped_test = v_23_0_
+end
 local run_buf_tests = nil
 do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
     local function run_buf_tests0()
-      return ani_test.run(context())
+      local c = context()
+      local req = {("; run-buf-tests (" .. c .. ")")}
+      local function _3_()
+        return ani_test.run(c)
+      end
+      return wrapped_test(req, _3_)
     end
     v_23_0_0 = run_buf_tests0
     _0_0["run-buf-tests"] = v_23_0_0
@@ -220,7 +258,7 @@ do
   do
     local v_23_0_0 = nil
     local function run_all_tests0()
-      return ani_test["run-all"]()
+      return wrapped_test({"; run-all-tests"}, ani_test["run-all"])
     end
     v_23_0_0 = run_all_tests0
     _0_0["run-all-tests"] = v_23_0_0
