@@ -130,6 +130,7 @@
 
 ;; TODO Sessions.
 ;; TODO Auto remove completed messages.
+;; TODO Handle things lacking IDs.
 
 (comment
   (def c (try-nrepl-port-file))

@@ -163,7 +163,12 @@ do
 end
 local state = nil
 do
-  local v_23_0_ = (_0_0["aniseed/locals"].state or {conns = {}})
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = (_0_0.state or {conns = {}})
+    _0_0["state"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
   _0_0["aniseed/locals"]["state"] = v_23_0_
   state = v_23_0_
 end
@@ -242,6 +247,24 @@ do
   _0_0["aniseed/locals"]["remove-all-conns"] = v_23_0_
   remove_all_conns = v_23_0_
 end
+local send = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function send0(conn, msg, cb)
+      local msg_id = uuid.v4()
+      msg["id"] = msg_id
+      conn.msgs[msg_id] = {cb = cb, msg = msg}
+      return (conn.sock):write(bencode.encode(msg))
+    end
+    v_23_0_0 = send0
+    _0_0["send"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["send"] = v_23_0_
+  send = v_23_0_
+end
 local add_conn = nil
 do
   local v_23_0_ = nil
@@ -252,16 +275,28 @@ do
       local host = _4_["host"]
       local port = _4_["port"]
       do
-        local conn = {host = host, id = uuid.v4(), port = port, sock = vim.loop.new_tcp()}
+        local conn = {host = host, id = uuid.v4(), msgs = {}, port = port, sock = vim.loop.new_tcp()}
         state.conns[conn.id] = conn
         local function _5_(err)
           if err then
-            display_conn_status(conn, "connection-failed")
-            display({lines = {";; ", err}})
+            display_conn_status(conn, err)
             return remove_conn(conn)
           else
             local function _6_(err0, chunk)
-              return chunk
+              if err0 then
+                return display_conn_status(conn, err0)
+              else
+                local result = bencode.decode(chunk)
+                local cb = conn.msgs[result.id].cb
+                local ok_3f, err1 = pcall(cb, result)
+                if not ok_3f then
+                  print(("conjure.lang.clojure-nrepl error: " .. err1))
+                end
+                if result.status then
+                  conn.msgs[result.id] = nil
+                  return nil
+                end
+              end
             end
             do end (conn.sock):read_start(vim.schedule_wrap(_6_))
             return display_conn_status(conn, "connected")
@@ -304,5 +339,5 @@ do
   _0_0["aniseed/locals"]["try-nrepl-port-file"] = v_23_0_
   try_nrepl_port_file = v_23_0_
 end
-              -- (local conn (try-nrepl-port-file)) (remove-conn conn) (remove-all-conns) state.conns (state.sock:write (bencode.encode table: 0x41bd6290)) (state.sock:write (bencode.encode table: 0x405cddf0))
+              -- (def c (try-nrepl-port-file)) (remove-conn c) (remove-all-conns) state.conns (send c table: 0x40df60c0 core.pr)
 return nil
