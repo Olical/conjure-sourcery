@@ -76,9 +76,6 @@
                             (unpack prefixed-result-lines)]})
       (log.append {:lines prefixed-result-lines}))))
 
-;; TODO Refactor testing to return the text as data.
-;; I can then display in hud and log if there is no error.
-
 (defn- wrapped-test [req f]
   (display {:lines req})
   (let [res (ani-core.with-out-str f)
