@@ -16,6 +16,15 @@
 ;; Maybe automate all of this or make it more DRY anyway. Could just have a
 ;; comment-prefix like buf-suffix that you set to `; `.
 
+;; Will need to change how evals happen.
+;; Let the lang decide if it's sync or async.
+;; Really Conjure passes code and context to the lang then it can decide if it displays the results.
+;; This gives the lang more freedom.
+
+;; TODO Sessions.
+;; TODO Auto remove completed messages.
+;; TODO Handle things lacking IDs.
+
 (def buf-suffix ".cljc")
 
 (def- default-namespace-name "user")
@@ -122,15 +131,6 @@
       (add-conn
         {:host "127.0.0.1"
          :port port}))))
-
-;; Will need to change how evals happen.
-;; Let the lang decide if it's sync or async.
-;; Really Conjure passes code and context to the lang then it can decide if it displays the results.
-;; This gives the lang more freedom.
-
-;; TODO Sessions.
-;; TODO Auto remove completed messages.
-;; TODO Handle things lacking IDs.
 
 (comment
   (def c (try-nrepl-port-file))
