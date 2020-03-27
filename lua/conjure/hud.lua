@@ -15,13 +15,13 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {buffer = "conjure.buffer", config = "conjure.config", core = "conjure.aniseed.core", lang = "conjure.lang", nvim = "conjure.aniseed.nvim"}}
-  return {require("conjure.buffer"), require("conjure.config"), require("conjure.aniseed.core"), require("conjure.lang"), require("conjure.aniseed.nvim")}
+  _0_0["aniseed/local-fns"] = {require = {a = "conjure.aniseed.core", buffer = "conjure.buffer", config = "conjure.config", lang = "conjure.lang", nvim = "conjure.aniseed.nvim"}}
+  return {require("conjure.aniseed.core"), require("conjure.buffer"), require("conjure.config"), require("conjure.lang"), require("conjure.aniseed.nvim")}
 end
 local _2_ = _1_(...)
-local buffer = _2_[1]
-local config = _2_[2]
-local core = _2_[3]
+local a = _2_[1]
+local buffer = _2_[2]
+local config = _2_[3]
 local lang = _2_[4]
 local nvim = _2_[5]
 do local _ = ({nil, _0_0, nil})[2] end
@@ -113,8 +113,8 @@ do
         close()
         do
           local buf = buffer["upsert-hidden"](hud_buf_name())
-          local max_line_length = math.max(unpack(core.map(core.count, lines)))
-          local line_count = core.count(lines)
+          local max_line_length = math.max(unpack(a.map(a.count, lines)))
+          local line_count = a.count(lines)
           local opts = {anchor = "NW", col = 424242, focusable = false, height = math.min(config.hud["max-height"], line_count), relative = "editor", row = 0, style = "minimal", width = math.min(config.hud["max-width"], max_line_length)}
           nvim.buf_set_lines(buf, 0, -1, false, lines)
           state.id = nvim.open_win(buf, false, opts)

@@ -15,12 +15,12 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {config = "conjure.config", core = "conjure.aniseed.core", eval = "conjure.eval", extract = "conjure.extract", hud = "conjure.hud", lang = "conjure.lang", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string"}}
-  return {require("conjure.config"), require("conjure.aniseed.core"), require("conjure.eval"), require("conjure.extract"), require("conjure.hud"), require("conjure.lang"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string")}
+  _0_0["aniseed/local-fns"] = {require = {a = "conjure.aniseed.core", config = "conjure.config", eval = "conjure.eval", extract = "conjure.extract", hud = "conjure.hud", lang = "conjure.lang", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string"}}
+  return {require("conjure.aniseed.core"), require("conjure.config"), require("conjure.eval"), require("conjure.extract"), require("conjure.hud"), require("conjure.lang"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string")}
 end
 local _2_ = _1_(...)
-local config = _2_[1]
-local core = _2_[2]
+local a = _2_[1]
+local config = _2_[2]
 local eval = _2_[3]
 local extract = _2_[4]
 local hud = _2_[5]
@@ -130,7 +130,7 @@ do
     local v_23_0_0 = nil
     local function eval_ranged_command0(start, _end, code)
       if ("" == code) then
-        return eval.range(core.dec(start), _end)
+        return eval.range(a.dec(start), _end)
       else
         return eval.command(code)
       end

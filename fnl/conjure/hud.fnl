@@ -1,6 +1,6 @@
 (module conjure.hud
   {require {nvim conjure.aniseed.nvim
-            core conjure.aniseed.core
+            a conjure.aniseed.core
             buffer conjure.buffer
             lang conjure.lang
             config conjure.config}})
@@ -36,8 +36,8 @@
   (when config.hud.enabled?
     (close)
     (let [buf (buffer.upsert-hidden (hud-buf-name))
-          max-line-length (math.max (unpack (core.map core.count lines)))
-          line-count (core.count lines)
+          max-line-length (math.max (unpack (a.map a.count lines)))
+          line-count (a.count lines)
           opts {;; Ensure it always sticks to the top right.
                 :relative :editor
                 :row 0

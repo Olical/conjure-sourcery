@@ -1,6 +1,6 @@
 (module conjure.lang.fennel-aniseed
   {require {nvim conjure.aniseed.nvim
-            core conjure.aniseed.core
+            a conjure.aniseed.core
             str conjure.aniseed.string
             view conjure.aniseed.view
             ani-eval aniseed.eval
@@ -53,7 +53,7 @@
     opts))
 
 (defn eval-file [opts]
-  (set opts.code (core.slurp opts.file-path))
+  (set opts.code (a.slurp opts.file-path))
   (when opts.code
     (eval-str opts)))
 
@@ -66,7 +66,7 @@
           result-lines (str.split result-str "[^\n]+")
           prefixed-result-lines (if ok?
                                   result-lines
-                                  (core.map #(.. "; " $1) result-lines))]
+                                  (a.map #(.. "; " $1) result-lines))]
       (hud.display {:lines [(preview
                               {:opts opts
                                :sample-limit config.hud-sample-limit})
@@ -75,7 +75,7 @@
 
 ;; TODO Refactor testing to return the text as data.
 ;; I can then display in hud and log if there is no error.
-;; Maybe I can just have a core.with-out-str?
+;; Maybe I can just have a a.with-out-str?
 
 (defn run-buf-tests []
   (ani-test.run (context)))

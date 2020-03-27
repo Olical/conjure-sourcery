@@ -15,13 +15,13 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {bencode = "conjure.bencode", code = "conjure.code", core = "conjure.aniseed.core", hud = "conjure.hud", lang = "conjure.lang", log = "conjure.log", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", uuid = "conjure.uuid"}}
-  return {require("conjure.bencode"), require("conjure.code"), require("conjure.aniseed.core"), require("conjure.hud"), require("conjure.lang"), require("conjure.log"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.uuid")}
+  _0_0["aniseed/local-fns"] = {require = {a = "conjure.aniseed.core", bencode = "conjure.bencode", code = "conjure.code", hud = "conjure.hud", lang = "conjure.lang", log = "conjure.log", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", uuid = "conjure.uuid"}}
+  return {require("conjure.aniseed.core"), require("conjure.bencode"), require("conjure.code"), require("conjure.hud"), require("conjure.lang"), require("conjure.log"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.uuid")}
 end
 local _2_ = _1_(...)
-local bencode = _2_[1]
-local code = _2_[2]
-local core = _2_[3]
+local a = _2_[1]
+local bencode = _2_[2]
+local code = _2_[3]
 local hud = _2_[4]
 local lang = _2_[5]
 local log = _2_[6]
@@ -238,7 +238,7 @@ do
   do
     local v_23_0_0 = nil
     local function remove_all_conns0()
-      return core["run!"](remove_conn, core.vals(state.conns))
+      return a["run!"](remove_conn, a.vals(state.conns))
     end
     v_23_0_0 = remove_all_conns0
     _0_0["remove-all-conns"] = v_23_0_0
@@ -321,7 +321,7 @@ do
     local function try_nrepl_port_file0()
       local port = nil
       do
-        local _3_0 = core.slurp(".nrepl-port")
+        local _3_0 = a.slurp(".nrepl-port")
         if _3_0 then
           port = tonumber(_3_0)
         else
@@ -339,5 +339,5 @@ do
   _0_0["aniseed/locals"]["try-nrepl-port-file"] = v_23_0_
   try_nrepl_port_file = v_23_0_
 end
-              -- (def c (try-nrepl-port-file)) (remove-conn c) (remove-all-conns) state.conns (send c table: 0x40df60c0 core.pr)
+              -- (def c (try-nrepl-port-file)) (remove-conn c) (remove-all-conns) state.conns (send c table: 0x40f67bf0 a.pr)
 return nil

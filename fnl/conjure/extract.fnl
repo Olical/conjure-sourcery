@@ -1,5 +1,5 @@
 (module conjure.extract
-  {require {core conjure.aniseed.core
+  {require {a conjure.aniseed.core
             nvim conjure.aniseed.nvim
             nu conjure.aniseed.nvim.util
             str conjure.aniseed.string}})
@@ -8,11 +8,11 @@
   (let [lines (nvim.buf_get_lines
                 0 (- srow 1) erow false)]
     (-> lines
-        (core.update
+        (a.update
           (length lines)
           (fn [s]
             (string.sub s 0 ecol)))
-        (core.update
+        (a.update
           1
           (fn [s]
             (string.sub s scol)))
@@ -30,7 +30,7 @@
 
 (defn skip-match? []
   (let [[row col] (nvim.win_get_cursor 0)
-        stack (nvim.fn.synstack row (core.inc col))
+        stack (nvim.fn.synstack row (a.inc col))
         stack-size (length stack)]
     (if (= :number
            (type
@@ -69,8 +69,8 @@
 
     (when (and (not (nil-pos? start))
                (not (nil-pos? end)))
-      {:range {:start (core.update start 2 core.dec)
-               :end (core.update end 2 core.dec)}
+      {:range {:start (a.update start 2 a.dec)
+               :end (a.update end 2 a.dec)}
        :content (read-range start end)})))
 
 (defn word []
@@ -84,7 +84,7 @@
   (nvim.fn.expand "%:p"))
 
 (defn- buf-last-line-length [buf]
-  (core.count (core.first (nvim.buf_get_lines buf (core.dec (nvim.buf_line_count buf)) -1 false))))
+  (a.count (a.first (nvim.buf_get_lines buf (a.dec (nvim.buf_line_count buf)) -1 false))))
 
 (defn range [start end]
   {:content (str.join "\n" (nvim.buf_get_lines 0 start end false))

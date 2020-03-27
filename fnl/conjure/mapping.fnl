@@ -1,6 +1,6 @@
 (module conjure.mapping
   {require {nvim conjure.aniseed.nvim
-            core conjure.aniseed.core
+            a conjure.aniseed.core
             str conjure.aniseed.string
             config conjure.config
             extract conjure.extract
@@ -66,7 +66,7 @@
 
 (defn eval-ranged-command [start end code]
   (if (= "" code)
-    (eval.range (core.dec start) end)
+    (eval.range (a.dec start) end)
     (eval.command code)))
 
 (defn eval-selection [kind]

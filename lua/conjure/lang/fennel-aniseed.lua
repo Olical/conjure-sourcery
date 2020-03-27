@@ -15,14 +15,14 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {["ani-eval"] = "aniseed.eval", ["ani-test"] = "aniseed.test", code = "conjure.code", core = "conjure.aniseed.core", hud = "conjure.hud", log = "conjure.log", mapping = "conjure.mapping", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", view = "conjure.aniseed.view"}}
-  return {require("aniseed.eval"), require("aniseed.test"), require("conjure.code"), require("conjure.aniseed.core"), require("conjure.hud"), require("conjure.log"), require("conjure.mapping"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.aniseed.view")}
+  _0_0["aniseed/local-fns"] = {require = {["ani-eval"] = "aniseed.eval", ["ani-test"] = "aniseed.test", a = "conjure.aniseed.core", code = "conjure.code", hud = "conjure.hud", log = "conjure.log", mapping = "conjure.mapping", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", view = "conjure.aniseed.view"}}
+  return {require("conjure.aniseed.core"), require("aniseed.eval"), require("aniseed.test"), require("conjure.code"), require("conjure.hud"), require("conjure.log"), require("conjure.mapping"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.aniseed.view")}
 end
 local _2_ = _1_(...)
-local ani_eval = _2_[1]
-local ani_test = _2_[2]
-local code = _2_[3]
-local core = _2_[4]
+local a = _2_[1]
+local ani_eval = _2_[2]
+local ani_test = _2_[3]
+local code = _2_[4]
 local hud = _2_[5]
 local log = _2_[6]
 local mapping = _2_[7]
@@ -150,7 +150,7 @@ do
   do
     local v_23_0_0 = nil
     local function eval_file0(opts)
-      opts.code = core.slurp(opts["file-path"])
+      opts.code = a.slurp(opts["file-path"])
       if opts.code then
         return eval_str(opts)
       end
@@ -186,7 +186,7 @@ do
           local function _5_(_241)
             return ("; " .. _241)
           end
-          prefixed_result_lines = core.map(_5_, result_lines)
+          prefixed_result_lines = a.map(_5_, result_lines)
         end
         hud.display({lines = {preview({["sample-limit"] = config["hud-sample-limit"], opts = opts}), unpack(prefixed_result_lines)}})
         return log.append({lines = prefixed_result_lines})

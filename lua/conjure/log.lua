@@ -15,12 +15,12 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {buffer = "conjure.buffer", core = "conjure.aniseed.core", lang = "conjure.lang", nvim = "conjure.aniseed.nvim"}}
-  return {require("conjure.buffer"), require("conjure.aniseed.core"), require("conjure.lang"), require("conjure.aniseed.nvim")}
+  _0_0["aniseed/local-fns"] = {require = {a = "conjure.aniseed.core", buffer = "conjure.buffer", lang = "conjure.lang", nvim = "conjure.aniseed.nvim"}}
+  return {require("conjure.aniseed.core"), require("conjure.buffer"), require("conjure.lang"), require("conjure.aniseed.nvim")}
 end
 local _2_ = _1_(...)
-local buffer = _2_[1]
-local core = _2_[2]
+local a = _2_[1]
+local buffer = _2_[2]
 local lang = _2_[3]
 local nvim = _2_[4]
 do local _ = ({nil, _0_0, nil})[2] end
@@ -48,7 +48,7 @@ local buf_empty_3f = nil
 do
   local v_23_0_ = nil
   local function buf_empty_3f0(buf)
-    return ((nvim.buf_line_count(buf) <= 1) and (0 == core.count(core.first(nvim.buf_get_lines(buf, 0, -1, false)))))
+    return ((nvim.buf_line_count(buf) <= 1) and (0 == a.count(a.first(nvim.buf_get_lines(buf, 0, -1, false)))))
   end
   v_23_0_ = buf_empty_3f0
   _0_0["aniseed/locals"]["buf-empty?"] = v_23_0_
@@ -82,7 +82,7 @@ do
               return nvim.win_set_cursor(win, {new_lines, 0})
             end
           end
-          return core["run!"](_7_, nvim.list_wins())
+          return a["run!"](_7_, nvim.list_wins())
         end
       end
     end

@@ -1,6 +1,5 @@
 (module conjure.eval
   {require {nvim conjure.aniseed.nvim
-            core conjure.aniseed.core
             extract conjure.extract
             lang conjure.lang
             hud conjure.hud}})

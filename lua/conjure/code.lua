@@ -15,11 +15,11 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {core = "conjure.aniseed.core"}}
+  _0_0["aniseed/local-fns"] = {require = {a = "conjure.aniseed.core"}}
   return {require("conjure.aniseed.core")}
 end
 local _2_ = _1_(...)
-local core = _2_[1]
+local a = _2_[1]
 do local _ = ({nil, _0_0, nil})[2] end
 local trim = nil
 do
@@ -38,10 +38,10 @@ do
     local v_23_0_0 = nil
     local function left_sample0(s, limit)
       local flat = trim(string.gsub(string.gsub(s, "\n", " "), "%s+", " "))
-      if (limit >= core.count(flat)) then
+      if (limit >= a.count(flat)) then
         return flat
       else
-        return (string.sub(flat, 0, core.dec(limit)) .. "...")
+        return (string.sub(flat, 0, a.dec(limit)) .. "...")
       end
     end
     v_23_0_0 = left_sample0

@@ -1,5 +1,5 @@
 (module conjure.config
-  {require {core conjure.aniseed.core}})
+  {require {a conjure.aniseed.core}})
 
 (def langs
   {:fennel :conjure.lang.fennel-aniseed
@@ -26,7 +26,7 @@
    :close-passive-timeout 500})
 
 (defn filetypes []
-  (core.keys langs))
+  (a.keys langs))
 
 (defn filetype->module-name [filetype]
   (. langs filetype))

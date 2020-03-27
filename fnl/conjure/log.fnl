@@ -1,5 +1,5 @@
 (module conjure.log
-  {require {core conjure.aniseed.core
+  {require {a conjure.aniseed.core
             nvim conjure.aniseed.nvim
             buffer conjure.buffer
             lang conjure.lang}})
@@ -14,7 +14,7 @@
 
 (defn- buf-empty? [buf]
   (and (<= (nvim.buf_line_count buf) 1)
-       (= 0 (core.count (core.first (nvim.buf_get_lines buf 0 -1 false))))))
+       (= 0 (a.count (a.first (nvim.buf_get_lines buf 0 -1 false))))))
 
 (defn append [{: lines}]
   (let [buf (upsert-buf)
@@ -26,7 +26,7 @@
       -1 false lines)
 
     (let [new-lines (nvim.buf_line_count buf)]
-      (core.run!
+      (a.run!
         (fn [win]
           (let [[row col] (nvim.win_get_cursor win)]
             (when (and (= buf (nvim.win_get_buf win))

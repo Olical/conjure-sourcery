@@ -15,11 +15,11 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {core = "conjure.aniseed.core", nu = "conjure.aniseed.nvim.util", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string"}}
+  _0_0["aniseed/local-fns"] = {require = {a = "conjure.aniseed.core", nu = "conjure.aniseed.nvim.util", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string"}}
   return {require("conjure.aniseed.core"), require("conjure.aniseed.nvim.util"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string")}
 end
 local _2_ = _1_(...)
-local core = _2_[1]
+local a = _2_[1]
 local nu = _2_[2]
 local nvim = _2_[3]
 local str = _2_[4]
@@ -42,7 +42,7 @@ do
       local function _7_(s)
         return string.sub(s, scol)
       end
-      return str.join("\n", core.update(core.update(lines, #lines, _6_), 1, _7_))
+      return str.join("\n", a.update(a.update(lines, #lines, _6_), 1, _7_))
     end
   end
   v_23_0_ = read_range0
@@ -84,7 +84,7 @@ do
       local _3_ = nvim.win_get_cursor(0)
       local row = _3_[1]
       local col = _3_[2]
-      local stack = nvim.fn.synstack(row, core.inc(col))
+      local stack = nvim.fn.synstack(row, a.inc(col))
       local stack_size = #stack
       local function _4_()
         local name = nvim.fn.synIDattr(stack[stack_size], "name")
@@ -142,7 +142,7 @@ do
         end
         _end = nvim.fn.searchpairpos("(", "", ")", (flags .. _7_()), skip_match_3f_viml)
         if (not nil_pos_3f(start) and not nil_pos_3f(_end)) then
-          return {content = read_range(start, _end), range = {["end"] = core.update(_end, 2, core.dec), start = core.update(start, 2, core.dec)}}
+          return {content = read_range(start, _end), range = {["end"] = a.update(_end, 2, a.dec), start = a.update(start, 2, a.dec)}}
         end
       end
     end
@@ -187,7 +187,7 @@ local buf_last_line_length = nil
 do
   local v_23_0_ = nil
   local function buf_last_line_length0(buf)
-    return core.count(core.first(nvim.buf_get_lines(buf, core.dec(nvim.buf_line_count(buf)), -1, false)))
+    return a.count(a.first(nvim.buf_get_lines(buf, a.dec(nvim.buf_line_count(buf)), -1, false)))
   end
   v_23_0_ = buf_last_line_length0
   _0_0["aniseed/locals"]["buf-last-line-length"] = v_23_0_

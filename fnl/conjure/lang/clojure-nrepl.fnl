@@ -1,6 +1,6 @@
 (module conjure.lang.clojure-nrepl
   {require {nvim conjure.aniseed.nvim
-            core conjure.aniseed.core
+            a conjure.aniseed.core
             str conjure.aniseed.string
             code conjure.code
             hud conjure.hud
@@ -76,7 +76,7 @@
       (display-conn-status conn :disconnected))))
 
 (defn remove-all-conns []
-  (core.run! remove-conn (core.vals state.conns)))
+  (a.run! remove-conn (a.vals state.conns)))
 
 (defn send [conn msg cb]
   (let [msg-id (uuid.v4)]
@@ -117,7 +117,7 @@
     conn))
 
 (defn try-nrepl-port-file []
-  (let [port (-?> (core.slurp ".nrepl-port") (tonumber))]
+  (let [port (-?> (a.slurp ".nrepl-port") (tonumber))]
     (when port
       (add-conn
         {:host "127.0.0.1"
@@ -138,4 +138,4 @@
   (remove-all-conns)
   state.conns
 
-  (send c {:op :eval :code "(/ 10 2)"} core.pr))
+  (send c {:op :eval :code "(/ 10 2)"} a.pr))
