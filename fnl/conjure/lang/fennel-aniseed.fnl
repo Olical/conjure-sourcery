@@ -95,17 +95,7 @@
   (wrapped-test ["; run-all-tests"] ani-test.run-all))
 
 (defn on-filetype []
-  (mapping.map-local->plug
-    :n config.mappings.run-buf-tests
-    :conjure_lang_fennel_aniseed_run_buf_tests)
-  (mapping.map-local->plug
-    :n config.mappings.run-all-tests
-    :conjure_lang_fennel_aniseed_run_all_tests))
-
-(mapping.map-plug
-  :n :conjure_lang_fennel_aniseed_run_buf_tests
-  :conjure.lang.fennel-aniseed :run-buf-tests)
-
-(mapping.map-plug
-  :n :conjure_lang_fennel_aniseed_run_all_tests
-  :conjure.lang.fennel-aniseed :run-all-tests)
+  (mapping.buf :n config.mappings.run-buf-tests
+               :conjure.lang.fennel-aniseed :run-buf-tests)
+  (mapping.buf :n config.mappings.run-all-tests
+               :conjure.lang.fennel-aniseed :run-all-tests))

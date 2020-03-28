@@ -273,8 +273,8 @@ do
   do
     local v_23_0_0 = nil
     local function on_filetype0()
-      mapping["map-local->plug"]("n", config.mappings["run-buf-tests"], "conjure_lang_fennel_aniseed_run_buf_tests")
-      return mapping["map-local->plug"]("n", config.mappings["run-all-tests"], "conjure_lang_fennel_aniseed_run_all_tests")
+      mapping.buf("n", config.mappings["run-buf-tests"], "conjure.lang.fennel-aniseed", "run-buf-tests")
+      return mapping.buf("n", config.mappings["run-all-tests"], "conjure.lang.fennel-aniseed", "run-all-tests")
     end
     v_23_0_0 = on_filetype0
     _0_0["on-filetype"] = v_23_0_0
@@ -283,5 +283,4 @@ do
   _0_0["aniseed/locals"]["on-filetype"] = v_23_0_
   on_filetype = v_23_0_
 end
-mapping["map-plug"]("n", "conjure_lang_fennel_aniseed_run_buf_tests", "conjure.lang.fennel-aniseed", "run-buf-tests")
-return mapping["map-plug"]("n", "conjure_lang_fennel_aniseed_run_all_tests", "conjure.lang.fennel-aniseed", "run-all-tests")
+return nil
