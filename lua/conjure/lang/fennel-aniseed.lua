@@ -124,7 +124,7 @@ do
           end
           prefixed_result_lines = a.map(_5_, result_lines)
         end
-        hud.display({lines = {opts.preview, unpack(prefixed_result_lines)}})
+        hud.display({lines = a.concat({opts.preview}, prefixed_result_lines)})
         return log.append({lines = prefixed_result_lines})
       end
     end

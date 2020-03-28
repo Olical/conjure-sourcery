@@ -35,8 +35,8 @@
           prefixed-result-lines (if ok?
                                   result-lines
                                   (a.map #(.. "; " $1) result-lines))]
-      (hud.display {:lines [opts.preview
-                            (unpack prefixed-result-lines)]})
+      (hud.display {:lines (a.concat [opts.preview]
+                                     prefixed-result-lines)})
       (log.append {:lines prefixed-result-lines}))))
 
 (defn eval-str [opts]
