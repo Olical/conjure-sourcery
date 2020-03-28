@@ -5,12 +5,14 @@
             hud conjure.hud
             log conjure.log
             lang conjure.lang
+            text conjure.text
             bencode conjure.bencode
             uuid conjure.uuid}})
 
-;; TODO Sessions.
-;; TODO Auto remove completed messages.
+;; TODO Sessions so *e / *1 work and can be cancelled.
+;; TODO Some messages never get completed.
 ;; TODO Handle things lacking IDs.
+;; TODO Cleanup conns on exit.
 
 (def buf-suffix ".cljc")
 (def default-context "user")
@@ -19,20 +21,6 @@
 
 (def config
   {})
-
-(defn display-request [opts]
-  (let [display-opts {:lines [opts.preview]}]
-    (hud.display display-opts)
-    (log.append display-opts)))
-
-(defn eval-str [opts]
-  opts)
-
-(defn eval-file [opts]
-  opts)
-
-(defn display-result [opts]
-  nil)
 
 (defonce state
   {:conns {}})
@@ -91,7 +79,7 @@
                             cb (. (. conn.msgs result.id) :cb)
                             (ok? err) (pcall cb result)]
                         (when (not ok?)
-                          (print (.. "conjure.lang.clojure-nrepl error: " err)))
+                          (a.println (.. "conjure.lang.clojure-nrepl error: " err)))
                         (when result.status
                           (tset conn.msgs result.id nil)))))))
               (display-conn-status conn :connected))))))
@@ -103,6 +91,30 @@
       (add-conn
         {:host "127.0.0.1"
          :port port}))))
+
+(defn display-result [opts resp]
+  ; (display {:lines ["; debug" (a.pr-str resp)]})
+
+  (let [lines (if
+                resp.out (text.prefixed-lines resp.out "; (out) ")
+                resp.err (text.prefixed-lines resp.err "; (err) ")
+                resp.value [resp.value]
+                nil)]
+    (when lines
+      (hud.display {:lines (a.concat [opts.preview] lines)})
+      (log.append {:lines lines}))))
+
+(defn eval-str [opts]
+  (let [conn (a.first (a.vals state.conns))]
+    (when conn
+      (send
+        conn
+        {:op :eval :code opts.code}
+        #(display-result opts $1)))))
+
+(defn eval-file [opts]
+  (a.assoc opts :code (.. "(load-file \"" opts.file-path "\")"))
+  (eval-str opts))
 
 (comment
   (def c (try-nrepl-port-file))

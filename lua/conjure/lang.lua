@@ -53,12 +53,16 @@ do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
-    local function with_filetype0(ft, f)
+    local function with_filetype0(ft, f, ...)
       overrides.filetype = ft
       do
-        local result = f()
+        local ok_3f, result = pcall(f, ...)
         overrides.filetype = nil
-        return result
+        if ok_3f then
+          return result
+        else
+          return error(result)
+        end
       end
     end
     v_23_0_0 = with_filetype0

@@ -15,8 +15,8 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {a = "conjure.aniseed.core", bencode = "conjure.bencode", hud = "conjure.hud", lang = "conjure.lang", log = "conjure.log", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", uuid = "conjure.uuid"}}
-  return {require("conjure.aniseed.core"), require("conjure.bencode"), require("conjure.hud"), require("conjure.lang"), require("conjure.log"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.uuid")}
+  _0_0["aniseed/local-fns"] = {require = {a = "conjure.aniseed.core", bencode = "conjure.bencode", hud = "conjure.hud", lang = "conjure.lang", log = "conjure.log", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", text = "conjure.text", uuid = "conjure.uuid"}}
+  return {require("conjure.aniseed.core"), require("conjure.bencode"), require("conjure.hud"), require("conjure.lang"), require("conjure.log"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.text"), require("conjure.uuid")}
 end
 local _2_ = _1_(...)
 local a = _2_[1]
@@ -26,7 +26,8 @@ local lang = _2_[4]
 local log = _2_[5]
 local nvim = _2_[6]
 local str = _2_[7]
-local uuid = _2_[8]
+local text = _2_[8]
+local uuid = _2_[9]
 do local _ = ({nil, _0_0, nil})[2] end
 local buf_suffix = nil
 do
@@ -82,68 +83,6 @@ do
   end
   _0_0["aniseed/locals"]["config"] = v_23_0_
   config = v_23_0_
-end
-local display_request = nil
-do
-  local v_23_0_ = nil
-  do
-    local v_23_0_0 = nil
-    local function display_request0(opts)
-      local display_opts = {lines = {opts.preview}}
-      hud.display(display_opts)
-      return log.append(display_opts)
-    end
-    v_23_0_0 = display_request0
-    _0_0["display-request"] = v_23_0_0
-    v_23_0_ = v_23_0_0
-  end
-  _0_0["aniseed/locals"]["display-request"] = v_23_0_
-  display_request = v_23_0_
-end
-local eval_str = nil
-do
-  local v_23_0_ = nil
-  do
-    local v_23_0_0 = nil
-    local function eval_str0(opts)
-      return opts
-    end
-    v_23_0_0 = eval_str0
-    _0_0["eval-str"] = v_23_0_0
-    v_23_0_ = v_23_0_0
-  end
-  _0_0["aniseed/locals"]["eval-str"] = v_23_0_
-  eval_str = v_23_0_
-end
-local eval_file = nil
-do
-  local v_23_0_ = nil
-  do
-    local v_23_0_0 = nil
-    local function eval_file0(opts)
-      return opts
-    end
-    v_23_0_0 = eval_file0
-    _0_0["eval-file"] = v_23_0_0
-    v_23_0_ = v_23_0_0
-  end
-  _0_0["aniseed/locals"]["eval-file"] = v_23_0_
-  eval_file = v_23_0_
-end
-local display_result = nil
-do
-  local v_23_0_ = nil
-  do
-    local v_23_0_0 = nil
-    local function display_result0(opts)
-      return nil
-    end
-    v_23_0_0 = display_result0
-    _0_0["display-result"] = v_23_0_0
-    v_23_0_ = v_23_0_0
-  end
-  _0_0["aniseed/locals"]["display-result"] = v_23_0_
-  display_result = v_23_0_
 end
 local state = nil
 do
@@ -274,7 +213,7 @@ do
                 local cb = conn.msgs[result.id].cb
                 local ok_3f, err1 = pcall(cb, result)
                 if not ok_3f then
-                  print(("conjure.lang.clojure-nrepl error: " .. err1))
+                  a.println(("conjure.lang.clojure-nrepl error: " .. err1))
                 end
                 if result.status then
                   conn.msgs[result.id] = nil
@@ -323,5 +262,70 @@ do
   _0_0["aniseed/locals"]["try-nrepl-port-file"] = v_23_0_
   try_nrepl_port_file = v_23_0_
 end
-              -- (def c (try-nrepl-port-file)) (remove-conn c) (remove-all-conns) state.conns (send c table: 0x41ad2f70 a.pr)
+local display_result = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function display_result0(opts, resp)
+      local lines = nil
+      if resp.out then
+        lines = text["prefixed-lines"](resp.out, "; (out) ")
+      elseif resp.err then
+        lines = text["prefixed-lines"](resp.err, "; (err) ")
+      elseif resp.value then
+        lines = {resp.value}
+      else
+        lines = nil
+      end
+      if lines then
+        hud.display({lines = a.concat({opts.preview}, lines)})
+        return log.append({lines = lines})
+      end
+    end
+    v_23_0_0 = display_result0
+    _0_0["display-result"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["display-result"] = v_23_0_
+  display_result = v_23_0_
+end
+local eval_str = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function eval_str0(opts)
+      local conn = a.first(a.vals(state.conns))
+      if conn then
+        local function _3_(_241)
+          return display_result(opts, _241)
+        end
+        return send(conn, {code = opts.code, op = "eval"}, _3_)
+      end
+    end
+    v_23_0_0 = eval_str0
+    _0_0["eval-str"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["eval-str"] = v_23_0_
+  eval_str = v_23_0_
+end
+local eval_file = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function eval_file0(opts)
+      a.assoc(opts, "code", ("(load-file \"" .. opts["file-path"] .. "\")"))
+      return eval_str(opts)
+    end
+    v_23_0_0 = eval_file0
+    _0_0["eval-file"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["eval-file"] = v_23_0_
+  eval_file = v_23_0_
+end
+              -- (def c (try-nrepl-port-file)) (remove-conn c) (remove-all-conns) state.conns (send c table: 0x418ac0a8 a.pr)
 return nil

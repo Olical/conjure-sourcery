@@ -14,11 +14,13 @@
 
 (defonce- overrides {})
 
-(defn with-filetype [ft f]
+(defn with-filetype [ft f ...]
   (set overrides.filetype ft)
-  (let [result (f)]
+  (let [(ok? result) (pcall f ...)]
     (set overrides.filetype nil)
-    result))
+    (if ok?
+      result
+      (error result))))
 
 (defn current []
   (let [ft (or overrides.filetype nvim.bo.filetype)
