@@ -15,15 +15,47 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {extract = "conjure.extract", hud = "conjure.hud", lang = "conjure.lang", nvim = "conjure.aniseed.nvim"}}
-  return {require("conjure.extract"), require("conjure.hud"), require("conjure.lang"), require("conjure.aniseed.nvim")}
+  _0_0["aniseed/local-fns"] = {require = {config = "conjure.config", extract = "conjure.extract", hud = "conjure.hud", lang = "conjure.lang", log = "conjure.log", nvim = "conjure.aniseed.nvim", text = "conjure.text"}}
+  return {require("conjure.config"), require("conjure.extract"), require("conjure.hud"), require("conjure.lang"), require("conjure.log"), require("conjure.aniseed.nvim"), require("conjure.text")}
 end
 local _2_ = _1_(...)
-local extract = _2_[1]
-local hud = _2_[2]
-local lang = _2_[3]
-local nvim = _2_[4]
+local config = _2_[1]
+local extract = _2_[2]
+local hud = _2_[3]
+local lang = _2_[4]
+local log = _2_[5]
+local nvim = _2_[6]
+local text = _2_[7]
 do local _ = ({nil, _0_0, nil})[2] end
+local preview = nil
+do
+  local v_23_0_ = nil
+  local function preview0(opts)
+    local sample_limit = config.preview["sample-limit"]
+    local function _3_()
+      if (("file" == opts.origin) or ("buf" == opts.origin)) then
+        return text["right-sample"](opts["file-path"], sample_limit)
+      else
+        return text["left-sample"](opts.code, sample_limit)
+      end
+    end
+    return (lang.get("comment-prefix") .. opts.action .. " (" .. opts.origin .. "): " .. _3_())
+  end
+  v_23_0_ = preview0
+  _0_0["aniseed/locals"]["preview"] = v_23_0_
+  preview = v_23_0_
+end
+local display_request = nil
+do
+  local v_23_0_ = nil
+  local function display_request0(opts)
+    hud.display({lines = {opts.preview}})
+    return log.append({lines = {opts.preview}})
+  end
+  v_23_0_ = display_request0
+  _0_0["aniseed/locals"]["display-request"] = v_23_0_
+  display_request = v_23_0_
+end
 local file = nil
 do
   local v_23_0_ = nil
@@ -31,8 +63,9 @@ do
     local v_23_0_0 = nil
     local function file0()
       local opts = {["file-path"] = extract["file-path"](), action = "eval", origin = "file"}
-      lang.call("display-request", opts)
-      return lang.call("display-result", lang.call("eval-file", opts))
+      opts.preview = preview(opts)
+      display_request(opts)
+      return lang.call("eval-file", opts)
     end
     v_23_0_0 = file0
     _0_0["file"] = v_23_0_0
@@ -49,8 +82,9 @@ do
     opts.action = "eval"
     opts.context = (nvim.b.conjure_context or extract.context())
     opts["file-path"] = extract["file-path"]()
-    lang.call("display-request", opts)
-    return lang.call("display-result", lang.call("eval-str", opts))
+    opts.preview = preview(opts)
+    display_request(opts)
+    return lang.call("eval-str", opts)
   end
   v_23_0_ = eval_str0
   _0_0["aniseed/locals"]["eval-str"] = v_23_0_

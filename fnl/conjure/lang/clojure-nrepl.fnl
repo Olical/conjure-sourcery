@@ -2,24 +2,11 @@
   {require {nvim conjure.aniseed.nvim
             a conjure.aniseed.core
             str conjure.aniseed.string
-            text conjure.text
             hud conjure.hud
             log conjure.log
             lang conjure.lang
             bencode conjure.bencode
             uuid conjure.uuid}})
-
-;; Similarities to Fennel that could do with extracting:
-;;  * context extraction
-;;  * preview generation
-;;  * request displaying
-;; Maybe automate all of this or make it more DRY anyway. Could just have a
-;; comment-prefix like buf-suffix that you set to `; `.
-
-;; Will need to change how evals happen.
-;; Let the lang decide if it's sync or async.
-;; Really Conjure passes code and context to the lang then it can decide if it displays the results.
-;; This gives the lang more freedom.
 
 ;; TODO Sessions.
 ;; TODO Auto remove completed messages.
@@ -28,21 +15,13 @@
 (def buf-suffix ".cljc")
 (def default-context "user")
 (def context-pattern "[(]%s*ns%s*(.-)[%s){]")
+(def comment-prefix "; ")
 
 (def config
   {})
 
-(defn- preview [{: sample-limit : opts}]
-  (.. "; " opts.action " (" opts.origin "): "
-      (if (or (= :file opts.origin) (= :buf opts.origin))
-        (text.right-sample opts.file-path sample-limit)
-        (text.left-sample opts.code sample-limit))))
-
 (defn display-request [opts]
-  (let [display-opts
-        {:lines [(preview
-                   {:opts opts
-                    :sample-limit config.log-sample-limit})]}]
+  (let [display-opts {:lines [opts.preview]}]
     (hud.display display-opts)
     (log.append display-opts)))
 

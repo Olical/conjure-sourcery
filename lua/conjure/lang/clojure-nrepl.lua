@@ -15,8 +15,8 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {a = "conjure.aniseed.core", bencode = "conjure.bencode", hud = "conjure.hud", lang = "conjure.lang", log = "conjure.log", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", text = "conjure.text", uuid = "conjure.uuid"}}
-  return {require("conjure.aniseed.core"), require("conjure.bencode"), require("conjure.hud"), require("conjure.lang"), require("conjure.log"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.text"), require("conjure.uuid")}
+  _0_0["aniseed/local-fns"] = {require = {a = "conjure.aniseed.core", bencode = "conjure.bencode", hud = "conjure.hud", lang = "conjure.lang", log = "conjure.log", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", uuid = "conjure.uuid"}}
+  return {require("conjure.aniseed.core"), require("conjure.bencode"), require("conjure.hud"), require("conjure.lang"), require("conjure.log"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.uuid")}
 end
 local _2_ = _1_(...)
 local a = _2_[1]
@@ -26,8 +26,7 @@ local lang = _2_[4]
 local log = _2_[5]
 local nvim = _2_[6]
 local str = _2_[7]
-local text = _2_[8]
-local uuid = _2_[9]
+local uuid = _2_[8]
 do local _ = ({nil, _0_0, nil})[2] end
 local buf_suffix = nil
 do
@@ -62,6 +61,17 @@ do
   _0_0["aniseed/locals"]["context-pattern"] = v_23_0_
   context_pattern = v_23_0_
 end
+local comment_prefix = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = "; "
+    _0_0["comment-prefix"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["comment-prefix"] = v_23_0_
+  comment_prefix = v_23_0_
+end
 local config = nil
 do
   local v_23_0_ = nil
@@ -73,33 +83,13 @@ do
   _0_0["aniseed/locals"]["config"] = v_23_0_
   config = v_23_0_
 end
-local preview = nil
-do
-  local v_23_0_ = nil
-  local function preview0(_3_0)
-    local _4_ = _3_0
-    local sample_limit = _4_["sample-limit"]
-    local opts = _4_["opts"]
-    local function _5_()
-      if (("file" == opts.origin) or ("buf" == opts.origin)) then
-        return text["right-sample"](opts["file-path"], sample_limit)
-      else
-        return text["left-sample"](opts.code, sample_limit)
-      end
-    end
-    return ("; " .. opts.action .. " (" .. opts.origin .. "): " .. _5_())
-  end
-  v_23_0_ = preview0
-  _0_0["aniseed/locals"]["preview"] = v_23_0_
-  preview = v_23_0_
-end
 local display_request = nil
 do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
     local function display_request0(opts)
-      local display_opts = {lines = {preview({["sample-limit"] = config["log-sample-limit"], opts = opts})}}
+      local display_opts = {lines = {opts.preview}}
       hud.display(display_opts)
       return log.append(display_opts)
     end
@@ -333,5 +323,5 @@ do
   _0_0["aniseed/locals"]["try-nrepl-port-file"] = v_23_0_
   try_nrepl_port_file = v_23_0_
 end
-              -- (def c (try-nrepl-port-file)) (remove-conn c) (remove-all-conns) state.conns (send c table: 0x418fe548 a.pr)
+              -- (def c (try-nrepl-port-file)) (remove-conn c) (remove-all-conns) state.conns (send c table: 0x41e04c70 a.pr)
 return nil

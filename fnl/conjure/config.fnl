@@ -28,6 +28,9 @@
 (def extract
   {:context-header-lines 24})
 
+(def preview
+  {:sample-limit 32})
+
 (defn filetypes []
   (a.keys langs))
 

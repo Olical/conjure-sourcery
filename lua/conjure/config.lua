@@ -65,6 +65,17 @@ do
   _0_0["aniseed/locals"]["extract"] = v_23_0_
   extract = v_23_0_
 end
+local preview = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = {["sample-limit"] = 32}
+    _0_0["preview"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["preview"] = v_23_0_
+  preview = v_23_0_
+end
 local filetypes = nil
 do
   local v_23_0_ = nil

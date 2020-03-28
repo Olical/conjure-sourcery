@@ -2,16 +2,30 @@
   {require {nvim conjure.aniseed.nvim
             extract conjure.extract
             lang conjure.lang
-            hud conjure.hud}})
+            text conjure.text
+            config conjure.config
+            hud conjure.hud
+            log conjure.log}})
+
+(defn- preview [opts]
+  (let [sample-limit config.preview.sample-limit]
+    (.. (lang.get :comment-prefix)
+        opts.action " (" opts.origin "): "
+        (if (or (= :file opts.origin) (= :buf opts.origin))
+          (text.right-sample opts.file-path sample-limit)
+          (text.left-sample opts.code sample-limit)))))
+
+(defn- display-request [opts]
+  (hud.display {:lines [opts.preview]})
+  (log.append {:lines [opts.preview]}))
 
 (defn file []
   (let [opts {:file-path (extract.file-path)
               :origin :file
               :action :eval}]
-    (lang.call :display-request opts)
-    (->> opts
-         (lang.call :eval-file)
-         (lang.call :display-result))))
+    (set opts.preview (preview opts))
+    (display-request opts)
+    (lang.call :eval-file opts)))
 
 (defn- eval-str [opts]
   (vim.schedule hud.clear-passive-timer)
@@ -20,10 +34,9 @@
        (or nvim.b.conjure_context
            (extract.context)))
   (set opts.file-path (extract.file-path))
-  (lang.call :display-request opts)
-  (->> opts
-       (lang.call :eval-str)
-       (lang.call :display-result)))
+  (set opts.preview (preview opts))
+  (display-request opts)
+  (lang.call :eval-str opts))
 
 (defn current-form []
   (let [{: content : range} (extract.form {})]
