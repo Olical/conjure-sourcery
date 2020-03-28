@@ -54,6 +54,17 @@ do
   _0_0["aniseed/locals"]["hud"] = v_23_0_
   hud = v_23_0_
 end
+local extract = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = {["context-header-lines"] = 24}
+    _0_0["extract"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["extract"] = v_23_0_
+  extract = v_23_0_
+end
 local filetypes = nil
 do
   local v_23_0_ = nil

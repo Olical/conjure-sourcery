@@ -26,18 +26,11 @@
 ;; TODO Handle things lacking IDs.
 
 (def buf-suffix ".cljc")
-
-(def- default-namespace-name "user")
-(def- buf-namespace-pattern "[(]%s*ns%s*(.-)[%s){]")
+(def default-context "user")
+(def context-pattern "[(]%s*ns%s*(.-)[%s){]")
 
 (def config
   {})
-
-(defn context []
-  (let [header (->> (nvim.buf_get_lines 0 0 config.buf-header-length false)
-                    (str.join "\n"))]
-    (or (string.match header buf-namespace-pattern)
-        default-namespace-name)))
 
 (defn- preview [{: sample-limit : opts}]
   (.. "; " opts.action " (" opts.origin "): "

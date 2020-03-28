@@ -25,6 +25,9 @@
    :close-passive? true
    :close-passive-timeout 500})
 
+(def extract
+  {:context-header-lines 24})
+
 (defn filetypes []
   (a.keys langs))
 

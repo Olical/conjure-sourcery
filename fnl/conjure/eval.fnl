@@ -18,7 +18,7 @@
   (set opts.action :eval)
   (set opts.context
        (or nvim.b.conjure_context
-           (lang.call :context)))
+           (extract.context)))
   (set opts.file-path (extract.file-path))
   (lang.call :display-request opts)
   (->> opts

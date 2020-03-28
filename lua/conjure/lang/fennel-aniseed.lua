@@ -15,21 +15,22 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {["ani-core"] = "aniseed.core", ["ani-eval"] = "aniseed.eval", ["ani-test"] = "aniseed.test", a = "conjure.aniseed.core", hud = "conjure.hud", log = "conjure.log", mapping = "conjure.mapping", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", text = "conjure.text", view = "conjure.aniseed.view"}}
-  return {require("conjure.aniseed.core"), require("aniseed.core"), require("aniseed.eval"), require("aniseed.test"), require("conjure.hud"), require("conjure.log"), require("conjure.mapping"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.text"), require("conjure.aniseed.view")}
+  _0_0["aniseed/local-fns"] = {require = {["ani-core"] = "aniseed.core", ["ani-eval"] = "aniseed.eval", ["ani-test"] = "aniseed.test", a = "conjure.aniseed.core", extract = "conjure.extract", hud = "conjure.hud", log = "conjure.log", mapping = "conjure.mapping", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", text = "conjure.text", view = "conjure.aniseed.view"}}
+  return {require("conjure.aniseed.core"), require("aniseed.core"), require("aniseed.eval"), require("aniseed.test"), require("conjure.extract"), require("conjure.hud"), require("conjure.log"), require("conjure.mapping"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.text"), require("conjure.aniseed.view")}
 end
 local _2_ = _1_(...)
 local a = _2_[1]
 local ani_core = _2_[2]
 local ani_eval = _2_[3]
 local ani_test = _2_[4]
-local hud = _2_[5]
-local log = _2_[6]
-local mapping = _2_[7]
-local nvim = _2_[8]
-local str = _2_[9]
-local text = _2_[10]
-local view = _2_[11]
+local extract = _2_[5]
+local hud = _2_[6]
+local log = _2_[7]
+local mapping = _2_[8]
+local nvim = _2_[9]
+local str = _2_[10]
+local text = _2_[11]
+local view = _2_[12]
 do local _ = ({nil, _0_0, nil})[2] end
 local buf_suffix = nil
 do
@@ -42,44 +43,38 @@ do
   _0_0["aniseed/locals"]["buf-suffix"] = v_23_0_
   buf_suffix = v_23_0_
 end
-local default_module_name = nil
+local default_context = nil
 do
-  local v_23_0_ = "aniseed.user"
-  _0_0["aniseed/locals"]["default-module-name"] = v_23_0_
-  default_module_name = v_23_0_
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = "aniseed.user"
+    _0_0["default-context"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["default-context"] = v_23_0_
+  default_context = v_23_0_
 end
-local buf_module_pattern = nil
+local context_pattern = nil
 do
-  local v_23_0_ = "[(]%s*module%s*(.-)[%s){]"
-  _0_0["aniseed/locals"]["buf-module-pattern"] = v_23_0_
-  buf_module_pattern = v_23_0_
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = "[(]%s*module%s*(.-)[%s){]"
+    _0_0["context-pattern"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["context-pattern"] = v_23_0_
+  context_pattern = v_23_0_
 end
 local config = nil
 do
   local v_23_0_ = nil
   do
-    local v_23_0_0 = {["buf-header-length"] = 20, ["hud-sample-limit"] = 24, ["log-sample-limit"] = 64, mappings = {["run-all-tests"] = "ta", ["run-buf-tests"] = "tt"}}
+    local v_23_0_0 = {["hud-sample-limit"] = 24, ["log-sample-limit"] = 64, mappings = {["run-all-tests"] = "ta", ["run-buf-tests"] = "tt"}}
     _0_0["config"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
   _0_0["aniseed/locals"]["config"] = v_23_0_
   config = v_23_0_
-end
-local context = nil
-do
-  local v_23_0_ = nil
-  do
-    local v_23_0_0 = nil
-    local function context0()
-      local header = str.join("\n", nvim.buf_get_lines(0, 0, config["buf-header-length"], false))
-      return (string.match(header, buf_module_pattern) or default_module_name)
-    end
-    v_23_0_0 = context0
-    _0_0["context"] = v_23_0_0
-    v_23_0_ = v_23_0_0
-  end
-  _0_0["aniseed/locals"]["context"] = v_23_0_
-  context = v_23_0_
 end
 local preview = nil
 do
@@ -238,7 +233,7 @@ do
   do
     local v_23_0_0 = nil
     local function run_buf_tests0()
-      local c = context()
+      local c = extract.context()
       local req = {("; run-buf-tests (" .. c .. ")")}
       local function _3_()
         return ani_test.run(c)

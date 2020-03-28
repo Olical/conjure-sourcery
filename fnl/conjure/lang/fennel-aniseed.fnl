@@ -9,25 +9,18 @@
             mapping conjure.mapping
             text conjure.text
             hud conjure.hud
-            log conjure.log}})
+            log conjure.log
+            extract conjure.extract}})
 
 (def buf-suffix ".fnl")
-
-(def- default-module-name "aniseed.user")
-(def- buf-module-pattern "[(]%s*module%s*(.-)[%s){]")
+(def default-context "aniseed.user")
+(def context-pattern "[(]%s*module%s*(.-)[%s){]")
 
 (def config
   {:log-sample-limit 64
    :hud-sample-limit 24
-   :buf-header-length 20
    :mappings {:run-buf-tests "tt"
               :run-all-tests "ta"}})
-
-(defn context []
-  (let [header (->> (nvim.buf_get_lines 0 0 config.buf-header-length false)
-                    (str.join "\n"))]
-    (or (string.match header buf-module-pattern)
-        default-module-name)))
 
 (defn- preview [{: sample-limit : opts}]
   (.. "; " opts.action " (" opts.origin "): "
@@ -87,7 +80,7 @@
     (log.append {:lines lines})))
 
 (defn run-buf-tests []
-  (let [c (context)
+  (let [c (extract.context)
         req [(.. "; run-buf-tests (" c ")")]]
     (wrapped-test req #(ani-test.run c))))
 

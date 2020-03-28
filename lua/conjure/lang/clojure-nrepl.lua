@@ -40,17 +40,27 @@ do
   _0_0["aniseed/locals"]["buf-suffix"] = v_23_0_
   buf_suffix = v_23_0_
 end
-local default_namespace_name = nil
+local default_context = nil
 do
-  local v_23_0_ = "user"
-  _0_0["aniseed/locals"]["default-namespace-name"] = v_23_0_
-  default_namespace_name = v_23_0_
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = "user"
+    _0_0["default-context"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["default-context"] = v_23_0_
+  default_context = v_23_0_
 end
-local buf_namespace_pattern = nil
+local context_pattern = nil
 do
-  local v_23_0_ = "[(]%s*ns%s*(.-)[%s){]"
-  _0_0["aniseed/locals"]["buf-namespace-pattern"] = v_23_0_
-  buf_namespace_pattern = v_23_0_
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = "[(]%s*ns%s*(.-)[%s){]"
+    _0_0["context-pattern"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["context-pattern"] = v_23_0_
+  context_pattern = v_23_0_
 end
 local config = nil
 do
@@ -62,22 +72,6 @@ do
   end
   _0_0["aniseed/locals"]["config"] = v_23_0_
   config = v_23_0_
-end
-local context = nil
-do
-  local v_23_0_ = nil
-  do
-    local v_23_0_0 = nil
-    local function context0()
-      local header = str.join("\n", nvim.buf_get_lines(0, 0, config["buf-header-length"], false))
-      return (string.match(header, buf_namespace_pattern) or default_namespace_name)
-    end
-    v_23_0_0 = context0
-    _0_0["context"] = v_23_0_0
-    v_23_0_ = v_23_0_0
-  end
-  _0_0["aniseed/locals"]["context"] = v_23_0_
-  context = v_23_0_
 end
 local preview = nil
 do
@@ -339,5 +333,5 @@ do
   _0_0["aniseed/locals"]["try-nrepl-port-file"] = v_23_0_
   try_nrepl_port_file = v_23_0_
 end
-              -- (def c (try-nrepl-port-file)) (remove-conn c) (remove-all-conns) state.conns (send c table: 0x406235e8 a.pr)
+              -- (def c (try-nrepl-port-file)) (remove-conn c) (remove-all-conns) state.conns (send c table: 0x418fe548 a.pr)
 return nil

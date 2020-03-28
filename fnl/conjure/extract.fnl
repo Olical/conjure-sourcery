@@ -2,7 +2,9 @@
   {require {a conjure.aniseed.core
             nvim conjure.aniseed.nvim
             nu conjure.aniseed.nvim.util
-            str conjure.aniseed.string}})
+            str conjure.aniseed.string
+            config conjure.config
+            lang conjure.lang}})
 
 (defn- read-range [[srow scol] [erow ecol]]
   (let [lines (nvim.buf_get_lines
@@ -115,3 +117,10 @@
       {:content content
        :range {:start (getpos "'<")
                :end (getpos "'>")}})))
+
+(defn context []
+  (let [header (->> (nvim.buf_get_lines
+                      0 0 config.extract.context-header-lines false)
+                    (str.join "\n"))]
+    (or (string.match header (lang.get :context-pattern))
+        (lang.get :default-context))))
