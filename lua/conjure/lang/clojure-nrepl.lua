@@ -80,7 +80,7 @@ local config = nil
 do
   local v_23_0_ = nil
   do
-    local v_23_0_0 = {["debug?"] = false, mappings = {["add-conn-from-port-file"] = "cf", ["remove-all-conns"] = "cR", ["remove-conn"] = "cr"}}
+    local v_23_0_0 = {["debug?"] = true, mappings = {["add-conn-from-port-file"] = "cf", ["remove-all-conns"] = "cR", ["remove-conn"] = "cr"}}
     _0_0["config"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
@@ -134,6 +134,8 @@ do
         local conn = state.conns[id]
         if conn then
           if not (conn.sock):is_closing() then
+            do end (conn.sock):read_stop()
+            do end (conn.sock):shutdown()
             do end (conn.sock):close()
           end
           state.conns[id] = nil
@@ -195,6 +197,72 @@ do
   _0_0["aniseed/locals"]["send"] = v_23_0_
   send = v_23_0_
 end
+local decode_all = nil
+do
+  local v_23_0_ = nil
+  local function decode_all0(s, cb)
+    local result, consumed = bencode.decode(s)
+    cb(result)
+    if (consumed < a.count(s)) then
+      return decode_all0(string.sub(s, consumed), cb)
+    end
+  end
+  v_23_0_ = decode_all0
+  _0_0["aniseed/locals"]["decode-all"] = v_23_0_
+  decode_all = v_23_0_
+end
+local handle_read_fn = nil
+do
+  local v_23_0_ = nil
+  local function handle_read_fn0(conn)
+    local function _3_(err, chunk)
+      if err then
+        return display_conn_status(conn, err)
+      elseif not chunk then
+        return remove_conn(conn)
+      else
+        local function _4_(result)
+          dbg("<-", result)
+          do
+            local cb = conn.msgs[result.id].cb
+            local ok_3f, err0 = pcall(cb, result)
+            if not ok_3f then
+              a.println(("conjure.lang.clojure-nrepl error:" .. err0))
+            end
+            if (result.status and ("done" == a.first(result.status))) then
+              conn.msgs[result.id] = nil
+              return nil
+            end
+          end
+        end
+        return decode_all(chunk, _4_)
+      end
+    end
+    return vim.schedule_wrap(_3_)
+  end
+  v_23_0_ = handle_read_fn0
+  _0_0["aniseed/locals"]["handle-read-fn"] = v_23_0_
+  handle_read_fn = v_23_0_
+end
+local handle_connect_fn = nil
+do
+  local v_23_0_ = nil
+  local function handle_connect_fn0(conn)
+    local function _3_(err)
+      if err then
+        display_conn_status(conn, err)
+        return remove_conn(conn)
+      else
+        do end (conn.sock):read_start(handle_read_fn(conn))
+        return display_conn_status(conn, "connected")
+      end
+    end
+    return vim.schedule_wrap(_3_)
+  end
+  v_23_0_ = handle_connect_fn0
+  _0_0["aniseed/locals"]["handle-connect-fn"] = v_23_0_
+  handle_connect_fn = v_23_0_
+end
 local add_conn = nil
 do
   local v_23_0_ = nil
@@ -206,33 +274,16 @@ do
       local port = _4_["port"]
       do
         local conn = {host = host, id = uuid.v4(), msgs = {}, port = port, sock = vim.loop.new_tcp()}
-        state.conns[conn.id] = conn
-        local function _5_(err)
-          if err then
-            display_conn_status(conn, err)
-            return remove_conn(conn)
-          else
-            local function _6_(err0, chunk)
-              if err0 then
-                return display_conn_status(conn, err0)
-              else
-                local result = dbg("<-", bencode.decode(chunk))
-                local cb = conn.msgs[result.id].cb
-                local ok_3f, err1 = pcall(cb, result)
-                if not ok_3f then
-                  a.println(("conjure.lang.clojure-nrepl error:" .. err1))
-                end
-                if (result.status and ("done" == a.first(result.status))) then
-                  conn.msgs[result.id] = nil
-                  return nil
-                end
-              end
-            end
-            do end (conn.sock):read_start(vim.schedule_wrap(_6_))
-            return display_conn_status(conn, "connected")
-          end
+        local existing = nil
+        local function _5_(conn0)
+          return ((host == conn0.host) and (port == conn0.port) and conn0)
         end
-        do end (conn.sock):connect(host, port, vim.schedule_wrap(_5_))
+        existing = a.some(_5_, a.vals(state.conns))
+        if existing then
+          remove_conn(existing)
+        end
+        state.conns[conn.id] = conn
+        do end (conn.sock):connect(host, port, handle_connect_fn(conn))
         return conn
       end
     end
@@ -281,7 +332,7 @@ do
       elseif resp.err then
         lines = text["prefixed-lines"](resp.err, "; (err) ")
       elseif resp.value then
-        lines = {resp.value}
+        lines = text["split-lines"](resp.value)
       else
         lines = nil
       end
@@ -370,5 +421,5 @@ nvim.ex.augroup("conjure_clojure_nrepl_cleanup")
 nvim.ex.autocmd_()
 nvim.ex.autocmd("VimLeavePre *", bridge["viml->lua"]("conjure.lang.clojure-nrepl", "remove-all-conns", {}))
 nvim.ex.augroup("END")
-              -- (def c (try-nrepl-port-file)) (remove-conn c) (remove-all-conns) state.conns (send c table: 0x4055eb90 a.pr)
+              -- (def c (try-nrepl-port-file)) (remove-conn c) (remove-all-conns) state.conns (send c table: 0x4079b660 a.pr)
 return nil
