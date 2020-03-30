@@ -15,8 +15,8 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {a = "conjure.aniseed.core", bencode = "conjure.bencode", hud = "conjure.hud", lang = "conjure.lang", log = "conjure.log", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", text = "conjure.text", uuid = "conjure.uuid"}}
-  return {require("conjure.aniseed.core"), require("conjure.bencode"), require("conjure.hud"), require("conjure.lang"), require("conjure.log"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.text"), require("conjure.uuid")}
+  _0_0["aniseed/local-fns"] = {require = {a = "conjure.aniseed.core", bencode = "conjure.bencode", hud = "conjure.hud", lang = "conjure.lang", log = "conjure.log", mapping = "conjure.mapping", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", text = "conjure.text", uuid = "conjure.uuid", view = "conjure.aniseed.view"}}
+  return {require("conjure.aniseed.core"), require("conjure.bencode"), require("conjure.hud"), require("conjure.lang"), require("conjure.log"), require("conjure.mapping"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.text"), require("conjure.uuid"), require("conjure.aniseed.view")}
 end
 local _2_ = _1_(...)
 local a = _2_[1]
@@ -24,10 +24,12 @@ local bencode = _2_[2]
 local hud = _2_[3]
 local lang = _2_[4]
 local log = _2_[5]
-local nvim = _2_[6]
-local str = _2_[7]
-local text = _2_[8]
-local uuid = _2_[9]
+local mapping = _2_[6]
+local nvim = _2_[7]
+local str = _2_[8]
+local text = _2_[9]
+local uuid = _2_[10]
+local view = _2_[11]
 do local _ = ({nil, _0_0, nil})[2] end
 local buf_suffix = nil
 do
@@ -77,7 +79,7 @@ local config = nil
 do
   local v_23_0_ = nil
   do
-    local v_23_0_0 = {}
+    local v_23_0_0 = {["debug?"] = true, mappings = {["add-conn-from-port-file"] = "cf", ["remove-all-conns"] = "cR", ["remove-conn"] = "cr"}}
     _0_0["config"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
@@ -98,34 +100,24 @@ end
 local display = nil
 do
   local v_23_0_ = nil
-  do
-    local v_23_0_0 = nil
-    local function display0(opts)
-      local function _3_()
-        hud.display(opts)
-        return log.append(opts)
-      end
-      return lang["with-filetype"]("clojure", _3_)
+  local function display0(opts)
+    local function _3_()
+      hud.display(opts)
+      return log.append(opts)
     end
-    v_23_0_0 = display0
-    _0_0["display"] = v_23_0_0
-    v_23_0_ = v_23_0_0
+    return lang["with-filetype"]("clojure", _3_)
   end
+  v_23_0_ = display0
   _0_0["aniseed/locals"]["display"] = v_23_0_
   display = v_23_0_
 end
 local display_conn_status = nil
 do
   local v_23_0_ = nil
-  do
-    local v_23_0_0 = nil
-    local function display_conn_status0(conn, status)
-      return display({lines = {(";; " .. conn.host .. ":" .. conn.port .. " (" .. status .. ")")}})
-    end
-    v_23_0_0 = display_conn_status0
-    _0_0["display-conn-status"] = v_23_0_0
-    v_23_0_ = v_23_0_0
+  local function display_conn_status0(conn, status)
+    return display({lines = {(";; " .. conn.host .. ":" .. conn.port .. " (" .. status .. ")")}})
   end
+  v_23_0_ = display_conn_status0
   _0_0["aniseed/locals"]["display-conn-status"] = v_23_0_
   display_conn_status = v_23_0_
 end
@@ -170,6 +162,19 @@ do
   _0_0["aniseed/locals"]["remove-all-conns"] = v_23_0_
   remove_all_conns = v_23_0_
 end
+local dbg = nil
+do
+  local v_23_0_ = nil
+  local function dbg0(desc, data)
+    if config["debug?"] then
+      display({lines = a.concat({("; debug " .. desc)}, text["split-lines"](view.serialise(data)))})
+    end
+    return data
+  end
+  v_23_0_ = dbg0
+  _0_0["aniseed/locals"]["dbg"] = v_23_0_
+  dbg = v_23_0_
+end
 local send = nil
 do
   local v_23_0_ = nil
@@ -178,6 +183,7 @@ do
     local function send0(conn, msg, cb)
       local msg_id = uuid.v4()
       msg["id"] = msg_id
+      dbg("->", msg)
       conn.msgs[msg_id] = {cb = cb, msg = msg}
       return (conn.sock):write(bencode.encode(msg))
     end
@@ -209,11 +215,11 @@ do
               if err0 then
                 return display_conn_status(conn, err0)
               else
-                local result = bencode.decode(chunk)
+                local result = dbg("<-", bencode.decode(chunk))
                 local cb = conn.msgs[result.id].cb
                 local ok_3f, err1 = pcall(cb, result)
                 if not ok_3f then
-                  a.println(("conjure.lang.clojure-nrepl error: " .. err1))
+                  a.println(("conjure.lang.clojure-nrepl error:" .. err1))
                 end
                 if result.status then
                   conn.msgs[result.id] = nil
@@ -236,12 +242,12 @@ do
   _0_0["aniseed/locals"]["add-conn"] = v_23_0_
   add_conn = v_23_0_
 end
-local try_nrepl_port_file = nil
+local add_conn_from_port_file = nil
 do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
-    local function try_nrepl_port_file0()
+    local function add_conn_from_port_file0()
       local port = nil
       do
         local _3_0 = a.slurp(".nrepl-port")
@@ -255,12 +261,12 @@ do
         return add_conn({host = "127.0.0.1", port = port})
       end
     end
-    v_23_0_0 = try_nrepl_port_file0
-    _0_0["try-nrepl-port-file"] = v_23_0_0
+    v_23_0_0 = add_conn_from_port_file0
+    _0_0["add-conn-from-port-file"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
-  _0_0["aniseed/locals"]["try-nrepl-port-file"] = v_23_0_
-  try_nrepl_port_file = v_23_0_
+  _0_0["aniseed/locals"]["add-conn-from-port-file"] = v_23_0_
+  add_conn_from_port_file = v_23_0_
 end
 local display_result = nil
 do
@@ -327,5 +333,37 @@ do
   _0_0["aniseed/locals"]["eval-file"] = v_23_0_
   eval_file = v_23_0_
 end
-              -- (def c (try-nrepl-port-file)) (remove-conn c) (remove-all-conns) state.conns (send c table: 0x418ac0a8 a.pr)
+local remove_conn_interactive = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function remove_conn_interactive0()
+      return a.println("Not implemented yet.")
+    end
+    v_23_0_0 = remove_conn_interactive0
+    _0_0["remove-conn-interactive"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["remove-conn-interactive"] = v_23_0_
+  remove_conn_interactive = v_23_0_
+end
+local on_filetype = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function on_filetype0()
+      mapping.buf("n", config.mappings["remove-all-conns"], "conjure.lang.clojure-nrepl", "remove-all-conns")
+      mapping.buf("n", config.mappings["remove-conn"], "conjure.lang.clojure-nrepl", "remove-conn-interactive")
+      return mapping.buf("n", config.mappings["add-conn-from-port-file"], "conjure.lang.clojure-nrepl", "add-conn-from-port-file")
+    end
+    v_23_0_0 = on_filetype0
+    _0_0["on-filetype"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["on-filetype"] = v_23_0_
+  on_filetype = v_23_0_
+end
+              -- (def c (try-nrepl-port-file)) (remove-conn c) (remove-all-conns) state.conns (send c table: 0x41fd50a0 a.pr)
 return nil

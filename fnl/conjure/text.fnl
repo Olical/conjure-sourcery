@@ -16,7 +16,10 @@
 (defn right-sample [s limit]
   (string.reverse (left-sample (string.reverse s) limit)))
 
+(defn split-lines [s]
+  (str.split s "[^\n]+"))
+
 (defn prefixed-lines [s prefix]
-  (->> (str.split s "[^\n]+")
+  (->> (split-lines s)
        (a.map (fn [line]
                 (.. prefix line)))))

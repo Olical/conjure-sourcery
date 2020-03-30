@@ -67,6 +67,21 @@ do
   _0_0["aniseed/locals"]["right-sample"] = v_23_0_
   right_sample = v_23_0_
 end
+local split_lines = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function split_lines0(s)
+      return str.split(s, "[^\n]+")
+    end
+    v_23_0_0 = split_lines0
+    _0_0["split-lines"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["split-lines"] = v_23_0_
+  split_lines = v_23_0_
+end
 local prefixed_lines = nil
 do
   local v_23_0_ = nil
@@ -76,7 +91,7 @@ do
       local function _3_(line)
         return (prefix .. line)
       end
-      return a.map(_3_, str.split(s, "[^\n]+"))
+      return a.map(_3_, split_lines(s))
     end
     v_23_0_0 = prefixed_lines0
     _0_0["prefixed-lines"] = v_23_0_0

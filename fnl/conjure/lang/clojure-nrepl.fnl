@@ -2,10 +2,12 @@
   {require {nvim conjure.aniseed.nvim
             a conjure.aniseed.core
             str conjure.aniseed.string
+            view conjure.aniseed.view
             hud conjure.hud
             log conjure.log
             lang conjure.lang
             text conjure.text
+            mapping conjure.mapping
             bencode conjure.bencode
             uuid conjure.uuid}})
 
@@ -20,19 +22,22 @@
 (def comment-prefix "; ")
 
 (def config
-  {})
+  {:debug? true
+   :mappings {:remove-conn "cr"
+              :remove-all-conns "cR"
+              :add-conn-from-port-file "cf"}})
 
 (defonce state
   {:conns {}})
 
-(defn display [opts]
+(defn- display [opts]
   (lang.with-filetype
     :clojure
     (fn []
       (hud.display opts)
       (log.append opts))))
 
-(defn display-conn-status [conn status]
+(defn- display-conn-status [conn status]
   (display
     {:lines [(.. ";; " conn.host ":" conn.port " (" status ")")]}))
 
@@ -47,9 +52,17 @@
 (defn remove-all-conns []
   (a.run! remove-conn (a.vals state.conns)))
 
+(defn- dbg [desc data]
+  (when config.debug?
+    (display {:lines (a.concat
+                       [(.. "; debug " desc)]
+                       (text.split-lines (view.serialise data)))}))
+  data)
+
 (defn send [conn msg cb]
   (let [msg-id (uuid.v4)]
     (tset msg :id msg-id)
+    (dbg "->" msg)
     (tset conn.msgs msg-id {:msg msg :cb cb})
     (conn.sock:write (bencode.encode msg))))
 
@@ -75,17 +88,17 @@
                   (fn [err chunk]
                     (if err
                       (display-conn-status conn err)
-                      (let [result (bencode.decode chunk)
+                      (let [result (dbg "<-" (bencode.decode chunk))
                             cb (. (. conn.msgs result.id) :cb)
                             (ok? err) (pcall cb result)]
                         (when (not ok?)
-                          (a.println (.. "conjure.lang.clojure-nrepl error: " err)))
+                          (a.println (.. "conjure.lang.clojure-nrepl error:" err)))
                         (when result.status
                           (tset conn.msgs result.id nil)))))))
               (display-conn-status conn :connected))))))
     conn))
 
-(defn try-nrepl-port-file []
+(defn add-conn-from-port-file []
   (let [port (-?> (a.slurp ".nrepl-port") (tonumber))]
     (when port
       (add-conn
@@ -93,8 +106,6 @@
          :port port}))))
 
 (defn display-result [opts resp]
-  ; (display {:lines ["; debug" (a.pr-str resp)]})
-
   (let [lines (if
                 resp.out (text.prefixed-lines resp.out "; (out) ")
                 resp.err (text.prefixed-lines resp.err "; (err) ")
@@ -115,6 +126,17 @@
 (defn eval-file [opts]
   (a.assoc opts :code (.. "(load-file \"" opts.file-path "\")"))
   (eval-str opts))
+
+(defn remove-conn-interactive []
+  (a.println "Not implemented yet."))
+
+(defn on-filetype []
+  (mapping.buf :n config.mappings.remove-all-conns
+               :conjure.lang.clojure-nrepl :remove-all-conns)
+  (mapping.buf :n config.mappings.remove-conn
+               :conjure.lang.clojure-nrepl :remove-conn-interactive)
+  (mapping.buf :n config.mappings.add-conn-from-port-file
+               :conjure.lang.clojure-nrepl :add-conn-from-port-file))
 
 (comment
   (def c (try-nrepl-port-file))
