@@ -45,6 +45,7 @@
   (let [conn (. state.conns id)]
     (when conn
       (when (not (conn.sock:is_closing))
+        (conn.sock:read_stop)
         (conn.sock:close))
       (tset state.conns id nil)
       (display-conn-status conn :disconnected))))
@@ -68,6 +69,21 @@
 
 (defn- handle-read-fn [conn]
   (vim.schedule_wrap
+    (fn [err chunk]
+      (if
+        err (display-conn-status conn err)
+        (not chunk) (remove-conn conn)
+        (let [result (dbg "<-" (bencode.decode chunk))
+              cb (. (. conn.msgs result.id) :cb)
+              (ok? err) (pcall cb result)]
+          (when (not ok?)
+            (a.println (.. "conjure.lang.clojure-nrepl error:" err)))
+          (when (and result.status
+                     (= :done (a.first result.status)))
+            (tset conn.msgs result.id nil)))))))
+
+(defn- handle-connect-fn [conn]
+  (vim.schedule_wrap
     (fn [err]
       (if err
         (do
@@ -75,20 +91,7 @@
           (remove-conn conn))
 
         (do
-          (conn.sock:read_start
-            (vim.schedule_wrap
-              (fn [err chunk]
-                (if
-                  err (display-conn-status conn err)
-                  (not chunk) (remove-conn conn)
-                  (let [result (dbg "<-" (bencode.decode chunk))
-                        cb (. (. conn.msgs result.id) :cb)
-                        (ok? err) (pcall cb result)]
-                    (when (not ok?)
-                      (a.println (.. "conjure.lang.clojure-nrepl error:" err)))
-                    (when (and result.status
-                               (= :done (a.first result.status)))
-                      (tset conn.msgs result.id nil)))))))
+          (conn.sock:read_start (handle-read-fn conn))
           (display-conn-status conn :connected))))))
 
 (defn add-conn [{: host : port}]
@@ -106,7 +109,7 @@
       (remove-conn existing))
 
     (tset state.conns conn.id conn)
-    (conn.sock:connect host port (handle-read-fn conn))
+    (conn.sock:connect host port (handle-connect-fn conn))
     conn))
 
 (defn add-conn-from-port-file []
@@ -120,7 +123,7 @@
   (let [lines (if
                 resp.out (text.prefixed-lines resp.out "; (out) ")
                 resp.err (text.prefixed-lines resp.err "; (err) ")
-                resp.value [resp.value]
+                resp.value (text.split-lines resp.value)
                 nil)]
     (when lines
       (hud.display {:lines (a.concat [opts.preview] lines)})
