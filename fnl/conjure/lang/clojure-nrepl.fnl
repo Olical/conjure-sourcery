@@ -66,37 +66,47 @@
     (tset conn.msgs msg-id {:msg msg :cb cb})
     (conn.sock:write (bencode.encode msg))))
 
+(defn- handle-read-fn [conn]
+  (vim.schedule_wrap
+    (fn [err]
+      (if err
+        (do
+          (display-conn-status conn err)
+          (remove-conn conn))
+
+        (do
+          (conn.sock:read_start
+            (vim.schedule_wrap
+              (fn [err chunk]
+                (if
+                  err (display-conn-status conn err)
+                  (not chunk) (remove-conn conn)
+                  (let [result (dbg "<-" (bencode.decode chunk))
+                        cb (. (. conn.msgs result.id) :cb)
+                        (ok? err) (pcall cb result)]
+                    (when (not ok?)
+                      (a.println (.. "conjure.lang.clojure-nrepl error:" err)))
+                    (when (and result.status
+                               (= :done (a.first result.status)))
+                      (tset conn.msgs result.id nil)))))))
+          (display-conn-status conn :connected))))))
+
 (defn add-conn [{: host : port}]
   (let [conn {:sock (vim.loop.new_tcp)
               :id (uuid.v4)
               :host host
               :port port
-              :msgs {}}]
-    (tset state.conns conn.id conn)
-    (conn.sock:connect
-      host port
-      (vim.schedule_wrap
-        (fn [err]
-          (if err
-            (do
-              (display-conn-status conn err)
-              (remove-conn conn))
+              :msgs {}}
+        existing (a.some
+                   (fn [conn]
+                     (and (= host conn.host) (= port conn.port) conn))
+                   (a.vals state.conns))]
 
-            (do
-              (conn.sock:read_start
-                (vim.schedule_wrap
-                  (fn [err chunk]
-                    (if err
-                      (display-conn-status conn err)
-                      (let [result (dbg "<-" (bencode.decode chunk))
-                            cb (. (. conn.msgs result.id) :cb)
-                            (ok? err) (pcall cb result)]
-                        (when (not ok?)
-                          (a.println (.. "conjure.lang.clojure-nrepl error:" err)))
-                        (when (and result.status
-                                   (= :done (a.first result.status)))
-                          (tset conn.msgs result.id nil)))))))
-              (display-conn-status conn :connected))))))
+    (when existing
+      (remove-conn existing))
+
+    (tset state.conns conn.id conn)
+    (conn.sock:connect host port (handle-read-fn conn))
     conn))
 
 (defn add-conn-from-port-file []
