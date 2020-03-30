@@ -9,12 +9,12 @@
             text conjure.text
             mapping conjure.mapping
             bencode conjure.bencode
+            bridge conjure.bridge
             uuid conjure.uuid}})
 
 ;; TODO Sessions so *e / *1 work and can be cancelled.
 ;; TODO Some messages never get completed.
 ;; TODO Handle things lacking IDs.
-;; TODO Cleanup conns on exit.
 
 (def buf-suffix ".cljc")
 (def default-context "user")
@@ -22,7 +22,7 @@
 (def comment-prefix "; ")
 
 (def config
-  {:debug? true
+  {:debug? false
    :mappings {:remove-conn "cr"
               :remove-all-conns "cR"
               :add-conn-from-port-file "cf"}})
@@ -93,7 +93,8 @@
                             (ok? err) (pcall cb result)]
                         (when (not ok?)
                           (a.println (.. "conjure.lang.clojure-nrepl error:" err)))
-                        (when result.status
+                        (when (and result.status
+                                   (= :done (a.first result.status)))
                           (tset conn.msgs result.id nil)))))))
               (display-conn-status conn :connected))))))
     conn))
@@ -137,6 +138,13 @@
                :conjure.lang.clojure-nrepl :remove-conn-interactive)
   (mapping.buf :n config.mappings.add-conn-from-port-file
                :conjure.lang.clojure-nrepl :add-conn-from-port-file))
+
+(nvim.ex.augroup :conjure_clojure_nrepl_cleanup)
+(nvim.ex.autocmd_)
+(nvim.ex.autocmd
+  "VimLeavePre *"
+  (bridge.viml->lua :conjure.lang.clojure-nrepl :remove-all-conns {}))
+(nvim.ex.augroup :END)
 
 (comment
   (def c (try-nrepl-port-file))

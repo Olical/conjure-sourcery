@@ -15,21 +15,22 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {a = "conjure.aniseed.core", bencode = "conjure.bencode", hud = "conjure.hud", lang = "conjure.lang", log = "conjure.log", mapping = "conjure.mapping", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", text = "conjure.text", uuid = "conjure.uuid", view = "conjure.aniseed.view"}}
-  return {require("conjure.aniseed.core"), require("conjure.bencode"), require("conjure.hud"), require("conjure.lang"), require("conjure.log"), require("conjure.mapping"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.text"), require("conjure.uuid"), require("conjure.aniseed.view")}
+  _0_0["aniseed/local-fns"] = {require = {a = "conjure.aniseed.core", bencode = "conjure.bencode", bridge = "conjure.bridge", hud = "conjure.hud", lang = "conjure.lang", log = "conjure.log", mapping = "conjure.mapping", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", text = "conjure.text", uuid = "conjure.uuid", view = "conjure.aniseed.view"}}
+  return {require("conjure.aniseed.core"), require("conjure.bencode"), require("conjure.bridge"), require("conjure.hud"), require("conjure.lang"), require("conjure.log"), require("conjure.mapping"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.text"), require("conjure.uuid"), require("conjure.aniseed.view")}
 end
 local _2_ = _1_(...)
 local a = _2_[1]
 local bencode = _2_[2]
-local hud = _2_[3]
-local lang = _2_[4]
-local log = _2_[5]
-local mapping = _2_[6]
-local nvim = _2_[7]
-local str = _2_[8]
-local text = _2_[9]
-local uuid = _2_[10]
-local view = _2_[11]
+local bridge = _2_[3]
+local hud = _2_[4]
+local lang = _2_[5]
+local log = _2_[6]
+local mapping = _2_[7]
+local nvim = _2_[8]
+local str = _2_[9]
+local text = _2_[10]
+local uuid = _2_[11]
+local view = _2_[12]
 do local _ = ({nil, _0_0, nil})[2] end
 local buf_suffix = nil
 do
@@ -79,7 +80,7 @@ local config = nil
 do
   local v_23_0_ = nil
   do
-    local v_23_0_0 = {["debug?"] = true, mappings = {["add-conn-from-port-file"] = "cf", ["remove-all-conns"] = "cR", ["remove-conn"] = "cr"}}
+    local v_23_0_0 = {["debug?"] = false, mappings = {["add-conn-from-port-file"] = "cf", ["remove-all-conns"] = "cR", ["remove-conn"] = "cr"}}
     _0_0["config"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
@@ -221,7 +222,7 @@ do
                 if not ok_3f then
                   a.println(("conjure.lang.clojure-nrepl error:" .. err1))
                 end
-                if result.status then
+                if (result.status and ("done" == a.first(result.status))) then
                   conn.msgs[result.id] = nil
                   return nil
                 end
@@ -365,5 +366,9 @@ do
   _0_0["aniseed/locals"]["on-filetype"] = v_23_0_
   on_filetype = v_23_0_
 end
-              -- (def c (try-nrepl-port-file)) (remove-conn c) (remove-all-conns) state.conns (send c table: 0x41fd50a0 a.pr)
+nvim.ex.augroup("conjure_clojure_nrepl_cleanup")
+nvim.ex.autocmd_()
+nvim.ex.autocmd("VimLeavePre *", bridge["viml->lua"]("conjure.lang.clojure-nrepl", "remove-all-conns", {}))
+nvim.ex.augroup("END")
+              -- (def c (try-nrepl-port-file)) (remove-conn c) (remove-all-conns) state.conns (send c table: 0x4055eb90 a.pr)
 return nil
