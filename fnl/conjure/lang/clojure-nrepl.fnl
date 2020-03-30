@@ -46,6 +46,7 @@
     (when conn
       (when (not (conn.sock:is_closing))
         (conn.sock:read_stop)
+        (conn.sock:shutdown)
         (conn.sock:close))
       (tset state.conns id nil)
       (display-conn-status conn :disconnected))))
