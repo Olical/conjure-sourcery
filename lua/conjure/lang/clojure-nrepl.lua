@@ -80,7 +80,7 @@ local config = nil
 do
   local v_23_0_ = nil
   do
-    local v_23_0_0 = {["debug?"] = true, mappings = {["add-conn-from-port-file"] = "cf", ["remove-all-conns"] = "cR", ["remove-conn"] = "cr"}}
+    local v_23_0_0 = {["debug?"] = false, mappings = {["add-conn-from-port-file"] = "cf", ["remove-all-conns"] = "cR", ["remove-conn"] = "cr"}}
     _0_0["config"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
@@ -200,11 +200,19 @@ end
 local decode_all = nil
 do
   local v_23_0_ = nil
-  local function decode_all0(s, cb)
-    local result, consumed = bencode.decode(s)
-    cb(result)
-    if (consumed < a.count(s)) then
-      return decode_all0(string.sub(s, consumed), cb)
+  local function decode_all0(s)
+    local progress = 1
+    do
+      local acc = {}
+      while (progress < a.count(s)) do
+        local result, consumed = bencode.decode(s, progress)
+        if a["nil?"](result) then
+          error(consumed)
+        end
+        table.insert(acc, result)
+        progress = consumed
+      end
+      return acc
     end
   end
   v_23_0_ = decode_all0
@@ -235,7 +243,7 @@ do
             end
           end
         end
-        return decode_all(chunk, _4_)
+        return a["run!"](_4_, decode_all(chunk))
       end
     end
     return vim.schedule_wrap(_3_)
@@ -421,5 +429,5 @@ nvim.ex.augroup("conjure_clojure_nrepl_cleanup")
 nvim.ex.autocmd_()
 nvim.ex.autocmd("VimLeavePre *", bridge["viml->lua"]("conjure.lang.clojure-nrepl", "remove-all-conns", {}))
 nvim.ex.augroup("END")
-              -- (def c (try-nrepl-port-file)) (remove-conn c) (remove-all-conns) state.conns (send c table: 0x4079b660 a.pr)
+              -- (def c (try-nrepl-port-file)) (remove-conn c) (remove-all-conns) state.conns (send c table: 0x407e9db0 a.pr)
 return nil

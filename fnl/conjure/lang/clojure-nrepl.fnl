@@ -67,11 +67,18 @@
     (tset conn.msgs msg-id {:msg msg :cb cb})
     (conn.sock:write (bencode.encode msg))))
 
-(defn- decode-all [s cb]
-  (let [(result consumed) (bencode.decode s)]
-    (cb result)
-    (when (< consumed (a.count s))
-      (decode-all (string.sub s consumed) cb))))
+(defn- decode-all [s]
+  (var progress 1)
+  (let [acc []]
+    (while (< progress (a.count s))
+      (let [(result consumed) (bencode.decode s progress)]
+
+        (when (a.nil? result)
+          (error consumed))
+
+        (table.insert acc result)
+        (set progress consumed)))
+    acc))
 
 (defn- handle-read-fn [conn]
   (vim.schedule_wrap
@@ -79,17 +86,17 @@
       (if
         err (display-conn-status conn err)
         (not chunk) (remove-conn conn)
-        (decode-all
-          chunk
-          (fn [result]
-            (dbg "<-" result)
-            (let [cb (. (. conn.msgs result.id) :cb)
-                  (ok? err) (pcall cb result)]
-              (when (not ok?)
-                (a.println (.. "conjure.lang.clojure-nrepl error:" err)))
-              (when (and result.status
-                         (= :done (a.first result.status)))
-                (tset conn.msgs result.id nil)))))))))
+        (->> (decode-all chunk)
+             (a.run!
+               (fn [result]
+                 (dbg "<-" result)
+                 (let [cb (. (. conn.msgs result.id) :cb)
+                       (ok? err) (pcall cb result)]
+                   (when (not ok?)
+                     (a.println (.. "conjure.lang.clojure-nrepl error:" err)))
+                   (when (and result.status
+                              (= :done (a.first result.status)))
+                     (tset conn.msgs result.id nil))))))))))
 
 (defn- handle-connect-fn [conn]
   (vim.schedule_wrap
