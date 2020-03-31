@@ -10,12 +10,14 @@
             mapping conjure.mapping
             bencode conjure.bencode
             bridge conjure.bridge
-            uuid conjure.uuid}})
+            uuid conjure.uuid
+            conjure-config conjure.config}})
 
 ;; TODO Handle things lacking IDs.
 ;; TODO File / line / column metadata.
 ;; TODO Mappings for *e *1 *2 *3 values
 ;; TODO Close session on exit seems to hang Neovim.
+;; TODO Handle partial chunks of bencode data. (stream wrapper)
 
 (def buf-suffix ".cljc")
 (def default-context "user")
@@ -209,23 +211,33 @@
 (defn interrupt []
   (let [msgs (a.mapcat
                (fn [conn]
-                 (a.map
-                   (fn [msg]
-                     (a.merge {:conn conn} msg))
-                   (a.vals conn.msgs)))
+                 (->> (a.vals conn.msgs)
+                      (a.filter
+                        (fn [msg]
+                          (= :eval msg.msg.op)))
+                      (a.map
+                        (fn [msg]
+                          (a.merge {:conn conn} msg)))))
                (conns))]
-    (when (not (a.empty? msgs))
-      (table.sort
-        msgs
-        (fn [a b]
-          (< a.sent-at b.sent-at)))
-      (let [oldest (a.first msgs)]
-        (send oldest.conn
-              (a.merge
-                {:op :interrupt
-                 :id oldest.msg.id}
-                (when oldest.msg.session
-                  {:session oldest.msg.session})))))))
+    (if (a.empty? msgs)
+      (display {:lines ["; Nothing to interrupt."]})
+      (do
+        (table.sort
+          msgs
+          (fn [a b]
+            (< a.sent-at b.sent-at)))
+        (let [oldest (a.first msgs)]
+          (send oldest.conn
+                (a.merge
+                  {:op :interrupt
+                   :id oldest.msg.id}
+                  (when oldest.msg.session
+                    {:session oldest.msg.session})))
+          (display
+            {:lines [(.. "; Interrupted: "
+                         (text.left-sample
+                           oldest.msg.code
+                           conjure-config.preview.sample-limit))]}))))))
 
 (defn on-filetype []
   (mapping.buf :n config.mappings.remove-all-conns
@@ -240,11 +252,12 @@
 (when (not state.loaded?)
   (set state.loaded? true)
   (vim.schedule
-    (nvim.ex.augroup :conjure_clojure_nrepl_cleanup)
-    (nvim.ex.autocmd_)
-    (nvim.ex.autocmd
-      "VimLeavePre *"
-      (bridge.viml->lua :conjure.lang.clojure-nrepl :remove-all-conns {}))
-    (nvim.ex.augroup :END)
+    (fn []
+      (nvim.ex.augroup :conjure_clojure_nrepl_cleanup)
+      (nvim.ex.autocmd_)
+      (nvim.ex.autocmd
+        "VimLeavePre *"
+        (bridge.viml->lua :conjure.lang.clojure-nrepl :remove-all-conns {}))
+      (nvim.ex.augroup :END)
 
-    (add-conn-from-port-file)))
+      (add-conn-from-port-file))))

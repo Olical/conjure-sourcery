@@ -15,22 +15,23 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {a = "conjure.aniseed.core", bencode = "conjure.bencode", bridge = "conjure.bridge", hud = "conjure.hud", lang = "conjure.lang", log = "conjure.log", mapping = "conjure.mapping", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", text = "conjure.text", uuid = "conjure.uuid", view = "conjure.aniseed.view"}}
-  return {require("conjure.aniseed.core"), require("conjure.bencode"), require("conjure.bridge"), require("conjure.hud"), require("conjure.lang"), require("conjure.log"), require("conjure.mapping"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.text"), require("conjure.uuid"), require("conjure.aniseed.view")}
+  _0_0["aniseed/local-fns"] = {require = {["conjure-config"] = "conjure.config", a = "conjure.aniseed.core", bencode = "conjure.bencode", bridge = "conjure.bridge", hud = "conjure.hud", lang = "conjure.lang", log = "conjure.log", mapping = "conjure.mapping", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", text = "conjure.text", uuid = "conjure.uuid", view = "conjure.aniseed.view"}}
+  return {require("conjure.aniseed.core"), require("conjure.bencode"), require("conjure.bridge"), require("conjure.config"), require("conjure.hud"), require("conjure.lang"), require("conjure.log"), require("conjure.mapping"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.text"), require("conjure.uuid"), require("conjure.aniseed.view")}
 end
 local _2_ = _1_(...)
 local a = _2_[1]
 local bencode = _2_[2]
 local bridge = _2_[3]
-local hud = _2_[4]
-local lang = _2_[5]
-local log = _2_[6]
-local mapping = _2_[7]
-local nvim = _2_[8]
-local str = _2_[9]
-local text = _2_[10]
-local uuid = _2_[11]
-local view = _2_[12]
+local conjure_config = _2_[4]
+local hud = _2_[5]
+local lang = _2_[6]
+local log = _2_[7]
+local mapping = _2_[8]
+local nvim = _2_[9]
+local str = _2_[10]
+local text = _2_[11]
+local uuid = _2_[12]
+local view = _2_[13]
 do local _ = ({nil, _0_0, nil})[2] end
 local buf_suffix = nil
 do
@@ -469,10 +470,15 @@ do
         local function _4_(msg)
           return a.merge({conn = conn}, msg)
         end
-        return a.map(_4_, a.vals(conn.msgs))
+        local function _5_(msg)
+          return ("eval" == msg.msg.op)
+        end
+        return a.map(_4_, a.filter(_5_, a.vals(conn.msgs)))
       end
       msgs = a.mapcat(_3_, conns())
-      if not a["empty?"](msgs) then
+      if a["empty?"](msgs) then
+        return display({lines = {"; Nothing to interrupt."}})
+      else
         local function _4_(a0, b)
           return (a0["sent-at"] < b["sent-at"])
         end
@@ -484,7 +490,8 @@ do
               return {session = oldest.msg.session}
             end
           end
-          return send(oldest.conn, a.merge({id = oldest.msg.id, op = "interrupt"}, _5_()))
+          send(oldest.conn, a.merge({id = oldest.msg.id, op = "interrupt"}, _5_()))
+          return display({lines = {("; Interrupted: " .. text["left-sample"](oldest.msg.code, conjure_config.preview["sample-limit"]))}})
         end
       end
     end
@@ -515,5 +522,12 @@ do
 end
 if not state["loaded?"] then
   state["loaded?"] = true
-  return vim.schedule(nvim.ex.augroup("conjure_clojure_nrepl_cleanup"), nvim.ex.autocmd_(), nvim.ex.autocmd("VimLeavePre *", bridge["viml->lua"]("conjure.lang.clojure-nrepl", "remove-all-conns", {})), nvim.ex.augroup("END"), add_conn_from_port_file())
+  local function _3_()
+    nvim.ex.augroup("conjure_clojure_nrepl_cleanup")
+    nvim.ex.autocmd_()
+    nvim.ex.autocmd("VimLeavePre *", bridge["viml->lua"]("conjure.lang.clojure-nrepl", "remove-all-conns", {}))
+    nvim.ex.augroup("END")
+    return add_conn_from_port_file()
+  end
+  return vim.schedule(_3_)
 end
