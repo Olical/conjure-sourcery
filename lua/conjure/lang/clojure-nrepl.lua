@@ -89,12 +89,7 @@ do
 end
 local state = nil
 do
-  local v_23_0_ = nil
-  do
-    local v_23_0_0 = (_0_0.state or {["loaded?"] = false, conns = {}})
-    _0_0["state"] = v_23_0_0
-    v_23_0_ = v_23_0_0
-  end
+  local v_23_0_ = (_0_0["aniseed/locals"].state or {["loaded?"] = false, conns = {}})
   _0_0["aniseed/locals"]["state"] = v_23_0_
   state = v_23_0_
 end
@@ -181,19 +176,14 @@ end
 local send = nil
 do
   local v_23_0_ = nil
-  do
-    local v_23_0_0 = nil
-    local function send0(conn, msg, cb)
-      local msg_id = uuid.v4()
-      msg["id"] = msg_id
-      dbg("->", msg)
-      conn.msgs[msg_id] = {cb = cb, msg = msg}
-      return (conn.sock):write(bencode.encode(msg))
-    end
-    v_23_0_0 = send0
-    _0_0["send"] = v_23_0_0
-    v_23_0_ = v_23_0_0
+  local function send0(conn, msg, cb)
+    local msg_id = uuid.v4()
+    msg["id"] = msg_id
+    dbg("->", msg)
+    conn.msgs[msg_id] = {cb = cb, msg = msg}
+    return (conn.sock):write(bencode.encode(msg))
   end
+  v_23_0_ = send0
   _0_0["aniseed/locals"]["send"] = v_23_0_
   send = v_23_0_
 end
@@ -333,31 +323,26 @@ end
 local display_result = nil
 do
   local v_23_0_ = nil
-  do
-    local v_23_0_0 = nil
-    local function display_result0(opts, resp)
-      local lines = nil
-      if resp.out then
-        lines = text["prefixed-lines"](resp.out, "; (out) ")
-      elseif resp.err then
-        lines = text["prefixed-lines"](resp.err, "; (err) ")
-      elseif resp.value then
-        lines = text["split-lines"](resp.value)
-      else
-        lines = nil
-      end
-      if lines then
-        local function _4_()
-          hud.display({lines = a.concat({opts.preview}, lines)})
-          return log.append({lines = lines})
-        end
-        return lang["with-filetype"]("clojure", _4_)
-      end
+  local function display_result0(opts, resp)
+    local lines = nil
+    if resp.out then
+      lines = text["prefixed-lines"](resp.out, "; (out) ")
+    elseif resp.err then
+      lines = text["prefixed-lines"](resp.err, "; (err) ")
+    elseif resp.value then
+      lines = text["split-lines"](resp.value)
+    else
+      lines = nil
     end
-    v_23_0_0 = display_result0
-    _0_0["display-result"] = v_23_0_0
-    v_23_0_ = v_23_0_0
+    if lines then
+      local function _4_()
+        hud.display({lines = a.concat({opts.preview}, lines)})
+        return log.append({lines = lines})
+      end
+      return lang["with-filetype"]("clojure", _4_)
+    end
   end
+  v_23_0_ = display_result0
   _0_0["aniseed/locals"]["display-result"] = v_23_0_
   display_result = v_23_0_
 end

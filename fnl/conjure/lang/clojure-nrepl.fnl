@@ -12,8 +12,10 @@
             bridge conjure.bridge
             uuid conjure.uuid}})
 
-;; TODO Sessions so *e / *1 work and can be cancelled.
+;; TODO Sessions so *e / *1 work.
+;; TODO Cancel oldest eval.
 ;; TODO Handle things lacking IDs.
+;; TODO File / line / column metadata.
 
 (def buf-suffix ".cljc")
 (def default-context "user")
@@ -26,7 +28,7 @@
               :remove-all-conns "cR"
               :add-conn-from-port-file "cf"}})
 
-(defonce state
+(defonce- state
   {:loaded? false
    :conns {}})
 
@@ -61,7 +63,7 @@
                        (text.split-lines (view.serialise data)))}))
   data)
 
-(defn send [conn msg cb]
+(defn- send [conn msg cb]
   (let [msg-id (uuid.v4)]
     (tset msg :id msg-id)
     (dbg "->" msg)
@@ -137,7 +139,7 @@
          :port port})
       (display {:lines ["; No .nrepl-port file found."]}))))
 
-(defn display-result [opts resp]
+(defn- display-result [opts resp]
   (let [lines (if
                 resp.out (text.prefixed-lines resp.out "; (out) ")
                 resp.err (text.prefixed-lines resp.err "; (err) ")
