@@ -18,6 +18,7 @@
 ;; TODO Mappings for *e *1 *2 *3 values
 ;; TODO Close session on exit seems to hang Neovim.
 ;; TODO Handle partial chunks of bencode data. (stream wrapper)
+;; TODO Session stack.
 
 (def buf-suffix ".cljc")
 (def default-context "user")
