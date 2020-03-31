@@ -187,6 +187,33 @@ do
   _0_0["aniseed/locals"]["send"] = v_23_0_
   send = v_23_0_
 end
+local done_3f = nil
+do
+  local v_23_0_ = nil
+  local function done_3f0(msg)
+    return (msg and msg.status and ("done" == a.first(msg.status)))
+  end
+  v_23_0_ = done_3f0
+  _0_0["aniseed/locals"]["done?"] = v_23_0_
+  done_3f = v_23_0_
+end
+local with_all_msgs_fn = nil
+do
+  local v_23_0_ = nil
+  local function with_all_msgs_fn0(cb)
+    local acc = {}
+    local function _3_(msg)
+      table.insert(acc, msg)
+      if done_3f(msg) then
+        return cb(acc)
+      end
+    end
+    return _3_
+  end
+  v_23_0_ = with_all_msgs_fn0
+  _0_0["aniseed/locals"]["with-all-msgs-fn"] = v_23_0_
+  with_all_msgs_fn = v_23_0_
+end
 local decode_all = nil
 do
   local v_23_0_ = nil
@@ -195,11 +222,11 @@ do
     do
       local acc = {}
       while (progress < a.count(s)) do
-        local result, consumed = bencode.decode(s, progress)
-        if a["nil?"](result) then
+        local msg, consumed = bencode.decode(s, progress)
+        if a["nil?"](msg) then
           error(consumed)
         end
-        table.insert(acc, result)
+        table.insert(acc, msg)
         progress = consumed
       end
       return acc
@@ -219,16 +246,16 @@ do
       elseif not chunk then
         return remove_conn(conn)
       else
-        local function _4_(result)
-          dbg("<-", result)
+        local function _4_(msg)
+          dbg("<-", msg)
           do
-            local cb = conn.msgs[result.id].cb
-            local ok_3f, err0 = pcall(cb, result)
+            local cb = conn.msgs[msg.id].cb
+            local ok_3f, err0 = pcall(cb, msg)
             if not ok_3f then
               a.println(("conjure.lang.clojure-nrepl error:" .. err0))
             end
-            if (result.status and ("done" == a.first(result.status))) then
-              conn.msgs[result.id] = nil
+            if done_3f(msg) then
+              conn.msgs[msg.id] = nil
               return nil
             end
           end
@@ -252,7 +279,11 @@ do
         return remove_conn(conn)
       else
         do end (conn.sock):read_start(handle_read_fn(conn))
-        return display_conn_status(conn, "connected")
+        display_conn_status(conn, "connected")
+        local function _4_(msgs)
+          return a["assoc-in"](conn, {"sessions", "user"}, a.get(a.last(msgs), "new-session"))
+        end
+        return send(conn, {op = "clone"}, with_all_msgs_fn(_4_))
       end
     end
     return vim.schedule_wrap(_3_)
@@ -271,7 +302,7 @@ do
       local host = _4_["host"]
       local port = _4_["port"]
       do
-        local conn = {host = host, id = uuid.v4(), msgs = {}, port = port, sock = vim.loop.new_tcp()}
+        local conn = {host = host, id = uuid.v4(), msgs = {}, port = port, sessions = {}, sock = vim.loop.new_tcp()}
         local existing = nil
         local function _5_(conn0)
           return ((host == conn0.host) and (port == conn0.port) and conn0)
@@ -346,21 +377,39 @@ do
   _0_0["aniseed/locals"]["display-result"] = v_23_0_
   display_result = v_23_0_
 end
+local conns = nil
+do
+  local v_23_0_ = nil
+  local function conns0(opts)
+    local xs = a.vals(state.conns)
+    if (a["empty?"](xs) and (not opts or not opts["silent?"])) then
+      display({lines = {"; No connections."}})
+    end
+    return xs
+  end
+  v_23_0_ = conns0
+  _0_0["aniseed/locals"]["conns"] = v_23_0_
+  conns = v_23_0_
+end
 local eval_str = nil
 do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
     local function eval_str0(opts)
-      local conn = a.first(a.vals(state.conns))
-      if conn then
-        local function _3_(_241)
+      local function _3_(conn)
+        local function _4_()
+          local session = a["get-in"](conn, {"sessions", "user"})
+          if session then
+            return {session = session}
+          end
+        end
+        local function _5_(_241)
           return display_result(opts, _241)
         end
-        return send(conn, {code = opts.code, op = "eval"}, _3_)
-      else
-        return display({lines = {"; No connections."}})
+        return send(conn, a.merge({code = opts.code, op = "eval"}, _4_()), _5_)
       end
+      return a["run!"](_3_, conns())
     end
     v_23_0_0 = eval_str0
     _0_0["eval-str"] = v_23_0_0

@@ -12,10 +12,10 @@
             bridge conjure.bridge
             uuid conjure.uuid}})
 
-;; TODO Sessions so *e / *1 work.
 ;; TODO Cancel oldest eval.
 ;; TODO Handle things lacking IDs.
 ;; TODO File / line / column metadata.
+;; TODO Mappings for *e *1 *2 *3 values
 
 (def buf-suffix ".cljc")
 (def default-context "user")
@@ -70,16 +70,26 @@
     (tset conn.msgs msg-id {:msg msg :cb cb})
     (conn.sock:write (bencode.encode msg))))
 
+(defn- done? [msg]
+  (and msg msg.status (= :done (a.first msg.status))))
+
+(defn- with-all-msgs-fn [cb]
+  (let [acc []]
+    (fn [msg]
+      (table.insert acc msg)
+      (when (done? msg)
+        (cb acc)))))
+
 (defn- decode-all [s]
   (var progress 1)
   (let [acc []]
     (while (< progress (a.count s))
-      (let [(result consumed) (bencode.decode s progress)]
+      (let [(msg consumed) (bencode.decode s progress)]
 
-        (when (a.nil? result)
+        (when (a.nil? msg)
           (error consumed))
 
-        (table.insert acc result)
+        (table.insert acc msg)
         (set progress consumed)))
     acc))
 
@@ -91,15 +101,14 @@
         (not chunk) (remove-conn conn)
         (->> (decode-all chunk)
              (a.run!
-               (fn [result]
-                 (dbg "<-" result)
-                 (let [cb (. (. conn.msgs result.id) :cb)
-                       (ok? err) (pcall cb result)]
+               (fn [msg]
+                 (dbg "<-" msg)
+                 (let [cb (. (. conn.msgs msg.id) :cb)
+                       (ok? err) (pcall cb msg)]
                    (when (not ok?)
                      (a.println (.. "conjure.lang.clojure-nrepl error:" err)))
-                   (when (and result.status
-                              (= :done (a.first result.status)))
-                     (tset conn.msgs result.id nil))))))))))
+                   (when (done? msg)
+                     (tset conn.msgs msg.id nil))))))))))
 
 (defn- handle-connect-fn [conn]
   (vim.schedule_wrap
@@ -111,14 +120,24 @@
 
         (do
           (conn.sock:read_start (handle-read-fn conn))
-          (display-conn-status conn :connected))))))
+          (display-conn-status conn :connected)
+          (send
+            conn
+            {:op :clone}
+            (with-all-msgs-fn
+              (fn [msgs]
+                (a.assoc-in conn [:sessions :user]
+                            (-> msgs
+                                (->> (a.last))
+                                (a.get :new-session)))))))))))
 
 (defn add-conn [{: host : port}]
   (let [conn {:sock (vim.loop.new_tcp)
               :id (uuid.v4)
               :host host
               :port port
-              :msgs {}}
+              :msgs {}
+              :sessions {}}
         existing (a.some
                    (fn [conn]
                      (and (= host conn.host) (= port conn.port) conn))
@@ -152,14 +171,25 @@
           (hud.display {:lines (a.concat [opts.preview] lines)})
           (log.append {:lines lines}))))))
 
+(defn- conns [opts]
+  (let [xs (a.vals state.conns)]
+    (when (and (a.empty? xs) (or (not opts) (not opts.silent?)))
+      (display {:lines ["; No connections."]}))
+    xs))
+
 (defn eval-str [opts]
-  (let [conn (a.first (a.vals state.conns))]
-    (if conn
+  (a.run!
+    (fn [conn]
       (send
         conn
-        {:op :eval :code opts.code}
-        #(display-result opts $1))
-      (display {:lines ["; No connections."]}))))
+        (a.merge
+          {:op :eval
+           :code opts.code}
+          (let [session (a.get-in conn [:sessions :user])]
+            (when session
+              {:session session})))
+        #(display-result opts $1)))
+    (conns)))
 
 (defn eval-file [opts]
   (a.assoc opts :code (.. "(load-file \"" opts.file-path "\")"))
