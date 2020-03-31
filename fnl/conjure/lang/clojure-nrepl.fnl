@@ -27,7 +27,8 @@
               :add-conn-from-port-file "cf"}})
 
 (defonce state
-  {:conns {}})
+  {:loaded? false
+   :conns {}})
 
 (defn- display [opts]
   (lang.with-filetype
@@ -38,7 +39,7 @@
 
 (defn- display-conn-status [conn status]
   (display
-    {:lines [(.. ";; " conn.host ":" conn.port " (" status ")")]}))
+    {:lines [(.. "; " conn.host ":" conn.port " (" status ")")]}))
 
 (defn remove-conn [{: id}]
   (let [conn (. state.conns id)]
@@ -130,10 +131,11 @@
 
 (defn add-conn-from-port-file []
   (let [port (-?> (a.slurp ".nrepl-port") (tonumber))]
-    (when port
+    (if port
       (add-conn
         {:host "127.0.0.1"
-         :port port}))))
+         :port port})
+      (display {:lines ["; No .nrepl-port file found."]}))))
 
 (defn display-result [opts resp]
   (let [lines (if
@@ -142,16 +144,20 @@
                 resp.value (text.split-lines resp.value)
                 nil)]
     (when lines
-      (hud.display {:lines (a.concat [opts.preview] lines)})
-      (log.append {:lines lines}))))
+      (lang.with-filetype
+        :clojure
+        (fn []
+          (hud.display {:lines (a.concat [opts.preview] lines)})
+          (log.append {:lines lines}))))))
 
 (defn eval-str [opts]
   (let [conn (a.first (a.vals state.conns))]
-    (when conn
+    (if conn
       (send
         conn
         {:op :eval :code opts.code}
-        #(display-result opts $1)))))
+        #(display-result opts $1))
+      (display {:lines ["; No connections."]}))))
 
 (defn eval-file [opts]
   (a.assoc opts :code (.. "(load-file \"" opts.file-path "\")"))
@@ -168,17 +174,14 @@
   (mapping.buf :n config.mappings.add-conn-from-port-file
                :conjure.lang.clojure-nrepl :add-conn-from-port-file))
 
-(nvim.ex.augroup :conjure_clojure_nrepl_cleanup)
-(nvim.ex.autocmd_)
-(nvim.ex.autocmd
-  "VimLeavePre *"
-  (bridge.viml->lua :conjure.lang.clojure-nrepl :remove-all-conns {}))
-(nvim.ex.augroup :END)
+(when (not state.loaded?)
+  (set state.loaded? true)
+  (vim.schedule
+    (nvim.ex.augroup :conjure_clojure_nrepl_cleanup)
+    (nvim.ex.autocmd_)
+    (nvim.ex.autocmd
+      "VimLeavePre *"
+      (bridge.viml->lua :conjure.lang.clojure-nrepl :remove-all-conns {}))
+    (nvim.ex.augroup :END)
 
-(comment
-  (def c (try-nrepl-port-file))
-  (remove-conn c)
-  (remove-all-conns)
-  state.conns
-
-  (send c {:op :eval :code "(/ 10 2)"} a.pr))
+    (add-conn-from-port-file)))

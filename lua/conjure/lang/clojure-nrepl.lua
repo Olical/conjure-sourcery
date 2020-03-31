@@ -91,7 +91,7 @@ local state = nil
 do
   local v_23_0_ = nil
   do
-    local v_23_0_0 = (_0_0.state or {conns = {}})
+    local v_23_0_0 = (_0_0.state or {["loaded?"] = false, conns = {}})
     _0_0["state"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
@@ -116,7 +116,7 @@ local display_conn_status = nil
 do
   local v_23_0_ = nil
   local function display_conn_status0(conn, status)
-    return display({lines = {(";; " .. conn.host .. ":" .. conn.port .. " (" .. status .. ")")}})
+    return display({lines = {("; " .. conn.host .. ":" .. conn.port .. " (" .. status .. ")")}})
   end
   v_23_0_ = display_conn_status0
   _0_0["aniseed/locals"]["display-conn-status"] = v_23_0_
@@ -319,6 +319,8 @@ do
       end
       if port then
         return add_conn({host = "127.0.0.1", port = port})
+      else
+        return display({lines = {"; No .nrepl-port file found."}})
       end
     end
     v_23_0_0 = add_conn_from_port_file0
@@ -345,8 +347,11 @@ do
         lines = nil
       end
       if lines then
-        hud.display({lines = a.concat({opts.preview}, lines)})
-        return log.append({lines = lines})
+        local function _4_()
+          hud.display({lines = a.concat({opts.preview}, lines)})
+          return log.append({lines = lines})
+        end
+        return lang["with-filetype"]("clojure", _4_)
       end
     end
     v_23_0_0 = display_result0
@@ -368,6 +373,8 @@ do
           return display_result(opts, _241)
         end
         return send(conn, {code = opts.code, op = "eval"}, _3_)
+      else
+        return display({lines = {"; No connections."}})
       end
     end
     v_23_0_0 = eval_str0
@@ -425,9 +432,7 @@ do
   _0_0["aniseed/locals"]["on-filetype"] = v_23_0_
   on_filetype = v_23_0_
 end
-nvim.ex.augroup("conjure_clojure_nrepl_cleanup")
-nvim.ex.autocmd_()
-nvim.ex.autocmd("VimLeavePre *", bridge["viml->lua"]("conjure.lang.clojure-nrepl", "remove-all-conns", {}))
-nvim.ex.augroup("END")
-              -- (def c (try-nrepl-port-file)) (remove-conn c) (remove-all-conns) state.conns (send c table: 0x407e9db0 a.pr)
-return nil
+if not state["loaded?"] then
+  state["loaded?"] = true
+  return vim.schedule(nvim.ex.augroup("conjure_clojure_nrepl_cleanup"), nvim.ex.autocmd_(), nvim.ex.autocmd("VimLeavePre *", bridge["viml->lua"]("conjure.lang.clojure-nrepl", "remove-all-conns", {})), nvim.ex.augroup("END"), add_conn_from_port_file())
+end
