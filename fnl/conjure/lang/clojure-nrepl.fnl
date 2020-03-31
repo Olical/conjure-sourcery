@@ -12,10 +12,10 @@
             bridge conjure.bridge
             uuid conjure.uuid}})
 
-;; TODO Cancel oldest eval.
 ;; TODO Handle things lacking IDs.
 ;; TODO File / line / column metadata.
 ;; TODO Mappings for *e *1 *2 *3 values
+;; TODO Close session on exit seems to hang Neovim.
 
 (def buf-suffix ".cljc")
 (def default-context "user")
@@ -26,7 +26,8 @@
   {:debug? false
    :mappings {:remove-conn "cr"
               :remove-all-conns "cR"
-              :add-conn-from-port-file "cf"}})
+              :add-conn-from-port-file "cf"
+              :interrupt "ei"}})
 
 (defonce- state
   {:loaded? false
@@ -43,12 +44,25 @@
   (display
     {:lines [(.. "; " conn.host ":" conn.port " (" status ")")]}))
 
+(defn- dbg [desc data]
+  (when config.debug?
+    (display {:lines (a.concat
+                       [(.. "; debug " desc)]
+                       (text.split-lines (view.serialise data)))}))
+  data)
+
 (defn- send [conn msg cb]
   (let [msg-id (uuid.v4)]
     (tset msg :id msg-id)
     (dbg "->" msg)
-    (tset conn.msgs msg-id {:msg msg :cb cb})
+    (tset conn.msgs msg-id
+          {:msg msg
+           :cb cb
+           :sent-at (os.time)})
     (conn.sock:write (bencode.encode msg))))
+
+(defn- done? [msg]
+  (and msg msg.status (= :done (a.first msg.status))))
 
 (defn- with-all-msgs-fn [cb]
   (let [acc []]
@@ -74,16 +88,6 @@
 
 (defn remove-all-conns []
   (a.run! remove-conn (a.vals state.conns)))
-
-(defn- dbg [desc data]
-  (when config.debug?
-    (display {:lines (a.concat
-                       [(.. "; debug " desc)]
-                       (text.split-lines (view.serialise data)))}))
-  data)
-
-(defn- done? [msg]
-  (and msg msg.status (= :done (a.first msg.status))))
 
 (defn- decode-all [s]
   (var progress 1)
@@ -111,7 +115,7 @@
                  (let [cb (. (. conn.msgs msg.id) :cb)
                        (ok? err) (pcall cb msg)]
                    (when (not ok?)
-                     (a.println (.. "conjure.lang.clojure-nrepl error:" err)))
+                     (a.println "conjure.lang.clojure-nrepl error:" err))
                    (when (done? msg)
                      (tset conn.msgs msg.id nil))))))))))
 
@@ -202,13 +206,36 @@
 (defn remove-conn-interactive []
   (a.println "Not implemented yet."))
 
+(defn interrupt []
+  (let [msgs (a.mapcat
+               (fn [conn]
+                 (a.map
+                   (fn [msg]
+                     (a.merge {:conn conn} msg))
+                   (a.vals conn.msgs)))
+               (conns))]
+    (when (not (a.empty? msgs))
+      (table.sort
+        msgs
+        (fn [a b]
+          (< a.sent-at b.sent-at)))
+      (let [oldest (a.first msgs)]
+        (send oldest.conn
+              (a.merge
+                {:op :interrupt
+                 :id oldest.msg.id}
+                (when oldest.msg.session
+                  {:session oldest.msg.session})))))))
+
 (defn on-filetype []
   (mapping.buf :n config.mappings.remove-all-conns
                :conjure.lang.clojure-nrepl :remove-all-conns)
   (mapping.buf :n config.mappings.remove-conn
                :conjure.lang.clojure-nrepl :remove-conn-interactive)
   (mapping.buf :n config.mappings.add-conn-from-port-file
-               :conjure.lang.clojure-nrepl :add-conn-from-port-file))
+               :conjure.lang.clojure-nrepl :add-conn-from-port-file)
+  (mapping.buf :n config.mappings.interrupt
+               :conjure.lang.clojure-nrepl :interrupt))
 
 (when (not state.loaded?)
   (set state.loaded? true)
