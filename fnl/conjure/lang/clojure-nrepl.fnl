@@ -43,13 +43,32 @@
   (display
     {:lines [(.. "; " conn.host ":" conn.port " (" status ")")]}))
 
+(defn- send [conn msg cb]
+  (let [msg-id (uuid.v4)]
+    (tset msg :id msg-id)
+    (dbg "->" msg)
+    (tset conn.msgs msg-id {:msg msg :cb cb})
+    (conn.sock:write (bencode.encode msg))))
+
+(defn- with-all-msgs-fn [cb]
+  (let [acc []]
+    (fn [msg]
+      (table.insert acc msg)
+      (when (done? msg)
+        (cb acc)))))
+
 (defn remove-conn [{: id}]
   (let [conn (. state.conns id)]
     (when conn
       (when (not (conn.sock:is_closing))
-        (conn.sock:read_stop)
-        (conn.sock:shutdown)
-        (conn.sock:close))
+        (let [close (fn []
+                      (conn.sock:read_stop)
+                      (conn.sock:shutdown)
+                      (conn.sock:close))]
+          (if conn.session
+            (send conn {:op :close :session conn.session}
+                  (with-all-msgs-fn close))
+            (close))))
       (tset state.conns id nil)
       (display-conn-status conn :disconnected))))
 
@@ -63,22 +82,8 @@
                        (text.split-lines (view.serialise data)))}))
   data)
 
-(defn- send [conn msg cb]
-  (let [msg-id (uuid.v4)]
-    (tset msg :id msg-id)
-    (dbg "->" msg)
-    (tset conn.msgs msg-id {:msg msg :cb cb})
-    (conn.sock:write (bencode.encode msg))))
-
 (defn- done? [msg]
   (and msg msg.status (= :done (a.first msg.status))))
-
-(defn- with-all-msgs-fn [cb]
-  (let [acc []]
-    (fn [msg]
-      (table.insert acc msg)
-      (when (done? msg)
-        (cb acc)))))
 
 (defn- decode-all [s]
   (var progress 1)
@@ -126,10 +131,10 @@
             {:op :clone}
             (with-all-msgs-fn
               (fn [msgs]
-                (a.assoc-in conn [:sessions :user]
-                            (-> msgs
-                                (->> (a.last))
-                                (a.get :new-session)))))))))))
+                (set conn.session
+                     (-> msgs
+                         (->> (a.last))
+                         (a.get :new-session)))))))))))
 
 (defn add-conn [{: host : port}]
   (let [conn {:sock (vim.loop.new_tcp)
@@ -137,7 +142,7 @@
               :host host
               :port port
               :msgs {}
-              :sessions {}}
+              :session nil}
         existing (a.some
                    (fn [conn]
                      (and (= host conn.host) (= port conn.port) conn))
@@ -185,9 +190,8 @@
         (a.merge
           {:op :eval
            :code opts.code}
-          (let [session (a.get-in conn [:sessions :user])]
-            (when session
-              {:session session})))
+          (when conn.session
+            {:session conn.session}))
         #(display-result opts $1)))
     (conns)))
 
