@@ -155,11 +155,12 @@
       (send
         {:op :ls-sessions}
         (fn [msg]
-          (->> (a.get msg :sessions)
-               (a.filter
-                 (fn [session]
-                   (not= msg.session session)))
-               (cb)))))))
+          (let [sessions (->> (a.get msg :sessions)
+                              (a.filter
+                                (fn [session]
+                                  (not= msg.session session))))]
+            (table.sort sessions)
+            (cb sessions)))))))
 
 (defn- reuse-session [session]
   (a.assoc-in state [:conn :session] session)
