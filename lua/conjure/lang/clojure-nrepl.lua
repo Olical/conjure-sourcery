@@ -149,7 +149,10 @@ local done_3f = nil
 do
   local v_23_0_ = nil
   local function done_3f0(msg)
-    return (msg and msg.status and ("done" == a.first(msg.status)))
+    local function _3_(_241)
+      return ("done" == _241)
+    end
+    return (msg and msg.status and a.some(_3_, msg.status))
   end
   v_23_0_ = done_3f0
   _0_0["aniseed/locals"]["done?"] = v_23_0_
@@ -184,18 +187,9 @@ do
         local conn = state.conns[id]
         if conn then
           if not (conn.sock):is_closing() then
-            local close = nil
-            local function _5_()
-              do end (conn.sock):read_stop()
-              do end (conn.sock):shutdown()
-              return (conn.sock):close()
-            end
-            close = _5_
-            if conn.session then
-              send(conn, {op = "close", session = conn.session}, with_all_msgs_fn(close))
-            else
-              close()
-            end
+            do end (conn.sock):read_stop()
+            do end (conn.sock):shutdown()
+            do end (conn.sock):close()
           end
           state.conns[id] = nil
           return display_conn_status(conn, "disconnected")
@@ -246,6 +240,38 @@ do
   _0_0["aniseed/locals"]["decode-all"] = v_23_0_
   decode_all = v_23_0_
 end
+local display_result = nil
+do
+  local v_23_0_ = nil
+  local function display_result0(opts, resp)
+    local lines = nil
+    if resp.out then
+      lines = text["prefixed-lines"](resp.out, "; (out) ")
+    elseif resp.err then
+      lines = text["prefixed-lines"](resp.err, "; (err) ")
+    elseif resp.value then
+      lines = text["split-lines"](resp.value)
+    else
+      lines = nil
+    end
+    if lines then
+      local function _4_()
+        local _5_
+        if opts then
+          _5_ = {opts.preview}
+        else
+        _5_ = nil
+        end
+        hud.display({lines = a.concat(_5_, lines)})
+        return log.append({lines = lines})
+      end
+      return lang["with-filetype"]("clojure", _4_)
+    end
+  end
+  v_23_0_ = display_result0
+  _0_0["aniseed/locals"]["display-result"] = v_23_0_
+  display_result = v_23_0_
+end
 local handle_read_fn = nil
 do
   local v_23_0_ = nil
@@ -259,7 +285,11 @@ do
         local function _4_(msg)
           dbg("<-", msg)
           do
-            local cb = conn.msgs[msg.id].cb
+            local cb = nil
+            local function _5_(_241)
+              return display_result(nil, _241)
+            end
+            cb = a["get-in"](conn, {"msgs", msg.id, "cb"}, _5_)
             local ok_3f, err0 = pcall(cb, msg)
             if not ok_3f then
               a.println("conjure.lang.clojure-nrepl error:", err0)
@@ -361,32 +391,6 @@ do
   end
   _0_0["aniseed/locals"]["add-conn-from-port-file"] = v_23_0_
   add_conn_from_port_file = v_23_0_
-end
-local display_result = nil
-do
-  local v_23_0_ = nil
-  local function display_result0(opts, resp)
-    local lines = nil
-    if resp.out then
-      lines = text["prefixed-lines"](resp.out, "; (out) ")
-    elseif resp.err then
-      lines = text["prefixed-lines"](resp.err, "; (err) ")
-    elseif resp.value then
-      lines = text["split-lines"](resp.value)
-    else
-      lines = nil
-    end
-    if lines then
-      local function _4_()
-        hud.display({lines = a.concat({opts.preview}, lines)})
-        return log.append({lines = lines})
-      end
-      return lang["with-filetype"]("clojure", _4_)
-    end
-  end
-  v_23_0_ = display_result0
-  _0_0["aniseed/locals"]["display-result"] = v_23_0_
-  display_result = v_23_0_
 end
 local conns = nil
 do

@@ -5,6 +5,8 @@
             lang conjure.lang
             config conjure.config}})
 
+;; TODO Intermittent non display. I think it's a timeout clear issue.
+
 (defn- hud-buf-name []
   (.. "conjure-hud-" (nvim.fn.getpid) (lang.get :buf-suffix)))
 

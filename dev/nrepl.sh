@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-clj -Sdeps '{:deps {nrepl {:mvn/version "0.7.0"}}}' -m nrepl.cmdline --interactive
+clj -m nrepl.cmdline --middleware "[cider.piggieback/wrap-cljs-repl]" --interactive

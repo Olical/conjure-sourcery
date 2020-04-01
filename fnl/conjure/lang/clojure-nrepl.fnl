@@ -13,12 +13,11 @@
             uuid conjure.uuid
             conjure-config conjure.config}})
 
-;; TODO Handle things lacking IDs.
+;; TODO One conn to rule them all.
+;; TODO Session switching.
 ;; TODO File / line / column metadata.
 ;; TODO Mappings for *e *1 *2 *3 values
-;; TODO Close session on exit seems to hang Neovim.
 ;; TODO Handle partial chunks of bencode data. (stream wrapper)
-;; TODO Session stack.
 
 (def buf-suffix ".cljc")
 (def default-context "user")
@@ -65,7 +64,7 @@
     (conn.sock:write (bencode.encode msg))))
 
 (defn- done? [msg]
-  (and msg msg.status (= :done (a.first msg.status))))
+  (and msg msg.status (a.some #(= :done $1) msg.status)))
 
 (defn- with-all-msgs-fn [cb]
   (let [acc []]
@@ -78,14 +77,9 @@
   (let [conn (. state.conns id)]
     (when conn
       (when (not (conn.sock:is_closing))
-        (let [close (fn []
-                      (conn.sock:read_stop)
-                      (conn.sock:shutdown)
-                      (conn.sock:close))]
-          (if conn.session
-            (send conn {:op :close :session conn.session}
-                  (with-all-msgs-fn close))
-            (close))))
+        (conn.sock:read_stop)
+        (conn.sock:shutdown)
+        (conn.sock:close))
       (tset state.conns id nil)
       (display-conn-status conn :disconnected))))
 
@@ -105,6 +99,22 @@
         (set progress consumed)))
     acc))
 
+(defn- display-result [opts resp]
+  (let [lines (if
+                resp.out (text.prefixed-lines resp.out "; (out) ")
+                resp.err (text.prefixed-lines resp.err "; (err) ")
+                resp.value (text.split-lines resp.value)
+                nil)]
+    (when lines
+      (lang.with-filetype
+        :clojure
+        (fn []
+          (hud.display {:lines (a.concat
+                                 (when opts
+                                   [opts.preview])
+                                 lines)})
+          (log.append {:lines lines}))))))
+
 (defn- handle-read-fn [conn]
   (vim.schedule_wrap
     (fn [err chunk]
@@ -115,7 +125,7 @@
              (a.run!
                (fn [msg]
                  (dbg "<-" msg)
-                 (let [cb (. (. conn.msgs msg.id) :cb)
+                 (let [cb (a.get-in conn [:msgs msg.id :cb] #(display-result nil $1))
                        (ok? err) (pcall cb msg)]
                    (when (not ok?)
                      (a.println "conjure.lang.clojure-nrepl error:" err))
@@ -169,19 +179,6 @@
         {:host "127.0.0.1"
          :port port})
       (display {:lines ["; No .nrepl-port file found."]}))))
-
-(defn- display-result [opts resp]
-  (let [lines (if
-                resp.out (text.prefixed-lines resp.out "; (out) ")
-                resp.err (text.prefixed-lines resp.err "; (err) ")
-                resp.value (text.split-lines resp.value)
-                nil)]
-    (when lines
-      (lang.with-filetype
-        :clojure
-        (fn []
-          (hud.display {:lines (a.concat [opts.preview] lines)})
-          (log.append {:lines lines}))))))
 
 (defn- conns [opts]
   (let [xs (a.vals state.conns)]
