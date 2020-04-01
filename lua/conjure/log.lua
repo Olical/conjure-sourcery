@@ -78,7 +78,7 @@ do
             local _8_ = nvim.win_get_cursor(win)
             local row = _8_[1]
             local col = _8_[2]
-            if ((buf == nvim.win_get_buf(win)) and (col == 0) and (old_lines == row)) then
+            if ((buf == nvim.win_get_buf(win)) and (old_lines == row)) then
               return nvim.win_set_cursor(win, {new_lines, 0})
             end
           end

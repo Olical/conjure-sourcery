@@ -81,7 +81,7 @@ local config = nil
 do
   local v_23_0_ = nil
   do
-    local v_23_0_0 = {["debug?"] = false, mappings = {["connect-port-file"] = "cf", ["last-exception"] = "ex", ["result-1"] = "e1", ["result-2"] = "e2", ["result-3"] = "e3", ["session-clone"] = "sc", ["session-close"] = "sq", ["session-close-all"] = "sQ", ["session-fresh"] = "sf", ["session-list"] = "sl", disconnect = "cd", interrupt = "ei"}}
+    local v_23_0_0 = {["debug?"] = false, mappings = {["connect-port-file"] = "cf", ["last-exception"] = "ex", ["result-1"] = "e1", ["result-2"] = "e2", ["result-3"] = "e3", ["session-clone"] = "sc", ["session-close"] = "sq", ["session-close-all"] = "sQ", ["session-fresh"] = "sf", ["session-list"] = "sl", ["session-next"] = "sn", ["session-prev"] = "sp", ["session-select"] = "ss", disconnect = "cd", interrupt = "ei"}}
     _0_0["config"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
@@ -299,10 +299,13 @@ do
   local function with_sessions0(cb)
     local function _3_(_)
       local function _4_(msg)
+        local sessions = nil
         local function _5_(session)
           return (msg.session ~= session)
         end
-        return cb(a.filter(_5_, a.get(msg, "sessions")))
+        sessions = a.filter(_5_, a.get(msg, "sessions"))
+        table.sort(sessions)
+        return cb(sessions)
       end
       return send({op = "ls-sessions"}, _4_)
     end
@@ -658,10 +661,13 @@ do
     local v_23_0_0 = nil
     local function display_sessions0()
       local function _3_(sessions)
-        local function _4_(_241)
-          return (";  - " .. _241)
+        local function _4_(_5_0)
+          local _6_ = _5_0
+          local idx = _6_[1]
+          local session = _6_[2]
+          return (";  " .. idx .. " - " .. session)
         end
-        return display(a.concat({("; Sessions (" .. a.count(sessions) .. "):")}, a.map(_4_, sessions)))
+        return display(a.concat({("; Sessions (" .. a.count(sessions) .. "):")}, a["map-indexed"](_4_, sessions)))
       end
       return with_sessions(_3_)
     end
@@ -692,6 +698,57 @@ do
   _0_0["aniseed/locals"]["close-all-sessions"] = v_23_0_
   close_all_sessions = v_23_0_
 end
+local next_session = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function next_session0()
+      local function _3_(conn)
+        local function _4_(sessions)
+          local session = a.get(conn, "session")
+          a.println("current", session)
+          return a.println("potential", sessions)
+        end
+        return with_sessions(_4_)
+      end
+      return with_conn_or_warn(_3_)
+    end
+    v_23_0_0 = next_session0
+    _0_0["next-session"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["next-session"] = v_23_0_
+  next_session = v_23_0_
+end
+local prev_session = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function prev_session0()
+    end
+    v_23_0_0 = prev_session0
+    _0_0["prev-session"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["prev-session"] = v_23_0_
+  prev_session = v_23_0_
+end
+local select_session_interactive = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function select_session_interactive0()
+    end
+    v_23_0_0 = select_session_interactive0
+    _0_0["select-session-interactive"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["select-session-interactive"] = v_23_0_
+  select_session_interactive = v_23_0_
+end
 local on_filetype = nil
 do
   local v_23_0_ = nil
@@ -709,7 +766,10 @@ do
       mapping.buf("n", config.mappings["session-fresh"], "conjure.lang.clojure-nrepl", "clone-fresh-session")
       mapping.buf("n", config.mappings["session-close"], "conjure.lang.clojure-nrepl", "close-current-session")
       mapping.buf("n", config.mappings["session-close-all"], "conjure.lang.clojure-nrepl", "close-all-sessions")
-      return mapping.buf("n", config.mappings["session-list"], "conjure.lang.clojure-nrepl", "display-sessions")
+      mapping.buf("n", config.mappings["session-list"], "conjure.lang.clojure-nrepl", "display-sessions")
+      mapping.buf("n", config.mappings["session-next"], "conjure.lang.clojure-nrepl", "next-session")
+      mapping.buf("n", config.mappings["session-prev"], "conjure.lang.clojure-nrepl", "prev-session")
+      return mapping.buf("n", config.mappings["session-select"], "conjure.lang.clojure-nrepl", "select-session-interactive")
     end
     v_23_0_0 = on_filetype0
     _0_0["on-filetype"] = v_23_0_0
