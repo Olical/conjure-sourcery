@@ -1,7 +1,7 @@
 (ns foo)
 
 (+ 10 20)
-(println "foo")
+(println "foo" #?(:clj :clojure! :cljs :clojurescript!))
 
 *1 *2 *3 *e
 

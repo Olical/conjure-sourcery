@@ -81,7 +81,7 @@ local config = nil
 do
   local v_23_0_ = nil
   do
-    local v_23_0_0 = {["debug?"] = false, mappings = {["add-conn-from-port-file"] = "cf", ["remove-all-conns"] = "cR", ["remove-conn"] = "cr", interrupt = "ei"}}
+    local v_23_0_0 = {["debug?"] = false, mappings = {["connect-port-file"] = "cf", disconnect = "cd", interrupt = "ei"}}
     _0_0["config"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
@@ -90,7 +90,7 @@ do
 end
 local state = nil
 do
-  local v_23_0_ = (_0_0["aniseed/locals"].state or {["loaded?"] = false, conns = {}})
+  local v_23_0_ = (_0_0["aniseed/locals"].state or {["loaded?"] = false, conn = nil})
   _0_0["aniseed/locals"]["state"] = v_23_0_
   state = v_23_0_
 end
@@ -108,11 +108,29 @@ do
   _0_0["aniseed/locals"]["display"] = v_23_0_
   display = v_23_0_
 end
+local conn_or_warn = nil
+do
+  local v_23_0_ = nil
+  local function conn_or_warn0(f)
+    local conn = a.get(state, "conn")
+    if conn then
+      return f(conn)
+    else
+      return display({lines = {"; No connection."}})
+    end
+  end
+  v_23_0_ = conn_or_warn0
+  _0_0["aniseed/locals"]["conn-or-warn"] = v_23_0_
+  conn_or_warn = v_23_0_
+end
 local display_conn_status = nil
 do
   local v_23_0_ = nil
-  local function display_conn_status0(conn, status)
-    return display({lines = {("; " .. conn.host .. ":" .. conn.port .. " (" .. status .. ")")}})
+  local function display_conn_status0(status)
+    local function _3_(conn)
+      return display({lines = {("; " .. conn.host .. ":" .. conn.port .. " (" .. status .. ")")}})
+    end
+    return conn_or_warn(_3_)
   end
   v_23_0_ = display_conn_status0
   _0_0["aniseed/locals"]["display-conn-status"] = v_23_0_
@@ -134,12 +152,15 @@ end
 local send = nil
 do
   local v_23_0_ = nil
-  local function send0(conn, msg, cb)
-    local msg_id = uuid.v4()
-    msg["id"] = msg_id
-    dbg("->", msg)
-    conn.msgs[msg_id] = {["sent-at"] = os.time(), cb = cb, msg = msg}
-    return (conn.sock):write(bencode.encode(msg))
+  local function send0(msg, cb)
+    local conn = a.get(state, "conn")
+    if conn then
+      local msg_id = uuid.v4()
+      a.assoc(msg, "id", msg_id)
+      dbg("->", msg)
+      a["assoc-in"](conn, {"msgs", msg_id}, {["sent-at"] = os.time(), cb = cb, msg = msg})
+      return (conn.sock):write(bencode.encode(msg))
+    end
   end
   v_23_0_ = send0
   _0_0["aniseed/locals"]["send"] = v_23_0_
@@ -175,48 +196,29 @@ do
   _0_0["aniseed/locals"]["with-all-msgs-fn"] = v_23_0_
   with_all_msgs_fn = v_23_0_
 end
-local remove_conn = nil
+local disconnect = nil
 do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
-    local function remove_conn0(_3_0)
-      local _4_ = _3_0
-      local id = _4_["id"]
-      do
-        local conn = state.conns[id]
-        if conn then
-          if not (conn.sock):is_closing() then
-            do end (conn.sock):read_stop()
-            do end (conn.sock):shutdown()
-            do end (conn.sock):close()
-          end
-          state.conns[id] = nil
-          return display_conn_status(conn, "disconnected")
+    local function disconnect0()
+      local function _3_(conn)
+        if not (conn.sock):is_closing() then
+          do end (conn.sock):read_stop()
+          do end (conn.sock):shutdown()
+          do end (conn.sock):close()
         end
+        display_conn_status("disconnected")
+        return a.assoc(state, "conn", nil)
       end
+      return conn_or_warn(_3_)
     end
-    v_23_0_0 = remove_conn0
-    _0_0["remove-conn"] = v_23_0_0
+    v_23_0_0 = disconnect0
+    _0_0["disconnect"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
-  _0_0["aniseed/locals"]["remove-conn"] = v_23_0_
-  remove_conn = v_23_0_
-end
-local remove_all_conns = nil
-do
-  local v_23_0_ = nil
-  do
-    local v_23_0_0 = nil
-    local function remove_all_conns0()
-      return a["run!"](remove_conn, a.vals(state.conns))
-    end
-    v_23_0_0 = remove_all_conns0
-    _0_0["remove-all-conns"] = v_23_0_0
-    v_23_0_ = v_23_0_0
-  end
-  _0_0["aniseed/locals"]["remove-all-conns"] = v_23_0_
-  remove_all_conns = v_23_0_
+  _0_0["aniseed/locals"]["disconnect"] = v_23_0_
+  disconnect = v_23_0_
 end
 local decode_all = nil
 do
@@ -275,12 +277,13 @@ end
 local handle_read_fn = nil
 do
   local v_23_0_ = nil
-  local function handle_read_fn0(conn)
+  local function handle_read_fn0()
     local function _3_(err, chunk)
+      local conn = a.get(state, "conn")
       if err then
-        return display_conn_status(conn, err)
+        return display_conn_status(err)
       elseif not chunk then
-        return remove_conn(conn)
+        return disconnect()
       else
         local function _4_(msg)
           dbg("<-", msg)
@@ -295,8 +298,7 @@ do
               a.println("conjure.lang.clojure-nrepl error:", err0)
             end
             if done_3f(msg) then
-              conn.msgs[msg.id] = nil
-              return nil
+              return a["assoc-in"](conn, {"msgs", msg.id}, nil)
             end
           end
         end
@@ -312,19 +314,19 @@ end
 local handle_connect_fn = nil
 do
   local v_23_0_ = nil
-  local function handle_connect_fn0(conn)
+  local function handle_connect_fn0()
     local function _3_(err)
+      local conn = a.get(state, "conn")
       if err then
-        display_conn_status(conn, err)
-        return remove_conn(conn)
+        display_conn_status(err)
+        return disconnect()
       else
-        do end (conn.sock):read_start(handle_read_fn(conn))
-        display_conn_status(conn, "connected")
+        do end (conn.sock):read_start(handle_read_fn())
+        display_conn_status("connected")
         local function _4_(msgs)
-          conn.session = a.get(a.last(msgs), "new-session")
-          return nil
+          return a.assoc(conn, "session", a.get(a.last(msgs), "new-session"))
         end
-        return send(conn, {op = "clone"}, with_all_msgs_fn(_4_))
+        return send({op = "clone"}, with_all_msgs_fn(_4_))
       end
     end
     return vim.schedule_wrap(_3_)
@@ -333,43 +335,37 @@ do
   _0_0["aniseed/locals"]["handle-connect-fn"] = v_23_0_
   handle_connect_fn = v_23_0_
 end
-local add_conn = nil
+local connect = nil
 do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
-    local function add_conn0(_3_0)
+    local function connect0(_3_0)
       local _4_ = _3_0
       local host = _4_["host"]
       local port = _4_["port"]
       do
-        local conn = {host = host, id = uuid.v4(), msgs = {}, port = port, session = nil, sock = vim.loop.new_tcp()}
-        local existing = nil
-        local function _5_(conn0)
-          return ((host == conn0.host) and (port == conn0.port) and conn0)
+        local conn = {host = host, msgs = {}, port = port, session = nil, sock = vim.loop.new_tcp()}
+        if a.get(state, "conn") then
+          disconnect()
         end
-        existing = a.some(_5_, a.vals(state.conns))
-        if existing then
-          remove_conn(existing)
-        end
-        state.conns[conn.id] = conn
-        do end (conn.sock):connect(host, port, handle_connect_fn(conn))
-        return conn
+        a.assoc(state, "conn", conn)
+        return (conn.sock):connect(host, port, handle_connect_fn())
       end
     end
-    v_23_0_0 = add_conn0
-    _0_0["add-conn"] = v_23_0_0
+    v_23_0_0 = connect0
+    _0_0["connect"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
-  _0_0["aniseed/locals"]["add-conn"] = v_23_0_
-  add_conn = v_23_0_
+  _0_0["aniseed/locals"]["connect"] = v_23_0_
+  connect = v_23_0_
 end
-local add_conn_from_port_file = nil
+local connect_port_file = nil
 do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
-    local function add_conn_from_port_file0()
+    local function connect_port_file0()
       local port = nil
       do
         local _3_0 = a.slurp(".nrepl-port")
@@ -380,31 +376,17 @@ do
         end
       end
       if port then
-        return add_conn({host = "127.0.0.1", port = port})
+        return connect({host = "127.0.0.1", port = port})
       else
         return display({lines = {"; No .nrepl-port file found."}})
       end
     end
-    v_23_0_0 = add_conn_from_port_file0
-    _0_0["add-conn-from-port-file"] = v_23_0_0
+    v_23_0_0 = connect_port_file0
+    _0_0["connect-port-file"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
-  _0_0["aniseed/locals"]["add-conn-from-port-file"] = v_23_0_
-  add_conn_from_port_file = v_23_0_
-end
-local conns = nil
-do
-  local v_23_0_ = nil
-  local function conns0(opts)
-    local xs = a.vals(state.conns)
-    if (a["empty?"](xs) and (not opts or not opts["silent?"])) then
-      display({lines = {"; No connections."}})
-    end
-    return xs
-  end
-  v_23_0_ = conns0
-  _0_0["aniseed/locals"]["conns"] = v_23_0_
-  conns = v_23_0_
+  _0_0["aniseed/locals"]["connect-port-file"] = v_23_0_
+  connect_port_file = v_23_0_
 end
 local eval_str = nil
 do
@@ -412,18 +394,19 @@ do
   do
     local v_23_0_0 = nil
     local function eval_str0(opts)
-      local function _3_(conn)
+      local function _3_(_)
         local function _4_()
-          if conn.session then
-            return {session = conn.session}
+          local session = a["get-in"](state, {"conn", "session"})
+          if session then
+            return {session = session}
           end
         end
         local function _5_(_241)
           return display_result(opts, _241)
         end
-        return send(conn, a.merge({code = opts.code, op = "eval"}, _4_()), _5_)
+        return send(a.merge({code = opts.code, op = "eval"}, _4_()), _5_)
       end
-      return a["run!"](_3_, conns())
+      return conn_or_warn(_3_)
     end
     v_23_0_0 = eval_str0
     _0_0["eval-str"] = v_23_0_0
@@ -448,56 +431,38 @@ do
   _0_0["aniseed/locals"]["eval-file"] = v_23_0_
   eval_file = v_23_0_
 end
-local remove_conn_interactive = nil
-do
-  local v_23_0_ = nil
-  do
-    local v_23_0_0 = nil
-    local function remove_conn_interactive0()
-      return a.println("Not implemented yet.")
-    end
-    v_23_0_0 = remove_conn_interactive0
-    _0_0["remove-conn-interactive"] = v_23_0_0
-    v_23_0_ = v_23_0_0
-  end
-  _0_0["aniseed/locals"]["remove-conn-interactive"] = v_23_0_
-  remove_conn_interactive = v_23_0_
-end
 local interrupt = nil
 do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
     local function interrupt0()
-      local msgs = nil
       local function _3_(conn)
+        local msgs = nil
         local function _4_(msg)
-          return a.merge({conn = conn}, msg)
-        end
-        local function _5_(msg)
           return ("eval" == msg.msg.op)
         end
-        return a.map(_4_, a.filter(_5_, a.vals(conn.msgs)))
-      end
-      msgs = a.mapcat(_3_, conns())
-      if a["empty?"](msgs) then
-        return display({lines = {"; Nothing to interrupt."}})
-      else
-        local function _4_(a0, b)
-          return (a0["sent-at"] < b["sent-at"])
-        end
-        table.sort(msgs, _4_)
-        do
-          local oldest = a.first(msgs)
-          local function _5_()
-            if oldest.msg.session then
-              return {session = oldest.msg.session}
-            end
+        msgs = a.filter(_4_, a.vals(conn.msgs))
+        if a["empty?"](msgs) then
+          return display({lines = {"; Nothing to interrupt."}})
+        else
+          local function _5_(a0, b)
+            return (a0["sent-at"] < b["sent-at"])
           end
-          send(oldest.conn, a.merge({id = oldest.msg.id, op = "interrupt"}, _5_()))
-          return display({lines = {("; Interrupted: " .. text["left-sample"](oldest.msg.code, conjure_config.preview["sample-limit"]))}})
+          table.sort(msgs, _5_)
+          do
+            local oldest = a.first(msgs)
+            local function _6_()
+              if oldest.msg.session then
+                return {session = oldest.msg.session}
+              end
+            end
+            send(a.merge({id = oldest.msg.id, op = "interrupt"}, _6_()))
+            return display({lines = {("; Interrupted: " .. text["left-sample"](oldest.msg.code, conjure_config.preview["sample-limit"]))}})
+          end
         end
       end
+      return conn_or_warn(_3_)
     end
     v_23_0_0 = interrupt0
     _0_0["interrupt"] = v_23_0_0
@@ -512,9 +477,8 @@ do
   do
     local v_23_0_0 = nil
     local function on_filetype0()
-      mapping.buf("n", config.mappings["remove-all-conns"], "conjure.lang.clojure-nrepl", "remove-all-conns")
-      mapping.buf("n", config.mappings["remove-conn"], "conjure.lang.clojure-nrepl", "remove-conn-interactive")
-      mapping.buf("n", config.mappings["add-conn-from-port-file"], "conjure.lang.clojure-nrepl", "add-conn-from-port-file")
+      mapping.buf("n", config.mappings.disconnect, "conjure.lang.clojure-nrepl", "disconnect")
+      mapping.buf("n", config.mappings["connect-port-file"], "conjure.lang.clojure-nrepl", "connect-port-file")
       return mapping.buf("n", config.mappings.interrupt, "conjure.lang.clojure-nrepl", "interrupt")
     end
     v_23_0_0 = on_filetype0
@@ -525,13 +489,13 @@ do
   on_filetype = v_23_0_
 end
 if not state["loaded?"] then
-  state["loaded?"] = true
+  a.assoc(state, "loaded?", true)
   local function _3_()
     nvim.ex.augroup("conjure_clojure_nrepl_cleanup")
     nvim.ex.autocmd_()
-    nvim.ex.autocmd("VimLeavePre *", bridge["viml->lua"]("conjure.lang.clojure-nrepl", "remove-all-conns", {}))
+    nvim.ex.autocmd("VimLeavePre *", bridge["viml->lua"]("conjure.lang.clojure-nrepl", "disconnect", {}))
     nvim.ex.augroup("END")
-    return add_conn_from_port_file()
+    return connect_port_file()
   end
   return vim.schedule(_3_)
 end
