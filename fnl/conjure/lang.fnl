@@ -10,7 +10,7 @@
                        fennel.traceback)]
     (if ok?
       result
-      (nvim.err_writeln result))))
+      (error result))))
 
 (defonce- overrides {})
 
@@ -27,7 +27,7 @@
         mod-name (config.filetype->module-name ft)]
     (if mod-name
       (safe-require mod-name)
-      (nvim.err_writeln (.. "No Conjure language for filetype: " ft)))))
+      (error (.. "No Conjure language for filetype: '" ft "'")))))
 
 (defn get [k]
   (-?> (current)

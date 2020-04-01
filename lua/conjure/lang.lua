@@ -35,7 +35,7 @@ do
     if ok_3f then
       return result
     else
-      return nvim.err_writeln(result)
+      return error(result)
     end
   end
   v_23_0_ = safe_require0
@@ -83,7 +83,7 @@ do
       if mod_name then
         return safe_require(mod_name)
       else
-        return nvim.err_writeln(("No Conjure language for filetype: " .. ft))
+        return error(("No Conjure language for filetype: '" .. ft .. "'"))
       end
     end
     v_23_0_0 = current0
