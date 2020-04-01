@@ -11,6 +11,7 @@
             bencode conjure.bencode
             bridge conjure.bridge
             uuid conjure.uuid
+            ll conjure.linked-list
             conjure-config conjure.config}})
 
 ;; TODO Session switching.
@@ -299,10 +300,14 @@
 (defn display-sessions []
   (with-sessions
     (fn [sessions]
-      (display (a.concat [(.. "; Sessions (" (a.count sessions) "):")]
-                         (a.map-indexed (fn [[idx session]]
-                                          (.. ";  " idx " - " session))
-                                        sessions))))))
+      (let [current (a.get-in state [:conn :session])]
+        (display (a.concat [(.. "; Sessions (" (a.count sessions) "):")]
+                           (a.map-indexed (fn [[idx session]]
+                                            (.. ";  " idx " - " session
+                                                (if (= current session)
+                                                  " (current)"
+                                                  "")))
+                                          sessions)))))))
 
 (defn close-all-sessions []
   (with-sessions
@@ -311,16 +316,32 @@
       (display [(.. "; Closed all sessions (" (a.count sessions)")")])
       (clone-session))))
 
-(defn next-session []
+(defn- cycle-session [f]
   (with-conn-or-warn
     (fn [conn]
       (with-sessions
         (fn [sessions]
-          (let [session (a.get conn :session)]
-            (a.println "current" session)
-            (a.println "potential" sessions)))))))
+          (if (= 1 (a.count sessions))
+            (display ["; No other sessions"])
+            (let [session (a.get conn :session)
+                  new-session (->> sessions
+                                   (ll.create)
+                                   (ll.cycle)
+                                   (ll.until #(f session $1))
+                                   (ll.val))]
+              (a.assoc conn :session new-session)
+              (display [(.. "; Session changed: " session " -> " new-session)]))))))))
 
-(defn prev-session [])
+(defn next-session []
+  (cycle-session
+    (fn [current node]
+      (= current (->> node (ll.prev) (ll.val))))))
+
+(defn prev-session []
+  (cycle-session
+    (fn [current node]
+      (= current (->> node (ll.next) (ll.val))))))
+
 (defn select-session-interactive [])
 
 (defn on-filetype []

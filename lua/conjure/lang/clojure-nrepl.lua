@@ -15,8 +15,8 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {["conjure-config"] = "conjure.config", a = "conjure.aniseed.core", bencode = "conjure.bencode", bridge = "conjure.bridge", hud = "conjure.hud", lang = "conjure.lang", log = "conjure.log", mapping = "conjure.mapping", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", text = "conjure.text", uuid = "conjure.uuid", view = "conjure.aniseed.view"}}
-  return {require("conjure.aniseed.core"), require("conjure.bencode"), require("conjure.bridge"), require("conjure.config"), require("conjure.hud"), require("conjure.lang"), require("conjure.log"), require("conjure.mapping"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.text"), require("conjure.uuid"), require("conjure.aniseed.view")}
+  _0_0["aniseed/local-fns"] = {require = {["conjure-config"] = "conjure.config", a = "conjure.aniseed.core", bencode = "conjure.bencode", bridge = "conjure.bridge", hud = "conjure.hud", lang = "conjure.lang", ll = "conjure.linked-list", log = "conjure.log", mapping = "conjure.mapping", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", text = "conjure.text", uuid = "conjure.uuid", view = "conjure.aniseed.view"}}
+  return {require("conjure.aniseed.core"), require("conjure.bencode"), require("conjure.bridge"), require("conjure.config"), require("conjure.hud"), require("conjure.lang"), require("conjure.linked-list"), require("conjure.log"), require("conjure.mapping"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.text"), require("conjure.uuid"), require("conjure.aniseed.view")}
 end
 local _2_ = _1_(...)
 local a = _2_[1]
@@ -25,13 +25,14 @@ local bridge = _2_[3]
 local conjure_config = _2_[4]
 local hud = _2_[5]
 local lang = _2_[6]
-local log = _2_[7]
-local mapping = _2_[8]
-local nvim = _2_[9]
-local str = _2_[10]
-local text = _2_[11]
-local uuid = _2_[12]
-local view = _2_[13]
+local ll = _2_[7]
+local log = _2_[8]
+local mapping = _2_[9]
+local nvim = _2_[10]
+local str = _2_[11]
+local text = _2_[12]
+local uuid = _2_[13]
+local view = _2_[14]
 do local _ = ({nil, _0_0, nil})[2] end
 local buf_suffix = nil
 do
@@ -661,11 +662,19 @@ do
     local v_23_0_0 = nil
     local function display_sessions0()
       local function _3_(sessions)
+        local current = a["get-in"](state, {"conn", "session"})
         local function _4_(_5_0)
           local _6_ = _5_0
           local idx = _6_[1]
           local session = _6_[2]
-          return (";  " .. idx .. " - " .. session)
+          local function _7_()
+            if (current == session) then
+              return " (current)"
+            else
+              return ""
+            end
+          end
+          return (";  " .. idx .. " - " .. session .. _7_())
         end
         return display(a.concat({("; Sessions (" .. a.count(sessions) .. "):")}, a["map-indexed"](_4_, sessions)))
       end
@@ -698,21 +707,43 @@ do
   _0_0["aniseed/locals"]["close-all-sessions"] = v_23_0_
   close_all_sessions = v_23_0_
 end
+local cycle_session = nil
+do
+  local v_23_0_ = nil
+  local function cycle_session0(f)
+    local function _3_(conn)
+      local function _4_(sessions)
+        if (1 == a.count(sessions)) then
+          return display({"; No other sessions"})
+        else
+          local session = a.get(conn, "session")
+          local new_session = nil
+          local function _5_(_241)
+            return f(session, _241)
+          end
+          new_session = ll.val(ll["until"](_5_, ll.cycle(ll.create(sessions))))
+          a.assoc(conn, "session", new_session)
+          return display({("; Session changed: " .. session .. " -> " .. new_session)})
+        end
+      end
+      return with_sessions(_4_)
+    end
+    return with_conn_or_warn(_3_)
+  end
+  v_23_0_ = cycle_session0
+  _0_0["aniseed/locals"]["cycle-session"] = v_23_0_
+  cycle_session = v_23_0_
+end
 local next_session = nil
 do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
     local function next_session0()
-      local function _3_(conn)
-        local function _4_(sessions)
-          local session = a.get(conn, "session")
-          a.println("current", session)
-          return a.println("potential", sessions)
-        end
-        return with_sessions(_4_)
+      local function _3_(current, node)
+        return (current == ll.val(ll.prev(node)))
       end
-      return with_conn_or_warn(_3_)
+      return cycle_session(_3_)
     end
     v_23_0_0 = next_session0
     _0_0["next-session"] = v_23_0_0
@@ -727,6 +758,10 @@ do
   do
     local v_23_0_0 = nil
     local function prev_session0()
+      local function _3_(current, node)
+        return (current == ll.val(ll.next(node)))
+      end
+      return cycle_session(_3_)
     end
     v_23_0_0 = prev_session0
     _0_0["prev-session"] = v_23_0_0
