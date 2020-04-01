@@ -72,7 +72,8 @@
                     {:msg msg
                      :cb cb
                      :sent-at (os.time)})
-        (conn.sock:write (bencode.encode msg))))))
+        (conn.sock:write (bencode.encode msg))
+        nil))))
 
 (defn- done? [msg]
   (and msg msg.status (a.some #(= :done $1) msg.status)))

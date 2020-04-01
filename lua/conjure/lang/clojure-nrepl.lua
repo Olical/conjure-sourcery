@@ -159,7 +159,8 @@ do
       a.assoc(msg, "id", msg_id)
       dbg("->", msg)
       a["assoc-in"](conn, {"msgs", msg_id}, {["sent-at"] = os.time(), cb = cb, msg = msg})
-      return (conn.sock):write(bencode.encode(msg))
+      do end (conn.sock):write(bencode.encode(msg))
+      return nil
     end
   end
   v_23_0_ = send0
