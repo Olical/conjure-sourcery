@@ -81,7 +81,7 @@ local config = nil
 do
   local v_23_0_ = nil
   do
-    local v_23_0_0 = {["debug?"] = false, mappings = {["connect-port-file"] = "cf", disconnect = "cd", interrupt = "ei"}}
+    local v_23_0_0 = {["debug?"] = false, mappings = {["connect-port-file"] = "cf", ["last-exception"] = "ex", ["result-1"] = "e1", ["result-2"] = "e2", ["result-3"] = "e3", disconnect = "cd", interrupt = "ei"}}
     _0_0["config"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
@@ -471,6 +471,63 @@ do
   _0_0["aniseed/locals"]["interrupt"] = v_23_0_
   interrupt = v_23_0_
 end
+local eval_str_fn = nil
+do
+  local v_23_0_ = nil
+  local function eval_str_fn0(code)
+    local function _3_()
+      return nvim.ex.ConjureEval(code)
+    end
+    return _3_
+  end
+  v_23_0_ = eval_str_fn0
+  _0_0["aniseed/locals"]["eval-str-fn"] = v_23_0_
+  eval_str_fn = v_23_0_
+end
+local last_exception = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = eval_str_fn("*e")
+    _0_0["last-exception"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["last-exception"] = v_23_0_
+  last_exception = v_23_0_
+end
+local result_1 = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = eval_str_fn("*1")
+    _0_0["result-1"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["result-1"] = v_23_0_
+  result_1 = v_23_0_
+end
+local result_2 = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = eval_str_fn("*2")
+    _0_0["result-2"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["result-2"] = v_23_0_
+  result_2 = v_23_0_
+end
+local result_3 = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = eval_str_fn("*3")
+    _0_0["result-3"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["result-3"] = v_23_0_
+  result_3 = v_23_0_
+end
 local on_filetype = nil
 do
   local v_23_0_ = nil
@@ -479,7 +536,11 @@ do
     local function on_filetype0()
       mapping.buf("n", config.mappings.disconnect, "conjure.lang.clojure-nrepl", "disconnect")
       mapping.buf("n", config.mappings["connect-port-file"], "conjure.lang.clojure-nrepl", "connect-port-file")
-      return mapping.buf("n", config.mappings.interrupt, "conjure.lang.clojure-nrepl", "interrupt")
+      mapping.buf("n", config.mappings.interrupt, "conjure.lang.clojure-nrepl", "interrupt")
+      mapping.buf("n", config.mappings["last-exception"], "conjure.lang.clojure-nrepl", "last-exception")
+      mapping.buf("n", config.mappings["result-1"], "conjure.lang.clojure-nrepl", "result-1")
+      mapping.buf("n", config.mappings["result-2"], "conjure.lang.clojure-nrepl", "result-2")
+      return mapping.buf("n", config.mappings["result-3"], "conjure.lang.clojure-nrepl", "result-3")
     end
     v_23_0_0 = on_filetype0
     _0_0["on-filetype"] = v_23_0_0

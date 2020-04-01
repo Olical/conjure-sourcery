@@ -15,7 +15,6 @@
 
 ;; TODO Session switching.
 ;; TODO File / line / column metadata.
-;; TODO Mappings for *e *1 *2 *3 values
 ;; TODO Handle partial chunks of bencode data. (stream wrapper)
 
 (def buf-suffix ".cljc")
@@ -27,7 +26,11 @@
   {:debug? false
    :mappings {:disconnect "cd"
               :connect-port-file "cf"
-              :interrupt "ei"}})
+              :interrupt "ei"
+              :last-exception "ex"
+              :result-1 "e1"
+              :result-2 "e2"
+              :result-3 "e3"}})
 
 (defonce- state
   {:loaded? false
@@ -222,13 +225,28 @@
                                oldest.msg.code
                                conjure-config.preview.sample-limit))]}))))))))
 
+(defn- eval-str-fn [code]
+  (fn []
+    (nvim.ex.ConjureEval code)))
+
+(def last-exception (eval-str-fn "*e"))
+(def result-1 (eval-str-fn "*1"))
+(def result-2 (eval-str-fn "*2"))
+(def result-3 (eval-str-fn "*3"))
+
 (defn on-filetype []
   (mapping.buf :n config.mappings.disconnect
                :conjure.lang.clojure-nrepl :disconnect)
   (mapping.buf :n config.mappings.connect-port-file
                :conjure.lang.clojure-nrepl :connect-port-file)
   (mapping.buf :n config.mappings.interrupt
-               :conjure.lang.clojure-nrepl :interrupt))
+               :conjure.lang.clojure-nrepl :interrupt)
+
+  (mapping.buf :n config.mappings.last-exception
+               :conjure.lang.clojure-nrepl :last-exception)
+  (mapping.buf :n config.mappings.result-1 :conjure.lang.clojure-nrepl :result-1)
+  (mapping.buf :n config.mappings.result-2 :conjure.lang.clojure-nrepl :result-2)
+  (mapping.buf :n config.mappings.result-3 :conjure.lang.clojure-nrepl :result-3))
 
 (when (not state.loaded?)
   (a.assoc state :loaded? true)
