@@ -30,7 +30,6 @@
         (fn [win]
           (let [[row col] (nvim.win_get_cursor win)]
             (when (and (= buf (nvim.win_get_buf win))
-                       (= col 0)
                        (= old-lines row))
               (nvim.win_set_cursor win [new-lines 0]))))
         (nvim.list_wins)))))
