@@ -7,6 +7,7 @@
 
 (comment
   (throw (Error. "ohno"))
+  (throw (js/Error. "ohno"))
   (do (Thread/sleep 5000)
       (println "FOO"))
   (do (Thread/sleep 5000)
