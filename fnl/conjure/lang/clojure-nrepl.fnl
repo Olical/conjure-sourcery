@@ -13,9 +13,11 @@
             uuid conjure.uuid
             conjure-config conjure.config}})
 
-;; TODO File / line / column metadata.
 ;; TODO Session switching.
+;; TODO File / line / column metadata.
 ;; TODO Handle partial chunks of bencode data. (stream wrapper)
+;; TODO Split up into multiple modules.
+;; TODO Reusing CLJS sessions hides stdout.
 
 (def buf-suffix ".cljc")
 (def default-context "user")
@@ -27,15 +29,20 @@
    :mappings {:disconnect "cd"
               :connect-port-file "cf"
               :interrupt "ei"
+
               :last-exception "ex"
               :result-1 "e1"
               :result-2 "e2"
               :result-3 "e3"
+
               :session-clone "sc"
               :session-fresh "sf"
               :session-close "sq"
               :session-close-all "sQ"
-              :session-list "sl"}})
+              :session-list "sl"
+              :session-next "sn"
+              :session-prev "sp"
+              :session-select "ss"}})
 
 (defonce- state
   {:loaded? false
@@ -292,7 +299,9 @@
   (with-sessions
     (fn [sessions]
       (display (a.concat [(.. "; Sessions (" (a.count sessions) "):")]
-                         (a.map #(.. ";  - " $1) sessions))))))
+                         (a.map-indexed (fn [[idx session]]
+                                          (.. ";  " idx " - " session))
+                                        sessions))))))
 
 (defn close-all-sessions []
   (with-sessions
