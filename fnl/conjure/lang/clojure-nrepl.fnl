@@ -311,6 +311,18 @@
       (display [(.. "; Closed all sessions (" (a.count sessions)")")])
       (clone-session))))
 
+(defn next-session []
+  (with-conn-or-warn
+    (fn [conn]
+      (with-sessions
+        (fn [sessions]
+          (let [session (a.get conn :session)]
+            (a.println "current" session)
+            (a.println "potential" sessions)))))))
+
+(defn prev-session [])
+(defn select-session-interactive [])
+
 (defn on-filetype []
   (mapping.buf :n config.mappings.disconnect
                :conjure.lang.clojure-nrepl :disconnect)
@@ -334,7 +346,13 @@
   (mapping.buf :n config.mappings.session-close-all
                :conjure.lang.clojure-nrepl :close-all-sessions)
   (mapping.buf :n config.mappings.session-list
-               :conjure.lang.clojure-nrepl :display-sessions))
+               :conjure.lang.clojure-nrepl :display-sessions)
+  (mapping.buf :n config.mappings.session-next
+               :conjure.lang.clojure-nrepl :next-session)
+  (mapping.buf :n config.mappings.session-prev
+               :conjure.lang.clojure-nrepl :prev-session)
+  (mapping.buf :n config.mappings.session-select
+               :conjure.lang.clojure-nrepl :select-session-interactive))
 
 (when (not state.loaded?)
   (a.assoc state :loaded? true)
