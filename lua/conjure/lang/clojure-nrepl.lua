@@ -81,7 +81,7 @@ local config = nil
 do
   local v_23_0_ = nil
   do
-    local v_23_0_0 = {["debug?"] = false, mappings = {["connect-port-file"] = "cf", ["last-exception"] = "ex", ["result-1"] = "e1", ["result-2"] = "e2", ["result-3"] = "e3", disconnect = "cd", interrupt = "ei"}}
+    local v_23_0_0 = {["debug?"] = false, mappings = {["connect-port-file"] = "cf", ["last-exception"] = "ex", ["result-1"] = "e1", ["result-2"] = "e2", ["result-3"] = "e3", ["session-clone"] = "sc", ["session-close"] = "sq", ["session-close-all"] = "sQ", ["session-fresh"] = "sf", ["session-list"] = "sl", disconnect = "cd", interrupt = "ei"}}
     _0_0["config"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
@@ -109,20 +109,20 @@ do
   _0_0["aniseed/locals"]["display"] = v_23_0_
   display = v_23_0_
 end
-local conn_or_warn = nil
+local with_conn_or_warn = nil
 do
   local v_23_0_ = nil
-  local function conn_or_warn0(f)
+  local function with_conn_or_warn0(f)
     local conn = a.get(state, "conn")
     if conn then
       return f(conn)
     else
-      return display({"; No connection."})
+      return display({"; No connection"})
     end
   end
-  v_23_0_ = conn_or_warn0
-  _0_0["aniseed/locals"]["conn-or-warn"] = v_23_0_
-  conn_or_warn = v_23_0_
+  v_23_0_ = with_conn_or_warn0
+  _0_0["aniseed/locals"]["with-conn-or-warn"] = v_23_0_
+  with_conn_or_warn = v_23_0_
 end
 local display_conn_status = nil
 do
@@ -131,7 +131,7 @@ do
     local function _3_(conn)
       return display({("; " .. conn.host .. ":" .. conn.port .. " (" .. status .. ")")})
     end
-    return conn_or_warn(_3_)
+    return with_conn_or_warn(_3_)
   end
   v_23_0_ = display_conn_status0
   _0_0["aniseed/locals"]["display-conn-status"] = v_23_0_
@@ -159,7 +159,9 @@ do
       local msg_id = uuid.v4()
       a.assoc(msg, "id", msg_id)
       dbg("->", msg)
-      a["assoc-in"](conn, {"msgs", msg_id}, {["sent-at"] = os.time(), cb = cb, msg = msg})
+      local function _3_()
+      end
+      a["assoc-in"](conn, {"msgs", msg_id}, {["sent-at"] = os.time(), cb = (cb or _3_), msg = msg})
       do end (conn.sock):write(bencode.encode(msg))
       return nil
     end
@@ -213,7 +215,7 @@ do
         display_conn_status("disconnected")
         return a.assoc(state, "conn", nil)
       end
-      return conn_or_warn(_3_)
+      return with_conn_or_warn(_3_)
     end
     v_23_0_0 = disconnect0
     _0_0["disconnect"] = v_23_0_0
@@ -295,16 +297,21 @@ local with_sessions = nil
 do
   local v_23_0_ = nil
   local function with_sessions0(cb)
-    local function _3_(msgs)
-      return cb(a.get(a.first(msgs), "sessions"))
+    local function _3_(_)
+      local function _4_(msg)
+        local function _5_(session)
+          return (msg.session ~= session)
+        end
+        return cb(a.filter(_5_, a.get(msg, "sessions")))
+      end
+      return send({op = "ls-sessions"}, _4_)
     end
-    return send({op = "ls-sessions"}, with_all_msgs_fn(_3_))
+    return with_conn_or_warn(_3_)
   end
   v_23_0_ = with_sessions0
   _0_0["aniseed/locals"]["with-sessions"] = v_23_0_
   with_sessions = v_23_0_
 end
-              -- (with-sessions a.println)
 local reuse_session = nil
 do
   local v_23_0_ = nil
@@ -357,7 +364,7 @@ do
               display({("; conjure.lang.clojure-nrepl error: " .. err0)})
             end
             if status_3d(msg, "unknown-session") then
-              display({"; Unknown session, correcting."})
+              display({"; Unknown session, correcting"})
               reuse_or_create_session()
             end
             if status_3d(msg, "done") then
@@ -438,7 +445,7 @@ do
       if port then
         return connect({host = "127.0.0.1", port = port})
       else
-        return display({"; No .nrepl-port file found."})
+        return display({"; No .nrepl-port file found"})
       end
     end
     v_23_0_0 = connect_port_file0
@@ -460,7 +467,7 @@ do
         end
         return send({code = opts.code, op = "eval", session = a["get-in"](state, {"conn", "session"})}, _4_)
       end
-      return conn_or_warn(_3_)
+      return with_conn_or_warn(_3_)
     end
     v_23_0_0 = eval_str0
     _0_0["eval-str"] = v_23_0_0
@@ -498,7 +505,7 @@ do
         end
         msgs = a.filter(_4_, a.vals(conn.msgs))
         if a["empty?"](msgs) then
-          return display({"; Nothing to interrupt."})
+          return display({"; Nothing to interrupt"})
         else
           local function _5_(a0, b)
             return (a0["sent-at"] < b["sent-at"])
@@ -511,7 +518,7 @@ do
           end
         end
       end
-      return conn_or_warn(_3_)
+      return with_conn_or_warn(_3_)
     end
     v_23_0_0 = interrupt0
     _0_0["interrupt"] = v_23_0_0
@@ -577,6 +584,114 @@ do
   _0_0["aniseed/locals"]["result-3"] = v_23_0_
   result_3 = v_23_0_
 end
+local clone_current_session = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function clone_current_session0()
+      local function _3_(conn)
+        return clone_session(a.get(conn, "session"))
+      end
+      return with_conn_or_warn(_3_)
+    end
+    v_23_0_0 = clone_current_session0
+    _0_0["clone-current-session"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["clone-current-session"] = v_23_0_
+  clone_current_session = v_23_0_
+end
+local clone_fresh_session = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function clone_fresh_session0()
+      local function _3_(conn)
+        return clone_session()
+      end
+      return with_conn_or_warn(_3_)
+    end
+    v_23_0_0 = clone_fresh_session0
+    _0_0["clone-fresh-session"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["clone-fresh-session"] = v_23_0_
+  clone_fresh_session = v_23_0_
+end
+local close_session = nil
+do
+  local v_23_0_ = nil
+  local function close_session0(session, cb)
+    return send({op = "close", session = session}, cb)
+  end
+  v_23_0_ = close_session0
+  _0_0["aniseed/locals"]["close-session"] = v_23_0_
+  close_session = v_23_0_
+end
+local close_current_session = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function close_current_session0()
+      local function _3_(conn)
+        local session = a.get(conn, "session")
+        a.assoc(conn, "session", nil)
+        display({("; Closed current session: " .. session)})
+        return close_session(session, reuse_or_create_session)
+      end
+      return with_conn_or_warn(_3_)
+    end
+    v_23_0_0 = close_current_session0
+    _0_0["close-current-session"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["close-current-session"] = v_23_0_
+  close_current_session = v_23_0_
+end
+local display_sessions = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function display_sessions0()
+      local function _3_(sessions)
+        local function _4_(_241)
+          return (";  - " .. _241)
+        end
+        return display(a.concat({("; Sessions (" .. a.count(sessions) .. "):")}, a.map(_4_, sessions)))
+      end
+      return with_sessions(_3_)
+    end
+    v_23_0_0 = display_sessions0
+    _0_0["display-sessions"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["display-sessions"] = v_23_0_
+  display_sessions = v_23_0_
+end
+local close_all_sessions = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function close_all_sessions0()
+      local function _3_(sessions)
+        a["run!"](close_session, sessions)
+        display({("; Closed all sessions (" .. a.count(sessions) .. ")")})
+        return clone_session()
+      end
+      return with_sessions(_3_)
+    end
+    v_23_0_0 = close_all_sessions0
+    _0_0["close-all-sessions"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["close-all-sessions"] = v_23_0_
+  close_all_sessions = v_23_0_
+end
 local on_filetype = nil
 do
   local v_23_0_ = nil
@@ -589,7 +704,12 @@ do
       mapping.buf("n", config.mappings["last-exception"], "conjure.lang.clojure-nrepl", "last-exception")
       mapping.buf("n", config.mappings["result-1"], "conjure.lang.clojure-nrepl", "result-1")
       mapping.buf("n", config.mappings["result-2"], "conjure.lang.clojure-nrepl", "result-2")
-      return mapping.buf("n", config.mappings["result-3"], "conjure.lang.clojure-nrepl", "result-3")
+      mapping.buf("n", config.mappings["result-3"], "conjure.lang.clojure-nrepl", "result-3")
+      mapping.buf("n", config.mappings["session-clone"], "conjure.lang.clojure-nrepl", "clone-current-session")
+      mapping.buf("n", config.mappings["session-fresh"], "conjure.lang.clojure-nrepl", "clone-fresh-session")
+      mapping.buf("n", config.mappings["session-close"], "conjure.lang.clojure-nrepl", "close-current-session")
+      mapping.buf("n", config.mappings["session-close-all"], "conjure.lang.clojure-nrepl", "close-all-sessions")
+      return mapping.buf("n", config.mappings["session-list"], "conjure.lang.clojure-nrepl", "display-sessions")
     end
     v_23_0_0 = on_filetype0
     _0_0["on-filetype"] = v_23_0_0

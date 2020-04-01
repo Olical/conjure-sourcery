@@ -30,7 +30,12 @@
               :last-exception "ex"
               :result-1 "e1"
               :result-2 "e2"
-              :result-3 "e3"}})
+              :result-3 "e3"
+              :session-clone "sc"
+              :session-fresh "sf"
+              :session-close "sq"
+              :session-close-all "sQ"
+              :session-list "sl"}})
 
 (defonce- state
   {:loaded? false
@@ -44,14 +49,14 @@
         (hud.display opts)
         (log.append opts)))))
 
-(defn- conn-or-warn [f]
+(defn- with-conn-or-warn [f]
   (let [conn (a.get state :conn)]
     (if conn
       (f conn)
-      (display ["; No connection."]))))
+      (display ["; No connection"]))))
 
 (defn- display-conn-status [status]
-  (conn-or-warn
+  (with-conn-or-warn
     (fn [conn]
       (display [(.. "; " conn.host ":" conn.port " (" status ")")]))))
 
@@ -70,7 +75,7 @@
         (dbg "->" msg)
         (a.assoc-in conn [:msgs msg-id]
                     {:msg msg
-                     :cb cb
+                     :cb (or cb (fn []))
                      :sent-at (os.time)})
         (conn.sock:write (bencode.encode msg))
         nil))))
@@ -86,7 +91,7 @@
         (cb acc)))))
 
 (defn disconnect []
-  (conn-or-warn
+  (with-conn-or-warn
     (fn [conn]
       (when (not (conn.sock:is_closing))
         (conn.sock:read_stop)
@@ -138,16 +143,16 @@
                         (or session "(fresh)") " -> " new-session)]))))))
 
 (defn- with-sessions [cb]
-  (send
-    {:op :ls-sessions}
-    (with-all-msgs-fn
-      (fn [msgs]
-        (-> (a.first msgs)
-            (a.get :sessions)
-            (cb))))))
-
-(comment
-  (with-sessions a.println))
+  (with-conn-or-warn
+    (fn [_]
+      (send
+        {:op :ls-sessions}
+        (fn [msg]
+          (->> (a.get msg :sessions)
+               (a.filter
+                 (fn [session]
+                   (not= msg.session session)))
+               (cb)))))))
 
 (defn- reuse-session [session]
   (a.assoc-in state [:conn :session] session)
@@ -176,7 +181,7 @@
                      (when (not ok?)
                        (display [(.. "; conjure.lang.clojure-nrepl error: " err)]))
                      (when (status= msg :unknown-session)
-                       (display ["; Unknown session, correcting."])
+                       (display ["; Unknown session, correcting"])
                        (reuse-or-create-session))
                      (when (status= msg :done)
                        (a.assoc-in conn [:msgs msg.id] nil)))))))))))
@@ -214,10 +219,10 @@
       (connect
         {:host "127.0.0.1"
          :port port})
-      (display ["; No .nrepl-port file found."]))))
+      (display ["; No .nrepl-port file found"]))))
 
 (defn eval-str [opts]
-  (conn-or-warn
+  (with-conn-or-warn
     (fn [_]
       (send
         {:op :eval
@@ -230,14 +235,14 @@
   (eval-str opts))
 
 (defn interrupt []
-  (conn-or-warn
+  (with-conn-or-warn
     (fn [conn]
       (let [msgs (->> (a.vals conn.msgs)
                       (a.filter
                         (fn [msg]
                           (= :eval msg.msg.op))))]
         (if (a.empty? msgs)
-          (display ["; Nothing to interrupt."])
+          (display ["; Nothing to interrupt"])
           (do
             (table.sort
               msgs
@@ -262,6 +267,40 @@
 (def result-2 (eval-str-fn "*2"))
 (def result-3 (eval-str-fn "*3"))
 
+(defn clone-current-session []
+  (with-conn-or-warn
+    (fn [conn]
+      (clone-session (a.get conn :session)))))
+
+(defn clone-fresh-session []
+  (with-conn-or-warn
+    (fn [conn]
+      (clone-session))))
+
+(defn- close-session [session cb]
+  (send {:op :close :session session} cb))
+
+(defn close-current-session []
+  (with-conn-or-warn
+    (fn [conn]
+      (let [session (a.get conn :session)]
+        (a.assoc conn :session nil)
+        (display [(.. "; Closed current session: " session)])
+        (close-session session reuse-or-create-session)))))
+
+(defn display-sessions []
+  (with-sessions
+    (fn [sessions]
+      (display (a.concat [(.. "; Sessions (" (a.count sessions) "):")]
+                         (a.map #(.. ";  - " $1) sessions))))))
+
+(defn close-all-sessions []
+  (with-sessions
+    (fn [sessions]
+      (a.run! close-session sessions)
+      (display [(.. "; Closed all sessions (" (a.count sessions)")")])
+      (clone-session))))
+
 (defn on-filetype []
   (mapping.buf :n config.mappings.disconnect
                :conjure.lang.clojure-nrepl :disconnect)
@@ -274,7 +313,18 @@
                :conjure.lang.clojure-nrepl :last-exception)
   (mapping.buf :n config.mappings.result-1 :conjure.lang.clojure-nrepl :result-1)
   (mapping.buf :n config.mappings.result-2 :conjure.lang.clojure-nrepl :result-2)
-  (mapping.buf :n config.mappings.result-3 :conjure.lang.clojure-nrepl :result-3))
+  (mapping.buf :n config.mappings.result-3 :conjure.lang.clojure-nrepl :result-3)
+
+  (mapping.buf :n config.mappings.session-clone
+               :conjure.lang.clojure-nrepl :clone-current-session)
+  (mapping.buf :n config.mappings.session-fresh
+               :conjure.lang.clojure-nrepl :clone-fresh-session)
+  (mapping.buf :n config.mappings.session-close
+               :conjure.lang.clojure-nrepl :close-current-session)
+  (mapping.buf :n config.mappings.session-close-all
+               :conjure.lang.clojure-nrepl :close-all-sessions)
+  (mapping.buf :n config.mappings.session-list
+               :conjure.lang.clojure-nrepl :display-sessions))
 
 (when (not state.loaded?)
   (a.assoc state :loaded? true)
