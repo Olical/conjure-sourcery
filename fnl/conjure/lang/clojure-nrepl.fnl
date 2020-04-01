@@ -13,8 +13,8 @@
             uuid conjure.uuid
             conjure-config conjure.config}})
 
-;; TODO Session switching.
 ;; TODO File / line / column metadata.
+;; TODO Session switching.
 ;; TODO Handle partial chunks of bencode data. (stream wrapper)
 
 (def buf-suffix ".cljc")
@@ -36,30 +36,30 @@
   {:loaded? false
    :conn nil})
 
-(defn- display [opts]
+(defn- display [lines]
   (lang.with-filetype
     :clojure
     (fn []
-      (hud.display opts)
-      (log.append opts))))
+      (let [opts {:lines lines}]
+        (hud.display opts)
+        (log.append opts)))))
 
 (defn- conn-or-warn [f]
   (let [conn (a.get state :conn)]
     (if conn
       (f conn)
-      (display {:lines ["; No connection."]}))))
+      (display ["; No connection."]))))
 
 (defn- display-conn-status [status]
   (conn-or-warn
     (fn [conn]
-      (display
-        {:lines [(.. "; " conn.host ":" conn.port " (" status ")")]}))))
+      (display [(.. "; " conn.host ":" conn.port " (" status ")")]))))
 
 (defn- dbg [desc data]
   (when config.debug?
-    (display {:lines (a.concat
-                       [(.. "; debug " desc)]
-                       (text.split-lines (view.serialise data)))}))
+    (display (a.concat
+               [(.. "; debug " desc)]
+               (text.split-lines (view.serialise data)))))
   data)
 
 (defn- send [msg cb]
@@ -75,14 +75,14 @@
         (conn.sock:write (bencode.encode msg))
         nil))))
 
-(defn- done? [msg]
-  (and msg msg.status (a.some #(= :done $1) msg.status)))
+(defn- status= [msg state]
+  (and msg msg.status (a.some #(= state $1) msg.status)))
 
 (defn- with-all-msgs-fn [cb]
   (let [acc []]
     (fn [msg]
       (table.insert acc msg)
-      (when (done? msg)
+      (when (status= msg :done)
         (cb acc)))))
 
 (defn disconnect []
@@ -124,6 +124,42 @@
                                  lines)})
           (log.append {:lines lines}))))))
 
+(defn- clone-session [session]
+  (send
+    {:op :clone
+     :session session}
+    (with-all-msgs-fn
+      (fn [msgs]
+        (let [new-session (-> msgs
+                              (->> (a.last))
+                              (a.get :new-session))]
+          (a.assoc-in state [:conn :session] new-session)
+          (display [(.. "; Cloned session: "
+                        (or session "(fresh)") " -> " new-session)]))))))
+
+(defn- with-sessions [cb]
+  (send
+    {:op :ls-sessions}
+    (with-all-msgs-fn
+      (fn [msgs]
+        (-> (a.first msgs)
+            (a.get :sessions)
+            (cb))))))
+
+(comment
+  (with-sessions a.println))
+
+(defn- reuse-session [session]
+  (a.assoc-in state [:conn :session] session)
+  (display [(.. "; Reused session: " session)]))
+
+(defn- reuse-or-create-session []
+  (with-sessions
+    (fn [sessions]
+      (if (a.empty? sessions)
+        (clone-session)
+        (reuse-session (a.first sessions))))))
+
 (defn- handle-read-fn []
   (vim.schedule_wrap
     (fn [err chunk]
@@ -138,8 +174,11 @@
                    (let [cb (a.get-in conn [:msgs msg.id :cb] #(display-result nil $1))
                          (ok? err) (pcall cb msg)]
                      (when (not ok?)
-                       (a.println "conjure.lang.clojure-nrepl error:" err))
-                     (when (done? msg)
+                       (display [(.. "; conjure.lang.clojure-nrepl error: " err)]))
+                     (when (status= msg :unknown-session)
+                       (display ["; Unknown session, correcting."])
+                       (reuse-or-create-session))
+                     (when (status= msg :done)
                        (a.assoc-in conn [:msgs msg.id] nil)))))))))))
 
 (defn- handle-connect-fn []
@@ -154,14 +193,7 @@
           (do
             (conn.sock:read_start (handle-read-fn))
             (display-conn-status :connected)
-            (send
-              {:op :clone}
-              (with-all-msgs-fn
-                (fn [msgs]
-                  (a.assoc conn :session
-                           (-> msgs
-                               (->> (a.last))
-                               (a.get :new-session))))))))))))
+            (reuse-or-create-session)))))))
 
 (defn connect [{: host : port}]
   (let [conn {:sock (vim.loop.new_tcp)
@@ -182,18 +214,15 @@
       (connect
         {:host "127.0.0.1"
          :port port})
-      (display {:lines ["; No .nrepl-port file found."]}))))
+      (display ["; No .nrepl-port file found."]))))
 
 (defn eval-str [opts]
   (conn-or-warn
     (fn [_]
       (send
-        (a.merge
-          {:op :eval
-           :code opts.code}
-          (let [session (a.get-in state [:conn :session])]
-            (when session
-              {:session session})))
+        {:op :eval
+         :code opts.code
+         :session (a.get-in state [:conn :session])}
         #(display-result opts $1)))))
 
 (defn eval-file [opts]
@@ -208,23 +237,21 @@
                         (fn [msg]
                           (= :eval msg.msg.op))))]
         (if (a.empty? msgs)
-          (display {:lines ["; Nothing to interrupt."]})
+          (display ["; Nothing to interrupt."])
           (do
             (table.sort
               msgs
               (fn [a b]
                 (< a.sent-at b.sent-at)))
             (let [oldest (a.first msgs)]
-              (send (a.merge
-                      {:op :interrupt
-                       :id oldest.msg.id}
-                      (when oldest.msg.session
-                        {:session oldest.msg.session})))
+              (send {:op :interrupt
+                     :id oldest.msg.id
+                     :session oldest.msg.session})
               (display
-                {:lines [(.. "; Interrupted: "
-                             (text.left-sample
-                               oldest.msg.code
-                               conjure-config.preview.sample-limit))]}))))))))
+                [(.. "; Interrupted: "
+                     (text.left-sample
+                       oldest.msg.code
+                       conjure-config.preview.sample-limit))]))))))))
 
 (defn- eval-str-fn [code]
   (fn []

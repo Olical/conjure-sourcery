@@ -97,8 +97,9 @@ end
 local display = nil
 do
   local v_23_0_ = nil
-  local function display0(opts)
+  local function display0(lines)
     local function _3_()
+      local opts = {lines = lines}
       hud.display(opts)
       return log.append(opts)
     end
@@ -116,7 +117,7 @@ do
     if conn then
       return f(conn)
     else
-      return display({lines = {"; No connection."}})
+      return display({"; No connection."})
     end
   end
   v_23_0_ = conn_or_warn0
@@ -128,7 +129,7 @@ do
   local v_23_0_ = nil
   local function display_conn_status0(status)
     local function _3_(conn)
-      return display({lines = {("; " .. conn.host .. ":" .. conn.port .. " (" .. status .. ")")}})
+      return display({("; " .. conn.host .. ":" .. conn.port .. " (" .. status .. ")")})
     end
     return conn_or_warn(_3_)
   end
@@ -141,7 +142,7 @@ do
   local v_23_0_ = nil
   local function dbg0(desc, data)
     if config["debug?"] then
-      display({lines = a.concat({("; debug " .. desc)}, text["split-lines"](view.serialise(data)))})
+      display(a.concat({("; debug " .. desc)}, text["split-lines"](view.serialise(data))))
     end
     return data
   end
@@ -167,18 +168,18 @@ do
   _0_0["aniseed/locals"]["send"] = v_23_0_
   send = v_23_0_
 end
-local done_3f = nil
+local status_3d = nil
 do
   local v_23_0_ = nil
-  local function done_3f0(msg)
+  local function status_3d0(msg, state0)
     local function _3_(_241)
-      return ("done" == _241)
+      return (state0 == _241)
     end
     return (msg and msg.status and a.some(_3_, msg.status))
   end
-  v_23_0_ = done_3f0
-  _0_0["aniseed/locals"]["done?"] = v_23_0_
-  done_3f = v_23_0_
+  v_23_0_ = status_3d0
+  _0_0["aniseed/locals"]["status="] = v_23_0_
+  status_3d = v_23_0_
 end
 local with_all_msgs_fn = nil
 do
@@ -187,7 +188,7 @@ do
     local acc = {}
     local function _3_(msg)
       table.insert(acc, msg)
-      if done_3f(msg) then
+      if status_3d(msg, "done") then
         return cb(acc)
       end
     end
@@ -275,6 +276,63 @@ do
   _0_0["aniseed/locals"]["display-result"] = v_23_0_
   display_result = v_23_0_
 end
+local clone_session = nil
+do
+  local v_23_0_ = nil
+  local function clone_session0(session)
+    local function _3_(msgs)
+      local new_session = a.get(a.last(msgs), "new-session")
+      a["assoc-in"](state, {"conn", "session"}, new_session)
+      return display({("; Cloned session: " .. (session or "(fresh)") .. " -> " .. new_session)})
+    end
+    return send({op = "clone", session = session}, with_all_msgs_fn(_3_))
+  end
+  v_23_0_ = clone_session0
+  _0_0["aniseed/locals"]["clone-session"] = v_23_0_
+  clone_session = v_23_0_
+end
+local with_sessions = nil
+do
+  local v_23_0_ = nil
+  local function with_sessions0(cb)
+    local function _3_(msgs)
+      return cb(a.get(a.first(msgs), "sessions"))
+    end
+    return send({op = "ls-sessions"}, with_all_msgs_fn(_3_))
+  end
+  v_23_0_ = with_sessions0
+  _0_0["aniseed/locals"]["with-sessions"] = v_23_0_
+  with_sessions = v_23_0_
+end
+              -- (with-sessions a.println)
+local reuse_session = nil
+do
+  local v_23_0_ = nil
+  local function reuse_session0(session)
+    a["assoc-in"](state, {"conn", "session"}, session)
+    return display({("; Reused session: " .. session)})
+  end
+  v_23_0_ = reuse_session0
+  _0_0["aniseed/locals"]["reuse-session"] = v_23_0_
+  reuse_session = v_23_0_
+end
+local reuse_or_create_session = nil
+do
+  local v_23_0_ = nil
+  local function reuse_or_create_session0()
+    local function _3_(sessions)
+      if a["empty?"](sessions) then
+        return clone_session()
+      else
+        return reuse_session(a.first(sessions))
+      end
+    end
+    return with_sessions(_3_)
+  end
+  v_23_0_ = reuse_or_create_session0
+  _0_0["aniseed/locals"]["reuse-or-create-session"] = v_23_0_
+  reuse_or_create_session = v_23_0_
+end
 local handle_read_fn = nil
 do
   local v_23_0_ = nil
@@ -296,9 +354,13 @@ do
             cb = a["get-in"](conn, {"msgs", msg.id, "cb"}, _5_)
             local ok_3f, err0 = pcall(cb, msg)
             if not ok_3f then
-              a.println("conjure.lang.clojure-nrepl error:", err0)
+              display({("; conjure.lang.clojure-nrepl error: " .. err0)})
             end
-            if done_3f(msg) then
+            if status_3d(msg, "unknown-session") then
+              display({"; Unknown session, correcting."})
+              reuse_or_create_session()
+            end
+            if status_3d(msg, "done") then
               return a["assoc-in"](conn, {"msgs", msg.id}, nil)
             end
           end
@@ -324,10 +386,7 @@ do
       else
         do end (conn.sock):read_start(handle_read_fn())
         display_conn_status("connected")
-        local function _4_(msgs)
-          return a.assoc(conn, "session", a.get(a.last(msgs), "new-session"))
-        end
-        return send({op = "clone"}, with_all_msgs_fn(_4_))
+        return reuse_or_create_session()
       end
     end
     return vim.schedule_wrap(_3_)
@@ -379,7 +438,7 @@ do
       if port then
         return connect({host = "127.0.0.1", port = port})
       else
-        return display({lines = {"; No .nrepl-port file found."}})
+        return display({"; No .nrepl-port file found."})
       end
     end
     v_23_0_0 = connect_port_file0
@@ -396,16 +455,10 @@ do
     local v_23_0_0 = nil
     local function eval_str0(opts)
       local function _3_(_)
-        local function _4_()
-          local session = a["get-in"](state, {"conn", "session"})
-          if session then
-            return {session = session}
-          end
-        end
-        local function _5_(_241)
+        local function _4_(_241)
           return display_result(opts, _241)
         end
-        return send(a.merge({code = opts.code, op = "eval"}, _4_()), _5_)
+        return send({code = opts.code, op = "eval", session = a["get-in"](state, {"conn", "session"})}, _4_)
       end
       return conn_or_warn(_3_)
     end
@@ -445,7 +498,7 @@ do
         end
         msgs = a.filter(_4_, a.vals(conn.msgs))
         if a["empty?"](msgs) then
-          return display({lines = {"; Nothing to interrupt."}})
+          return display({"; Nothing to interrupt."})
         else
           local function _5_(a0, b)
             return (a0["sent-at"] < b["sent-at"])
@@ -453,13 +506,8 @@ do
           table.sort(msgs, _5_)
           do
             local oldest = a.first(msgs)
-            local function _6_()
-              if oldest.msg.session then
-                return {session = oldest.msg.session}
-              end
-            end
-            send(a.merge({id = oldest.msg.id, op = "interrupt"}, _6_()))
-            return display({lines = {("; Interrupted: " .. text["left-sample"](oldest.msg.code, conjure_config.preview["sample-limit"]))}})
+            send({id = oldest.msg.id, op = "interrupt", session = oldest.msg.session})
+            return display({("; Interrupted: " .. text["left-sample"](oldest.msg.code, conjure_config.preview["sample-limit"]))})
           end
         end
       end

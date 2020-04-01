@@ -8,6 +8,8 @@
             hud conjure.hud
             log conjure.log}})
 
+;; TODO Handle eval of forms when no form matches gracefully. (,ee on a word)
+
 (defn- preview [opts]
   (let [sample-limit config.preview.sample-limit]
     (.. (lang.get :comment-prefix)
