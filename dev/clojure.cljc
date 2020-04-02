@@ -7,7 +7,6 @@
 
 (comment
   (throw (Error. "ohno"))
-  (throw (js/Error. "ohno"))
   (do (Thread/sleep 5000)
       (println "FOO"))
   (do (Thread/sleep 5000)
@@ -17,4 +16,5 @@
            '[cljs.repl.node :as node-repl])
   (piggieback/cljs-repl (node-repl/repl-env))
   (enable-console-print!)
+  (throw (js/Error. "ohno"))
   :cljs/quit)

@@ -163,16 +163,16 @@
             (table.sort sessions)
             (cb sessions)))))))
 
-(defn- reuse-session [session]
+(defn- assume-session [session]
   (a.assoc-in state [:conn :session] session)
-  (display [(.. "; Reused session: " session)]))
+  (display [(.. "; Assumed session: " session)]))
 
-(defn- reuse-or-create-session []
+(defn- assume-or-create-session []
   (with-sessions
     (fn [sessions]
       (if (a.empty? sessions)
         (clone-session)
-        (reuse-session (a.first sessions))))))
+        (assume-session (a.first sessions))))))
 
 (defn- handle-read-fn []
   (vim.schedule_wrap
@@ -191,7 +191,7 @@
                        (display [(.. "; conjure.lang.clojure-nrepl error: " err)]))
                      (when (status= msg :unknown-session)
                        (display ["; Unknown session, correcting"])
-                       (reuse-or-create-session))
+                       (assume-or-create-session))
                      (when (status= msg :done)
                        (a.assoc-in conn [:msgs msg.id] nil)))))))))))
 
@@ -207,7 +207,7 @@
           (do
             (conn.sock:read_start (handle-read-fn))
             (display-conn-status :connected)
-            (reuse-or-create-session)))))))
+            (assume-or-create-session)))))))
 
 (defn connect [{: host : port}]
   (let [conn {:sock (vim.loop.new_tcp)
@@ -295,7 +295,7 @@
       (let [session (a.get conn :session)]
         (a.assoc conn :session nil)
         (display [(.. "; Closed current session: " session)])
-        (close-session session reuse-or-create-session)))))
+        (close-session session assume-or-create-session)))))
 
 (defn display-sessions []
   (with-sessions
