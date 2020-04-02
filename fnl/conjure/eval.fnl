@@ -8,8 +8,6 @@
             hud conjure.hud
             log conjure.log}})
 
-;; TODO Handle eval of forms when no form matches gracefully. (,ee on a word)
-
 (defn- preview [opts]
   (let [sample-limit config.preview.sample-limit]
     (.. (lang.get :comment-prefix)
@@ -42,18 +40,22 @@
   (lang.call :eval-str opts))
 
 (defn current-form []
-  (let [{: content : range} (extract.form {})]
-    (eval-str
-      {:code content
-       :range range
-       :origin :current-form})))
+  (let [form (extract.form {})]
+    (when form
+      (let [{: content : range} form]
+        (eval-str
+          {:code content
+           :range range
+           :origin :current-form})))))
 
 (defn root-form []
-  (let [{: content : range} (extract.form {:root? true})]
-    (eval-str
-      {:code content
-       :range range
-       :origin :root-form})))
+  (let [form (extract.form {:root? true})]
+    (when form
+      (let [{: content : range} form]
+        (eval-str
+          {:code content
+           :range range
+           :origin :root-form})))))
 
 (defn word []
   (let [{: content : range} (extract.word)]
