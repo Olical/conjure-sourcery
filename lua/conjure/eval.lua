@@ -97,10 +97,13 @@ do
   do
     local v_23_0_0 = nil
     local function current_form0()
-      local _3_ = extract.form({})
-      local range = _3_["range"]
-      local content = _3_["content"]
-      return eval_str({code = content, origin = "current-form", range = range})
+      local form = extract.form({})
+      if form then
+        local _3_ = form
+        local range = _3_["range"]
+        local content = _3_["content"]
+        return eval_str({code = content, origin = "current-form", range = range})
+      end
     end
     v_23_0_0 = current_form0
     _0_0["current-form"] = v_23_0_0
@@ -115,10 +118,13 @@ do
   do
     local v_23_0_0 = nil
     local function root_form0()
-      local _3_ = extract.form({["root?"] = true})
-      local range = _3_["range"]
-      local content = _3_["content"]
-      return eval_str({code = content, origin = "root-form", range = range})
+      local form = extract.form({["root?"] = true})
+      if form then
+        local _3_ = form
+        local range = _3_["range"]
+        local content = _3_["content"]
+        return eval_str({code = content, origin = "root-form", range = range})
+      end
     end
     v_23_0_0 = root_form0
     _0_0["root-form"] = v_23_0_0
