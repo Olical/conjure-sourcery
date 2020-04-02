@@ -135,6 +135,10 @@
                                  lines)})
           (log.append {:lines lines}))))))
 
+(defn- assume-session [session]
+  (a.assoc-in state [:conn :session] session)
+  (display [(.. "; Assumed session: " session)]))
+
 (defn- clone-session [session]
   (send
     {:op :clone
@@ -178,10 +182,6 @@
     (with-all-msgs-fn
       (fn [msgs]
         (display [(.. "; Session type: " (a.get (a.first msgs) :value))])))))
-
-(defn- assume-session [session]
-  (a.assoc-in state [:conn :session] session)
-  (display [(.. "; Assumed session: " session)]))
 
 (defn- assume-or-create-session []
   (with-sessions

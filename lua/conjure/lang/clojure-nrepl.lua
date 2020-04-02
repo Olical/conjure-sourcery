@@ -268,12 +268,23 @@ do
   _0_0["aniseed/locals"]["display-result"] = v_23_0_
   display_result = v_23_0_
 end
+local assume_session = nil
+do
+  local v_23_0_ = nil
+  local function assume_session0(session)
+    a["assoc-in"](state, {"conn", "session"}, session)
+    return display({("; Assumed session: " .. session)})
+  end
+  v_23_0_ = assume_session0
+  _0_0["aniseed/locals"]["assume-session"] = v_23_0_
+  assume_session = v_23_0_
+end
 local clone_session = nil
 do
   local v_23_0_ = nil
   local function clone_session0(session)
     local function _3_(msgs)
-      return __fnl_global__assume_2dsession(a.get(a.last(msgs), "new-session"))
+      return assume_session(a.get(a.last(msgs), "new-session"))
     end
     return send({op = "clone", session = session}, with_all_msgs_fn(_3_))
   end
@@ -333,17 +344,6 @@ do
   end
   _0_0["aniseed/locals"]["display-session-type"] = v_23_0_
   display_session_type = v_23_0_
-end
-local assume_session = nil
-do
-  local v_23_0_ = nil
-  local function assume_session0(session)
-    a["assoc-in"](state, {"conn", "session"}, session)
-    return display({("; Assumed session: " .. session)})
-  end
-  v_23_0_ = assume_session0
-  _0_0["aniseed/locals"]["assume-session"] = v_23_0_
-  assume_session = v_23_0_
 end
 local assume_or_create_session = nil
 do
