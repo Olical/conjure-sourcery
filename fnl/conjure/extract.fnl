@@ -122,5 +122,4 @@
   (let [header (->> (nvim.buf_get_lines
                       0 0 config.extract.context-header-lines false)
                     (str.join "\n"))]
-    (or (string.match header (lang.get :context-pattern))
-        (lang.get :default-context))))
+    (string.match header (lang.get :context-pattern))))

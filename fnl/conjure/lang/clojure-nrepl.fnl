@@ -20,7 +20,6 @@
 ;; TODO Reusing CLJS sessions hides stdout.
 
 (def buf-suffix ".cljc")
-(def default-context "user")
 (def context-pattern "[(]%s*ns%s*(.-)[%s){]")
 (def comment-prefix "; ")
 
@@ -229,7 +228,7 @@
          :port port})
       (display ["; No .nrepl-port file found"]))))
 
-(defn eval-str [opts]
+(defn- eval-str-raw [opts]
   (with-conn-or-warn
     (fn [_]
       (send
@@ -238,9 +237,20 @@
          :session (a.get-in state [:conn :session])}
         #(display-result opts $1)))))
 
+(defn eval-str [opts]
+  (let [context (a.get opts :context)]
+    (send
+      {:op :eval
+       :code (if context
+               (.. "(in-ns '" context ")")
+               "(in-ns #?(:clj 'user, :cljs 'cljs.user))")
+       :session (a.get-in state [:conn :session])}
+      (fn []))
+    (eval-str-raw opts)))
+
 (defn eval-file [opts]
   (a.assoc opts :code (.. "(load-file \"" opts.file-path "\")"))
-  (eval-str opts))
+  (eval-str-raw opts))
 
 (defn interrupt []
   (with-conn-or-warn

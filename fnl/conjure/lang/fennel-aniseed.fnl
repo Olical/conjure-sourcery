@@ -13,7 +13,6 @@
             extract conjure.extract}})
 
 (def buf-suffix ".fnl")
-(def default-context "aniseed.user")
 (def context-pattern "[(]%s*module%s*(.-)[%s){]")
 (def comment-prefix "; ")
 
@@ -40,9 +39,7 @@
       (log.append {:lines prefixed-result-lines}))))
 
 (defn eval-str [opts]
-  (let [code (.. (if opts.context
-                   (.. "(module " opts.context ") ")
-                   "")
+  (let [code (.. (.. "(module " (or opts.context "aniseed.user") ") ")
                  opts.code "\n")
         (ok? result) (ani-eval.str code {:filename opts.file-path})]
     (set opts.ok? ok?)
@@ -67,7 +64,8 @@
 (defn run-buf-tests []
   (let [c (extract.context)
         req [(.. "; run-buf-tests (" c ")")]]
-    (wrapped-test req #(ani-test.run c))))
+    (when c
+      (wrapped-test req #(ani-test.run c)))))
 
 (defn run-all-tests []
   (wrapped-test ["; run-all-tests"] ani-test.run-all))

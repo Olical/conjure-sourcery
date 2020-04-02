@@ -1,6 +1,9 @@
-(ns foo)
+(ns dev.foo)
 
-(+ 10 20)
+(defn add [a b]
+  (+ a b))
+
+(add 10 20)
 (println "foo" #?(:clj :clojure! :cljs :clojurescript!))
 
 *1 *2 *3 *e
