@@ -317,9 +317,18 @@ end
 local eval_str_raw = nil
 do
   local v_23_0_ = nil
-  local function eval_str_raw0(code, cb)
+  local function eval_str_raw0(opts, cb)
     local function _3_(_)
-      return send({code = code, op = "eval", session = a["get-in"](state, {"conn", "session"})}, cb)
+      local _5_
+      do
+        local _4_0 = a["get-in"](opts, {"range", "start", 2})
+        if _4_0 then
+          _5_ = a.inc(_4_0)
+        else
+          _5_ = _4_0
+        end
+      end
+      return send({code = opts.code, column = _5_, file = opts["file-path"], line = a["get-in"](opts, {"range", "start", 1}), op = "eval", session = a["get-in"](state, {"conn", "session"})}, cb)
     end
     return with_conn_or_warn(_3_)
   end
@@ -336,7 +345,7 @@ do
       local function _3_(msgs)
         return display({("; Session type: " .. a.get(a.first(msgs), "value"))})
       end
-      return eval_str_raw(("#?(" .. str.join(" ", {":clj 'Clojure", ":cljs 'ClojureScript", ":cljr 'ClojureCLR", ":default 'Unknown"}) .. ")"), with_all_msgs_fn(_3_))
+      return eval_str_raw({code = ("#?(" .. str.join(" ", {":clj 'Clojure", ":cljs 'ClojureScript", ":cljr 'ClojureCLR", ":default 'Unknown"}) .. ")")}, with_all_msgs_fn(_3_))
     end
     v_23_0_0 = display_session_type0
     _0_0["display-session-type"] = v_23_0_0
@@ -494,12 +503,12 @@ do
           end
           local function _6_()
           end
-          eval_str_raw(_4_, _6_)
+          eval_str_raw({code = _4_}, _6_)
         end
         local function _4_(_241)
           return display_result(opts, _241)
         end
-        return eval_str_raw(opts.code, _4_)
+        return eval_str_raw(opts, _4_)
       end
       return with_conn_or_warn(_3_)
     end
@@ -519,7 +528,7 @@ do
       local function _3_(_241)
         return display_result(opts, _241)
       end
-      return eval_str_raw(("(load-file \"" .. opts["file-path"] .. "\")"), _3_)
+      return eval_str_raw(a.assoc(opts, "code", ("(load-file \"" .. opts["file-path"] .. "\")")), _3_)
     end
     v_23_0_0 = eval_file0
     _0_0["eval-file"] = v_23_0_0

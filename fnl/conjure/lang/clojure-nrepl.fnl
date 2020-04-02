@@ -14,7 +14,6 @@
             ll conjure.linked-list
             conjure-config conjure.config}})
 
-;; TODO File / line / column metadata.
 ;; TODO Handle partial chunks of bencode data. (stream wrapper)
 ;; TODO Split up into multiple modules.
 
@@ -160,25 +159,28 @@
             (table.sort sessions)
             (cb sessions)))))))
 
-(defn- eval-str-raw [code cb]
+(defn- eval-str-raw [opts cb]
   (with-conn-or-warn
     (fn [_]
       (send
         {:op :eval
-         :code code
+         :code opts.code
+         :file opts.file-path
+         :line (a.get-in opts [:range :start 1])
+         :column (-?> (a.get-in opts [:range :start 2]) (a.inc))
          :session (a.get-in state [:conn :session])}
         cb))))
 
 (defn display-session-type []
   (eval-str-raw
-    (.. "#?("
-        (str.join
-          " "
-          [":clj 'Clojure"
-           ":cljs 'ClojureScript"
-           ":cljr 'ClojureCLR"
-           ":default 'Unknown"])
-        ")")
+    {:code (.. "#?("
+               (str.join
+                 " "
+                 [":clj 'Clojure"
+                  ":cljs 'ClojureScript"
+                  ":cljr 'ClojureCLR"
+                  ":default 'Unknown"])
+               ")")}
     (with-all-msgs-fn
       (fn [msgs]
         (display [(.. "; Session type: " (a.get (a.first msgs) :value))])))))
@@ -250,14 +252,17 @@
   (with-conn-or-warn
     (fn [_]
       (let [context (a.get opts :context)]
-        (eval-str-raw (if context
-                        (.. "(in-ns '" context ")")
-                        "(in-ns #?(:clj 'user, :cljs 'cljs.user))")
-                      (fn [])))
-      (eval-str-raw opts.code #(display-result opts $1)))))
+        (eval-str-raw
+          {:code (if context
+                   (.. "(in-ns '" context ")")
+                   "(in-ns #?(:clj 'user, :cljs 'cljs.user))")}
+          (fn [])))
+      (eval-str-raw opts #(display-result opts $1)))))
 
 (defn eval-file [opts]
-  (eval-str-raw (.. "(load-file \"" opts.file-path "\")") #(display-result opts $1)))
+  (eval-str-raw
+    (a.assoc opts :code (.. "(load-file \"" opts.file-path "\")"))
+    #(display-result opts $1)))
 
 (defn interrupt []
   (with-conn-or-warn

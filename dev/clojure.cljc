@@ -3,6 +3,7 @@
 (defn add [a b]
   (+ a b))
 
+(meta #'add)
 (time (add 10 20))
 (println "foo" #?(:clj :clojure! :cljs :clojurescript!))
 
