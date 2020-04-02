@@ -43,17 +43,6 @@ do
   _0_0["aniseed/locals"]["buf-suffix"] = v_23_0_
   buf_suffix = v_23_0_
 end
-local default_context = nil
-do
-  local v_23_0_ = nil
-  do
-    local v_23_0_0 = "aniseed.user"
-    _0_0["default-context"] = v_23_0_0
-    v_23_0_ = v_23_0_0
-  end
-  _0_0["aniseed/locals"]["default-context"] = v_23_0_
-  default_context = v_23_0_
-end
 local context_pattern = nil
 do
   local v_23_0_ = nil
@@ -141,15 +130,7 @@ do
   do
     local v_23_0_0 = nil
     local function eval_str0(opts)
-      local code = nil
-      local function _3_()
-        if opts.context then
-          return ("(module " .. opts.context .. ") ")
-        else
-          return ""
-        end
-      end
-      code = (_3_() .. opts.code .. "\n")
+      local code = (("(module " .. (opts.context or "aniseed.user") .. ") ") .. opts.code .. "\n")
       local ok_3f, result = ani_eval.str(code, {filename = opts["file-path"]})
       opts["ok?"] = ok_3f
       opts.result = result
@@ -211,10 +192,12 @@ do
     local function run_buf_tests0()
       local c = extract.context()
       local req = {("; run-buf-tests (" .. c .. ")")}
-      local function _3_()
-        return ani_test.run(c)
+      if c then
+        local function _3_()
+          return ani_test.run(c)
+        end
+        return wrapped_test(req, _3_)
       end
-      return wrapped_test(req, _3_)
     end
     v_23_0_0 = run_buf_tests0
     _0_0["run-buf-tests"] = v_23_0_0

@@ -17,7 +17,6 @@
 ;; TODO File / line / column metadata.
 ;; TODO Handle partial chunks of bencode data. (stream wrapper)
 ;; TODO Split up into multiple modules.
-;; TODO Reusing CLJS sessions hides stdout.
 
 (def buf-suffix ".cljc")
 (def context-pattern "[(]%s*ns%s*(.-)[%s){]")
@@ -41,7 +40,8 @@
               :session-list "sl"
               :session-next "sn"
               :session-prev "sp"
-              :session-select "ss"}})
+              :session-select "ss"
+              :session-type "st"}})
 
 (defonce- state
   {:loaded? false
@@ -141,12 +141,7 @@
      :session session}
     (with-all-msgs-fn
       (fn [msgs]
-        (let [new-session (-> msgs
-                              (->> (a.last))
-                              (a.get :new-session))]
-          (a.assoc-in state [:conn :session] new-session)
-          (display [(.. "; Cloned session: "
-                        (or session "(fresh)") " -> " new-session)]))))))
+        (assume-session (a.get (a.last msgs) :new-session))))))
 
 (defn- with-sessions [cb]
   (with-conn-or-warn
@@ -160,6 +155,29 @@
                                   (not= msg.session session))))]
             (table.sort sessions)
             (cb sessions)))))))
+
+(defn- eval-str-raw [code cb]
+  (with-conn-or-warn
+    (fn [_]
+      (send
+        {:op :eval
+         :code code
+         :session (a.get-in state [:conn :session])}
+        cb))))
+
+(defn display-session-type []
+  (eval-str-raw
+    (.. "#?("
+        (str.join
+          " "
+          [":clj 'Clojure"
+           ":cljs 'ClojureScript"
+           ":cljr 'ClojureCLR"
+           ":default 'Unknown"])
+        ")")
+    (with-all-msgs-fn
+      (fn [msgs]
+        (display [(.. "; Session type: " (a.get (a.first msgs) :value))])))))
 
 (defn- assume-session [session]
   (a.assoc-in state [:conn :session] session)
@@ -228,29 +246,18 @@
          :port port})
       (display ["; No .nrepl-port file found"]))))
 
-(defn- eval-str-raw [opts]
+(defn eval-str [opts]
   (with-conn-or-warn
     (fn [_]
-      (send
-        {:op :eval
-         :code opts.code
-         :session (a.get-in state [:conn :session])}
-        #(display-result opts $1)))))
-
-(defn eval-str [opts]
-  (let [context (a.get opts :context)]
-    (send
-      {:op :eval
-       :code (if context
-               (.. "(in-ns '" context ")")
-               "(in-ns #?(:clj 'user, :cljs 'cljs.user))")
-       :session (a.get-in state [:conn :session])}
-      (fn []))
-    (eval-str-raw opts)))
+      (let [context (a.get opts :context)]
+        (eval-str-raw (if context
+                        (.. "(in-ns '" context ")")
+                        "(in-ns #?(:clj 'user, :cljs 'cljs.user))")
+                      (fn [])))
+      (eval-str-raw opts.code #(display-result opts $1)))))
 
 (defn eval-file [opts]
-  (a.assoc opts :code (.. "(load-file \"" opts.file-path "\")"))
-  (eval-str-raw opts))
+  (eval-str-raw (.. "(load-file \"" opts.file-path "\")") #(display-result opts $1)))
 
 (defn interrupt []
   (with-conn-or-warn
@@ -337,14 +344,12 @@
         (fn [sessions]
           (if (= 1 (a.count sessions))
             (display ["; No other sessions"])
-            (let [session (a.get conn :session)
-                  new-session (->> sessions
+            (let [session (a.get conn :session)]
+              (assume-session (->> sessions
                                    (ll.create)
                                    (ll.cycle)
                                    (ll.until #(f session $1))
-                                   (ll.val))]
-              (a.assoc conn :session new-session)
-              (display [(.. "; Session changed: " session " -> " new-session)]))))))))
+                                   (ll.val))))))))))
 
 (defn next-session []
   (cycle-session
@@ -399,7 +404,9 @@
   (mapping.buf :n config.mappings.session-prev
                :conjure.lang.clojure-nrepl :prev-session)
   (mapping.buf :n config.mappings.session-select
-               :conjure.lang.clojure-nrepl :select-session-interactive))
+               :conjure.lang.clojure-nrepl :select-session-interactive)
+  (mapping.buf :n config.mappings.session-type
+               :conjure.lang.clojure-nrepl :display-session-type))
 
 (when (not state.loaded?)
   (a.assoc state :loaded? true)

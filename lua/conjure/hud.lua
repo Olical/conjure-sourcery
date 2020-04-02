@@ -119,9 +119,10 @@ do
           if (line_count > 0) then
             nvim.buf_set_lines(buf, 0, -1, false, lines)
             state.id = nvim.open_win(buf, false, opts)
-            return nvim.win_set_option(state.id, "wrap", false)
+            nvim.win_set_option(state.id, "wrap", false)
           end
         end
+        return clear_passive_timer()
       end
     end
     v_23_0_0 = display0

@@ -3,7 +3,7 @@
 (defn add [a b]
   (+ a b))
 
-(add 10 20)
+(time (add 10 20))
 (println "foo" #?(:clj :clojure! :cljs :clojurescript!))
 
 *1 *2 *3 *e

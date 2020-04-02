@@ -45,17 +45,6 @@ do
   _0_0["aniseed/locals"]["buf-suffix"] = v_23_0_
   buf_suffix = v_23_0_
 end
-local default_context = nil
-do
-  local v_23_0_ = nil
-  do
-    local v_23_0_0 = "user"
-    _0_0["default-context"] = v_23_0_0
-    v_23_0_ = v_23_0_0
-  end
-  _0_0["aniseed/locals"]["default-context"] = v_23_0_
-  default_context = v_23_0_
-end
 local context_pattern = nil
 do
   local v_23_0_ = nil
@@ -82,7 +71,7 @@ local config = nil
 do
   local v_23_0_ = nil
   do
-    local v_23_0_0 = {["debug?"] = false, mappings = {["connect-port-file"] = "cf", ["last-exception"] = "ex", ["result-1"] = "e1", ["result-2"] = "e2", ["result-3"] = "e3", ["session-clone"] = "sc", ["session-close"] = "sq", ["session-close-all"] = "sQ", ["session-fresh"] = "sf", ["session-list"] = "sl", ["session-next"] = "sn", ["session-prev"] = "sp", ["session-select"] = "ss", disconnect = "cd", interrupt = "ei"}}
+    local v_23_0_0 = {["debug?"] = false, mappings = {["connect-port-file"] = "cf", ["last-exception"] = "ex", ["result-1"] = "e1", ["result-2"] = "e2", ["result-3"] = "e3", ["session-clone"] = "sc", ["session-close"] = "sq", ["session-close-all"] = "sQ", ["session-fresh"] = "sf", ["session-list"] = "sl", ["session-next"] = "sn", ["session-prev"] = "sp", ["session-select"] = "ss", ["session-type"] = "st", disconnect = "cd", interrupt = "ei"}}
     _0_0["config"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
@@ -284,9 +273,7 @@ do
   local v_23_0_ = nil
   local function clone_session0(session)
     local function _3_(msgs)
-      local new_session = a.get(a.last(msgs), "new-session")
-      a["assoc-in"](state, {"conn", "session"}, new_session)
-      return display({("; Cloned session: " .. (session or "(fresh)") .. " -> " .. new_session)})
+      return __fnl_global__assume_2dsession(a.get(a.last(msgs), "new-session"))
     end
     return send({op = "clone", session = session}, with_all_msgs_fn(_3_))
   end
@@ -316,33 +303,64 @@ do
   _0_0["aniseed/locals"]["with-sessions"] = v_23_0_
   with_sessions = v_23_0_
 end
-local reuse_session = nil
+local eval_str_raw = nil
 do
   local v_23_0_ = nil
-  local function reuse_session0(session)
-    a["assoc-in"](state, {"conn", "session"}, session)
-    return display({("; Reused session: " .. session)})
+  local function eval_str_raw0(code, cb)
+    local function _3_(_)
+      return send({code = code, op = "eval", session = a["get-in"](state, {"conn", "session"})}, cb)
+    end
+    return with_conn_or_warn(_3_)
   end
-  v_23_0_ = reuse_session0
-  _0_0["aniseed/locals"]["reuse-session"] = v_23_0_
-  reuse_session = v_23_0_
+  v_23_0_ = eval_str_raw0
+  _0_0["aniseed/locals"]["eval-str-raw"] = v_23_0_
+  eval_str_raw = v_23_0_
 end
-local reuse_or_create_session = nil
+local display_session_type = nil
 do
   local v_23_0_ = nil
-  local function reuse_or_create_session0()
+  do
+    local v_23_0_0 = nil
+    local function display_session_type0()
+      local function _3_(msgs)
+        return display({("; Session type: " .. a.get(a.first(msgs), "value"))})
+      end
+      return eval_str_raw(("#?(" .. str.join(" ", {":clj 'Clojure", ":cljs 'ClojureScript", ":cljr 'ClojureCLR", ":default 'Unknown"}) .. ")"), with_all_msgs_fn(_3_))
+    end
+    v_23_0_0 = display_session_type0
+    _0_0["display-session-type"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["display-session-type"] = v_23_0_
+  display_session_type = v_23_0_
+end
+local assume_session = nil
+do
+  local v_23_0_ = nil
+  local function assume_session0(session)
+    a["assoc-in"](state, {"conn", "session"}, session)
+    return display({("; Assumed session: " .. session)})
+  end
+  v_23_0_ = assume_session0
+  _0_0["aniseed/locals"]["assume-session"] = v_23_0_
+  assume_session = v_23_0_
+end
+local assume_or_create_session = nil
+do
+  local v_23_0_ = nil
+  local function assume_or_create_session0()
     local function _3_(sessions)
       if a["empty?"](sessions) then
         return clone_session()
       else
-        return reuse_session(a.first(sessions))
+        return assume_session(a.first(sessions))
       end
     end
     return with_sessions(_3_)
   end
-  v_23_0_ = reuse_or_create_session0
-  _0_0["aniseed/locals"]["reuse-or-create-session"] = v_23_0_
-  reuse_or_create_session = v_23_0_
+  v_23_0_ = assume_or_create_session0
+  _0_0["aniseed/locals"]["assume-or-create-session"] = v_23_0_
+  assume_or_create_session = v_23_0_
 end
 local handle_read_fn = nil
 do
@@ -369,7 +387,7 @@ do
             end
             if status_3d(msg, "unknown-session") then
               display({"; Unknown session, correcting"})
-              reuse_or_create_session()
+              assume_or_create_session()
             end
             if status_3d(msg, "done") then
               return a["assoc-in"](conn, {"msgs", msg.id}, nil)
@@ -397,7 +415,7 @@ do
       else
         do end (conn.sock):read_start(handle_read_fn())
         display_conn_status("connected")
-        return reuse_or_create_session()
+        return assume_or_create_session()
       end
     end
     return vim.schedule_wrap(_3_)
@@ -466,10 +484,22 @@ do
     local v_23_0_0 = nil
     local function eval_str0(opts)
       local function _3_(_)
+        do
+          local context = a.get(opts, "context")
+          local _4_
+          if context then
+            _4_ = ("(in-ns '" .. context .. ")")
+          else
+            _4_ = "(in-ns #?(:clj 'user, :cljs 'cljs.user))"
+          end
+          local function _6_()
+          end
+          eval_str_raw(_4_, _6_)
+        end
         local function _4_(_241)
           return display_result(opts, _241)
         end
-        return send({code = opts.code, op = "eval", session = a["get-in"](state, {"conn", "session"})}, _4_)
+        return eval_str_raw(opts.code, _4_)
       end
       return with_conn_or_warn(_3_)
     end
@@ -486,8 +516,10 @@ do
   do
     local v_23_0_0 = nil
     local function eval_file0(opts)
-      a.assoc(opts, "code", ("(load-file \"" .. opts["file-path"] .. "\")"))
-      return eval_str(opts)
+      local function _3_(_241)
+        return display_result(opts, _241)
+      end
+      return eval_str_raw(("(load-file \"" .. opts["file-path"] .. "\")"), _3_)
     end
     v_23_0_0 = eval_file0
     _0_0["eval-file"] = v_23_0_0
@@ -644,7 +676,7 @@ do
         local session = a.get(conn, "session")
         a.assoc(conn, "session", nil)
         display({("; Closed current session: " .. session)})
-        return close_session(session, reuse_or_create_session)
+        return close_session(session, assume_or_create_session)
       end
       return with_conn_or_warn(_3_)
     end
@@ -655,28 +687,41 @@ do
   _0_0["aniseed/locals"]["close-current-session"] = v_23_0_
   close_current_session = v_23_0_
 end
+local display_given_sessions = nil
+do
+  local v_23_0_ = nil
+  local function display_given_sessions0(sessions, cb)
+    local current = a["get-in"](state, {"conn", "session"})
+    local function _3_(_4_0)
+      local _5_ = _4_0
+      local idx = _5_[1]
+      local session = _5_[2]
+      local function _6_()
+        if (current == session) then
+          return " (current)"
+        else
+          return ""
+        end
+      end
+      return (";  " .. idx .. " - " .. session .. _6_())
+    end
+    display(a.concat({("; Sessions (" .. a.count(sessions) .. "):")}, a["map-indexed"](_3_, sessions)))
+    if cb then
+      return cb(sessions)
+    end
+  end
+  v_23_0_ = display_given_sessions0
+  _0_0["aniseed/locals"]["display-given-sessions"] = v_23_0_
+  display_given_sessions = v_23_0_
+end
 local display_sessions = nil
 do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
-    local function display_sessions0()
+    local function display_sessions0(cb)
       local function _3_(sessions)
-        local current = a["get-in"](state, {"conn", "session"})
-        local function _4_(_5_0)
-          local _6_ = _5_0
-          local idx = _6_[1]
-          local session = _6_[2]
-          local function _7_()
-            if (current == session) then
-              return " (current)"
-            else
-              return ""
-            end
-          end
-          return (";  " .. idx .. " - " .. session .. _7_())
-        end
-        return display(a.concat({("; Sessions (" .. a.count(sessions) .. "):")}, a["map-indexed"](_4_, sessions)))
+        return display_given_sessions(sessions, cb)
       end
       return with_sessions(_3_)
     end
@@ -717,13 +762,10 @@ do
           return display({"; No other sessions"})
         else
           local session = a.get(conn, "session")
-          local new_session = nil
           local function _5_(_241)
             return f(session, _241)
           end
-          new_session = ll.val(ll["until"](_5_, ll.cycle(ll.create(sessions))))
-          a.assoc(conn, "session", new_session)
-          return display({("; Session changed: " .. session .. " -> " .. new_session)})
+          return assume_session(ll.val(ll["until"](_5_, ll.cycle(ll.create(sessions)))))
         end
       end
       return with_sessions(_4_)
@@ -776,6 +818,26 @@ do
   do
     local v_23_0_0 = nil
     local function select_session_interactive0()
+      local function _3_(sessions)
+        if (1 == a.count(sessions)) then
+          return display({"; No other sessions."})
+        else
+          local function _4_()
+            nvim.ex.redraw_()
+            do
+              local n = nvim.fn.str2nr(nvim.fn.input("Session number: "))
+              local _5_ = a.count(sessions)
+              if ((1 <= n) and (n <= _5_)) then
+                return assume_session(a.get(sessions, n))
+              else
+                return display({"; Invalid session number."})
+              end
+            end
+          end
+          return display_given_sessions(sessions, _4_)
+        end
+      end
+      return with_sessions(_3_)
     end
     v_23_0_0 = select_session_interactive0
     _0_0["select-session-interactive"] = v_23_0_0
@@ -804,7 +866,8 @@ do
       mapping.buf("n", config.mappings["session-list"], "conjure.lang.clojure-nrepl", "display-sessions")
       mapping.buf("n", config.mappings["session-next"], "conjure.lang.clojure-nrepl", "next-session")
       mapping.buf("n", config.mappings["session-prev"], "conjure.lang.clojure-nrepl", "prev-session")
-      return mapping.buf("n", config.mappings["session-select"], "conjure.lang.clojure-nrepl", "select-session-interactive")
+      mapping.buf("n", config.mappings["session-select"], "conjure.lang.clojure-nrepl", "select-session-interactive")
+      return mapping.buf("n", config.mappings["session-type"], "conjure.lang.clojure-nrepl", "display-session-type")
     end
     v_23_0_0 = on_filetype0
     _0_0["on-filetype"] = v_23_0_0
