@@ -6,6 +6,7 @@
             config conjure.config}})
 
 ;; TODO Intermittent non display. I think it's a timeout clear issue.
+;; TODO Turn into a moving window of log, won't show if you can see the bottom of a log.
 
 (defn- hud-buf-name []
   (.. "conjure-hud-" (nvim.fn.getpid) (lang.get :buf-suffix)))

@@ -1,6 +1,8 @@
 (module conjure.linked-list
   {require {a conjure.aniseed.core}})
 
+;; TODO Clone first and last nodes in so it doesn't mutate the original.
+
 (defn create [xs prev]
   (when (not (a.empty? xs))
     (let [rest (a.rest xs)
