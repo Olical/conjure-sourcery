@@ -14,7 +14,6 @@
             ll conjure.linked-list
             conjure-config conjure.config}})
 
-;; TODO Session switching.
 ;; TODO File / line / column metadata.
 ;; TODO Handle partial chunks of bencode data. (stream wrapper)
 ;; TODO Split up into multiple modules.
@@ -297,17 +296,22 @@
         (display [(.. "; Closed current session: " session)])
         (close-session session assume-or-create-session)))))
 
-(defn display-sessions []
+(defn- display-given-sessions [sessions cb]
+  (let [current (a.get-in state [:conn :session])]
+    (display (a.concat [(.. "; Sessions (" (a.count sessions) "):")]
+                       (a.map-indexed (fn [[idx session]]
+                                        (.. ";  " idx " - " session
+                                            (if (= current session)
+                                              " (current)"
+                                              "")))
+                                      sessions)))
+    (when cb
+      (cb sessions))))
+
+(defn display-sessions [cb]
   (with-sessions
     (fn [sessions]
-      (let [current (a.get-in state [:conn :session])]
-        (display (a.concat [(.. "; Sessions (" (a.count sessions) "):")]
-                           (a.map-indexed (fn [[idx session]]
-                                            (.. ";  " idx " - " session
-                                                (if (= current session)
-                                                  " (current)"
-                                                  "")))
-                                          sessions)))))))
+      (display-given-sessions sessions cb))))
 
 (defn close-all-sessions []
   (with-sessions
@@ -342,7 +346,19 @@
     (fn [current node]
       (= current (->> node (ll.next) (ll.val))))))
 
-(defn select-session-interactive [])
+(defn select-session-interactive []
+  (with-sessions
+    (fn [sessions]
+      (if (= 1 (a.count sessions))
+        (display ["; No other sessions."])
+        (display-given-sessions
+          sessions
+          (fn []
+            (nvim.ex.redraw_)
+            (let [n (nvim.fn.str2nr (nvim.fn.input "Session number: "))]
+              (if (<= 1 n (a.count sessions))
+                (assume-session (a.get sessions n))
+                (display ["; Invalid session number."])))))))))
 
 (defn on-filetype []
   (mapping.buf :n config.mappings.disconnect
