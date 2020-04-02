@@ -86,7 +86,7 @@
 
 (defn range [start end]
   {:content (str.join "\n" (nvim.buf_get_lines 0 start end false))
-   :range {:start [start 0]
+   :range {:start [(a.inc start) 0]
            :end [end (buf-last-line-length 0)]}})
 
 (defn buf []
@@ -94,7 +94,7 @@
 
 (defn- getpos [expr]
   (let [[_ start end _] (nvim.fn.getpos expr)]
-    [start end]))
+    [start (a.dec end)]))
 
 (defn selection [{:kind kind :visual? visual?}]
   (let [sel-backup nvim.o.selection]

@@ -201,7 +201,7 @@ do
   do
     local v_23_0_0 = nil
     local function range0(start, _end)
-      return {content = str.join("\n", nvim.buf_get_lines(0, start, _end, false)), range = {["end"] = {_end, buf_last_line_length(0)}, start = {start, 0}}}
+      return {content = str.join("\n", nvim.buf_get_lines(0, start, _end, false)), range = {["end"] = {_end, buf_last_line_length(0)}, start = {a.inc(start), 0}}}
     end
     v_23_0_0 = range0
     _0_0["range"] = v_23_0_0
@@ -234,7 +234,7 @@ do
     local start = _3_[2]
     local _end = _3_[3]
     local _0 = _3_[4]
-    return {start, _end}
+    return {start, a.dec(_end)}
   end
   v_23_0_ = getpos0
   _0_0["aniseed/locals"]["getpos"] = v_23_0_
