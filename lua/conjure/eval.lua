@@ -15,18 +15,17 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {a = "conjure.aniseed.core", config = "conjure.config", extract = "conjure.extract", hud = "conjure.hud", lang = "conjure.lang", log = "conjure.log", nvim = "conjure.aniseed.nvim", text = "conjure.text"}}
-  return {require("conjure.aniseed.core"), require("conjure.config"), require("conjure.extract"), require("conjure.hud"), require("conjure.lang"), require("conjure.log"), require("conjure.aniseed.nvim"), require("conjure.text")}
+  _0_0["aniseed/local-fns"] = {require = {a = "conjure.aniseed.core", config = "conjure.config", extract = "conjure.extract", lang = "conjure.lang", log = "conjure.log", nvim = "conjure.aniseed.nvim", text = "conjure.text"}}
+  return {require("conjure.aniseed.core"), require("conjure.config"), require("conjure.extract"), require("conjure.lang"), require("conjure.log"), require("conjure.aniseed.nvim"), require("conjure.text")}
 end
 local _2_ = _1_(...)
 local a = _2_[1]
 local config = _2_[2]
 local extract = _2_[3]
-local hud = _2_[4]
-local lang = _2_[5]
-local log = _2_[6]
-local nvim = _2_[7]
-local text = _2_[8]
+local lang = _2_[4]
+local log = _2_[5]
+local nvim = _2_[6]
+local text = _2_[7]
 do local _ = ({nil, _0_0, nil})[2] end
 local preview = nil
 do
@@ -50,8 +49,7 @@ local display_request = nil
 do
   local v_23_0_ = nil
   local function display_request0(opts)
-    hud.display({lines = {opts.preview}})
-    return log.append({lines = {opts.preview}})
+    return log.append({opts.preview})
   end
   v_23_0_ = display_request0
   _0_0["aniseed/locals"]["display-request"] = v_23_0_
@@ -79,7 +77,6 @@ local eval_str = nil
 do
   local v_23_0_ = nil
   local function eval_str0(opts)
-    vim.schedule(hud["clear-passive-timer"])
     opts.action = "eval"
     opts.context = (nvim.b.conjure_context or extract.context())
     opts["file-path"] = extract["file-path"]()

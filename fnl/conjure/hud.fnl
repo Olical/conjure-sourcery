@@ -6,6 +6,7 @@
             config conjure.config}})
 
 ;; TODO Turn into a moving window of log, won't show if you can see the bottom of a log.
+;; Need to clear passive timer on log append then.
 
 (defn- hud-buf-name []
   (.. "conjure-hud-" (nvim.fn.getpid) (lang.get :buf-suffix)))

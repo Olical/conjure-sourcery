@@ -3,7 +3,6 @@
             a conjure.aniseed.core
             str conjure.aniseed.string
             view conjure.aniseed.view
-            hud conjure.hud
             log conjure.log
             lang conjure.lang
             text conjure.text
@@ -47,12 +46,7 @@
    :conn nil})
 
 (defn- display [lines]
-  (lang.with-filetype
-    :clojure
-    (fn []
-      (let [opts {:lines lines}]
-        (hud.display opts)
-        (log.append opts)))))
+  (lang.with-filetype :clojure log.append lines))
 
 (defn- with-conn-or-warn [f]
   (let [conn (a.get state :conn)]
@@ -124,15 +118,7 @@
                 resp.err (text.prefixed-lines resp.err "; (err) ")
                 resp.value (text.split-lines resp.value)
                 nil)]
-    (when lines
-      (lang.with-filetype
-        :clojure
-        (fn []
-          (hud.display {:lines (a.concat
-                                 (when opts
-                                   [opts.preview])
-                                 lines)})
-          (log.append {:lines lines}))))))
+    (display lines)))
 
 (defn- assume-session [session]
   (a.assoc-in state [:conn :session] session)

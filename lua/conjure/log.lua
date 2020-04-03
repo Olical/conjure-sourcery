@@ -59,30 +59,28 @@ do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
-    local function append0(_3_0)
-      local _4_ = _3_0
-      local lines = _4_["lines"]
-      do
+    local function append0(lines)
+      if not a["empty?"](lines) then
         local buf = upsert_buf()
         local old_lines = nvim.buf_line_count(buf)
-        local _5_
+        local _3_
         if buf_empty_3f(buf) then
-          _5_ = 0
+          _3_ = 0
         else
-          _5_ = -1
+          _3_ = -1
         end
-        nvim.buf_set_lines(buf, _5_, -1, false, lines)
+        nvim.buf_set_lines(buf, _3_, -1, false, lines)
         do
           local new_lines = nvim.buf_line_count(buf)
-          local function _7_(win)
-            local _8_ = nvim.win_get_cursor(win)
-            local row = _8_[1]
-            local col = _8_[2]
+          local function _5_(win)
+            local _6_ = nvim.win_get_cursor(win)
+            local row = _6_[1]
+            local col = _6_[2]
             if ((buf == nvim.win_get_buf(win)) and (old_lines == row)) then
               return nvim.win_set_cursor(win, {new_lines, 0})
             end
           end
-          return a["run!"](_7_, nvim.list_wins())
+          return a["run!"](_5_, nvim.list_wins())
         end
       end
     end

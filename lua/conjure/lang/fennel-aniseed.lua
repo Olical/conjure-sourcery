@@ -15,8 +15,8 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {["ani-core"] = "aniseed.core", ["ani-eval"] = "aniseed.eval", ["ani-test"] = "aniseed.test", a = "conjure.aniseed.core", extract = "conjure.extract", hud = "conjure.hud", log = "conjure.log", mapping = "conjure.mapping", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", text = "conjure.text", view = "conjure.aniseed.view"}}
-  return {require("conjure.aniseed.core"), require("aniseed.core"), require("aniseed.eval"), require("aniseed.test"), require("conjure.extract"), require("conjure.hud"), require("conjure.log"), require("conjure.mapping"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.text"), require("conjure.aniseed.view")}
+  _0_0["aniseed/local-fns"] = {require = {["ani-core"] = "aniseed.core", ["ani-eval"] = "aniseed.eval", ["ani-test"] = "aniseed.test", a = "conjure.aniseed.core", extract = "conjure.extract", lang = "conjure.lang", log = "conjure.log", mapping = "conjure.mapping", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", text = "conjure.text", view = "conjure.aniseed.view"}}
+  return {require("conjure.aniseed.core"), require("aniseed.core"), require("aniseed.eval"), require("aniseed.test"), require("conjure.extract"), require("conjure.lang"), require("conjure.log"), require("conjure.mapping"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.text"), require("conjure.aniseed.view")}
 end
 local _2_ = _1_(...)
 local a = _2_[1]
@@ -24,7 +24,7 @@ local ani_core = _2_[2]
 local ani_eval = _2_[3]
 local ani_test = _2_[4]
 local extract = _2_[5]
-local hud = _2_[6]
+local lang = _2_[6]
 local log = _2_[7]
 local mapping = _2_[8]
 local nvim = _2_[9]
@@ -79,9 +79,8 @@ end
 local display = nil
 do
   local v_23_0_ = nil
-  local function display0(opts)
-    hud.display(opts)
-    return log.append(opts)
+  local function display0(lines)
+    return lang["with-filetype"]("fennel", log.append, lines)
   end
   v_23_0_ = display0
   _0_0["aniseed/locals"]["display"] = v_23_0_
@@ -104,17 +103,17 @@ do
           result_str = result
         end
         local result_lines = str.split(result_str, "[^\n]+")
-        local prefixed_result_lines = nil
-        if ok_3f then
-          prefixed_result_lines = result_lines
-        else
-          local function _5_(_241)
-            return ("; " .. _241)
+        local function _5_()
+          if ok_3f then
+            return result_lines
+          else
+            local function _5_(_241)
+              return ("; " .. _241)
+            end
+            return a.map(_5_, result_lines)
           end
-          prefixed_result_lines = a.map(_5_, result_lines)
         end
-        hud.display({lines = a.concat({opts.preview}, prefixed_result_lines)})
-        return log.append({lines = prefixed_result_lines})
+        return display(_5_())
       end
     end
     v_23_0_0 = display_result0
@@ -164,20 +163,17 @@ end
 local wrapped_test = nil
 do
   local v_23_0_ = nil
-  local function wrapped_test0(req, f)
-    display({lines = req})
+  local function wrapped_test0(req_lines, f)
+    display(req_lines)
     do
       local res = ani_core["with-out-str"](f)
-      local lines = nil
       local _3_
       if ("" == res) then
         _3_ = "No results."
       else
         _3_ = res
       end
-      lines = text["prefixed-lines"](_3_, "; ")
-      hud.display({lines = a.concat(req, lines)})
-      return log.append({lines = lines})
+      return display(text["prefixed-lines"](_3_, "; "))
     end
   end
   v_23_0_ = wrapped_test0
@@ -191,12 +187,11 @@ do
     local v_23_0_0 = nil
     local function run_buf_tests0()
       local c = extract.context()
-      local req = {("; run-buf-tests (" .. c .. ")")}
       if c then
         local function _3_()
           return ani_test.run(c)
         end
-        return wrapped_test(req, _3_)
+        return wrapped_test({("; run-buf-tests (" .. c .. ")")}, _3_)
       end
     end
     v_23_0_0 = run_buf_tests0

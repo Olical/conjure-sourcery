@@ -5,7 +5,6 @@
             lang conjure.lang
             text conjure.text
             config conjure.config
-            hud conjure.hud
             log conjure.log}})
 
 (defn- preview [opts]
@@ -17,8 +16,7 @@
           (text.left-sample opts.code sample-limit)))))
 
 (defn- display-request [opts]
-  (hud.display {:lines [opts.preview]})
-  (log.append {:lines [opts.preview]}))
+  (log.append [opts.preview]))
 
 (defn file []
   (let [opts {:file-path (extract.file-path)
@@ -29,7 +27,6 @@
     (lang.call :eval-file opts)))
 
 (defn- eval-str [opts]
-  (vim.schedule hud.clear-passive-timer)
   (set opts.action :eval)
   (set opts.context
        (or nvim.b.conjure_context

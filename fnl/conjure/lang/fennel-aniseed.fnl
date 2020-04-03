@@ -6,9 +6,9 @@
             ani-core aniseed.core
             ani-eval aniseed.eval
             ani-test aniseed.test
+            lang conjure.lang
             mapping conjure.mapping
             text conjure.text
-            hud conjure.hud
             log conjure.log
             extract conjure.extract}})
 
@@ -20,9 +20,8 @@
   {:mappings {:run-buf-tests "tt"
               :run-all-tests "ta"}})
 
-(defn- display [opts]
-  (hud.display opts)
-  (log.append opts))
+(defn- display [lines]
+  (lang.with-filetype :fennel log.append lines))
 
 (defn display-result [opts]
   (when opts
@@ -30,13 +29,10 @@
           result-str (if ok?
                        (view.serialise result)
                        result)
-          result-lines (str.split result-str "[^\n]+")
-          prefixed-result-lines (if ok?
-                                  result-lines
-                                  (a.map #(.. "; " $1) result-lines))]
-      (hud.display {:lines (a.concat [opts.preview]
-                                     prefixed-result-lines)})
-      (log.append {:lines prefixed-result-lines}))))
+          result-lines (str.split result-str "[^\n]+")] 
+      (display (if ok?
+                 result-lines
+                 (a.map #(.. "; " $1) result-lines))))))
 
 (defn eval-str [opts]
   (let [code (.. (.. "(module " (or opts.context "aniseed.user") ") ")
@@ -51,21 +47,21 @@
   (when opts.code
     (eval-str opts)))
 
-(defn- wrapped-test [req f]
-  (display {:lines req})
-  (let [res (ani-core.with-out-str f)
-        lines (-> (if (= "" res)
-                    "No results."
-                    res)
-                  (text.prefixed-lines "; "))]
-    (hud.display {:lines (a.concat req lines)})
-    (log.append {:lines lines})))
+(defn- wrapped-test [req-lines f]
+  (display req-lines)
+  (let [res (ani-core.with-out-str f)]
+    (display
+      (-> (if (= "" res)
+            "No results."
+            res)
+          (text.prefixed-lines "; ")))))
 
 (defn run-buf-tests []
-  (let [c (extract.context)
-        req [(.. "; run-buf-tests (" c ")")]]
+  (let [c (extract.context)]
     (when c
-      (wrapped-test req #(ani-test.run c)))))
+      (wrapped-test
+        [(.. "; run-buf-tests (" c ")")]
+        #(ani-test.run c)))))
 
 (defn run-all-tests []
   (wrapped-test ["; run-all-tests"] ani-test.run-all))

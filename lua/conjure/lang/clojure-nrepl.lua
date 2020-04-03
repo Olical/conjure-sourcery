@@ -15,24 +15,23 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {["conjure-config"] = "conjure.config", a = "conjure.aniseed.core", bencode = "conjure.bencode", bridge = "conjure.bridge", hud = "conjure.hud", lang = "conjure.lang", ll = "conjure.linked-list", log = "conjure.log", mapping = "conjure.mapping", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", text = "conjure.text", uuid = "conjure.uuid", view = "conjure.aniseed.view"}}
-  return {require("conjure.aniseed.core"), require("conjure.bencode"), require("conjure.bridge"), require("conjure.config"), require("conjure.hud"), require("conjure.lang"), require("conjure.linked-list"), require("conjure.log"), require("conjure.mapping"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.text"), require("conjure.uuid"), require("conjure.aniseed.view")}
+  _0_0["aniseed/local-fns"] = {require = {["conjure-config"] = "conjure.config", a = "conjure.aniseed.core", bencode = "conjure.bencode", bridge = "conjure.bridge", lang = "conjure.lang", ll = "conjure.linked-list", log = "conjure.log", mapping = "conjure.mapping", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", text = "conjure.text", uuid = "conjure.uuid", view = "conjure.aniseed.view"}}
+  return {require("conjure.aniseed.core"), require("conjure.bencode"), require("conjure.bridge"), require("conjure.config"), require("conjure.lang"), require("conjure.linked-list"), require("conjure.log"), require("conjure.mapping"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.text"), require("conjure.uuid"), require("conjure.aniseed.view")}
 end
 local _2_ = _1_(...)
 local a = _2_[1]
 local bencode = _2_[2]
 local bridge = _2_[3]
 local conjure_config = _2_[4]
-local hud = _2_[5]
-local lang = _2_[6]
-local ll = _2_[7]
-local log = _2_[8]
-local mapping = _2_[9]
-local nvim = _2_[10]
-local str = _2_[11]
-local text = _2_[12]
-local uuid = _2_[13]
-local view = _2_[14]
+local lang = _2_[5]
+local ll = _2_[6]
+local log = _2_[7]
+local mapping = _2_[8]
+local nvim = _2_[9]
+local str = _2_[10]
+local text = _2_[11]
+local uuid = _2_[12]
+local view = _2_[13]
 do local _ = ({nil, _0_0, nil})[2] end
 local buf_suffix = nil
 do
@@ -88,12 +87,7 @@ local display = nil
 do
   local v_23_0_ = nil
   local function display0(lines)
-    local function _3_()
-      local opts = {lines = lines}
-      hud.display(opts)
-      return log.append(opts)
-    end
-    return lang["with-filetype"]("clojure", _3_)
+    return lang["with-filetype"]("clojure", log.append, lines)
   end
   v_23_0_ = display0
   _0_0["aniseed/locals"]["display"] = v_23_0_
@@ -250,19 +244,7 @@ do
     else
       lines = nil
     end
-    if lines then
-      local function _4_()
-        local _5_
-        if opts then
-          _5_ = {opts.preview}
-        else
-        _5_ = nil
-        end
-        hud.display({lines = a.concat(_5_, lines)})
-        return log.append({lines = lines})
-      end
-      return lang["with-filetype"]("clojure", _4_)
-    end
+    return display(lines)
   end
   v_23_0_ = display_result0
   _0_0["aniseed/locals"]["display-result"] = v_23_0_
