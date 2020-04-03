@@ -7,6 +7,8 @@
             config conjure.config
             log conjure.log}})
 
+;; TODO Eval form at mark.
+
 (defn- preview [opts]
   (let [sample-limit config.preview.sample-limit]
     (.. (lang.get :comment-prefix)
