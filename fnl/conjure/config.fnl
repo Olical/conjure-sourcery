@@ -18,17 +18,16 @@
    :eval-motion "E"
    :close-hud "q"})
 
-(def hud
-  {:max-width 80
-   :max-height 20
-   :enabled? true
-   :close-passive? true
-   :close-passive-timeout 500})
+(def log
+  {:hud {:width 0.42
+         :height 0.32
+         :enabled? true}})
 
 (def extract
   {:context-header-lines 24})
 
 (def preview
+  ;; TODO Make this percentage based.
   {:sample-limit 32})
 
 (defn filetypes []

@@ -2,7 +2,17 @@
   {require {a conjure.aniseed.core
             nvim conjure.aniseed.nvim
             buffer conjure.buffer
-            lang conjure.lang}})
+            lang conjure.lang
+            config conjure.config}})
+
+;; TODO Don't display HUD if we can see the bottom of a log.
+;; TODO Use markers to scroll to the last entry.
+;; TODO Implement trimming using a marker so as not to cut forms in half.
+;; TODO Use config and percentages for HUD size.
+;; TODO Mapping to open log in a tab.
+
+(defonce- state
+  {:hud {:id nil}})
 
 (defn- log-buf-name []
   (.. "conjure-log-" (nvim.fn.getpid) (lang.get :buf-suffix)))
@@ -10,11 +20,27 @@
 (defn- upsert-buf []
   (buffer.upsert-hidden (log-buf-name)))
 
-;; TODO Implement trimming using a marker so as not to cut forms in half.
+(defn close-hud []
+  (when state.hud.id
+    (pcall (fn [] (nvim.win_close state.hud.id true)))
+    (set state.hud.id nil)))
 
-(defn- buf-empty? [buf]
-  (and (<= (nvim.buf_line_count buf) 1)
-       (= 0 (a.count (a.first (nvim.buf_get_lines buf 0 -1 false))))))
+(defn- display-hud []
+  (when (and config.log.hud.enabled? (not state.hud.id))
+    (let [buf (upsert-buf)
+          opts {;; Ensure it always sticks to the top right.
+                :relative :editor
+                :row 0
+                :col 424242
+                :anchor :NW
+
+                :width 90
+                :height 10
+                :focusable false
+                :style :minimal}]
+      (set state.hud.id (nvim.open_win buf false opts))
+      (nvim.win_set_option state.hud.id :wrap false)
+      (nvim.win_set_cursor state.hud.id [(nvim.buf_line_count buf) 0]))))
 
 (defn append [lines]
   (when (not (a.empty? lines))
@@ -23,7 +49,7 @@
 
       (nvim.buf_set_lines
         buf
-        (if (buf-empty? buf) 0 -1)
+        (if (buffer.empty? buf) 0 -1)
         -1 false lines)
 
       (let [new-lines (nvim.buf_line_count buf)]
@@ -33,7 +59,9 @@
               (when (and (= buf (nvim.win_get_buf win))
                          (= old-lines row))
                 (nvim.win_set_cursor win [new-lines 0]))))
-          (nvim.list_wins))))))
+          (nvim.list_wins))))
+
+    (display-hud)))
 
 (defn- create-win [split-fn]
   (let [buf (upsert-buf)

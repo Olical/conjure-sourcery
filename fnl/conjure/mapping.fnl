@@ -4,7 +4,6 @@
             str conjure.aniseed.string
             config conjure.config
             extract conjure.extract
-            hud conjure.hud
             lang conjure.lang
             eval conjure.eval
             bridge conjure.bridge}})
@@ -31,15 +30,15 @@
   (buf :n config.mappings.eval-file :conjure.eval :file)
   (buf :n config.mappings.eval-buf :conjure.eval :buf)
   (buf :v config.mappings.eval-visual :conjure.mapping :eval-selection)
-  (buf :n config.mappings.close-hud :conjure.hud :close)
+  (buf :n config.mappings.close-hud :conjure.log :close-hud)
 
   (nvim.ex.autocmd
     :CursorMoved :<buffer>
-    (bridge.viml->lua :conjure.hud :close-passive {}))
+    (bridge.viml->lua :conjure.log :close-hud {}))
 
   (nvim.ex.autocmd
     :CursorMovedI :<buffer>
-    (bridge.viml->lua :conjure.hud :close-passive {}))
+    (bridge.viml->lua :conjure.log :close-hud {}))
 
   (lang.call :on-filetype))
 

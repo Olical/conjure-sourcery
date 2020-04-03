@@ -1,5 +1,6 @@
 (module conjure.buffer
-  {require {nvim conjure.aniseed.nvim}})
+  {require {nvim conjure.aniseed.nvim
+            a conjure.aniseed.core}})
 
 (defn unlist [buf]
   "The buflisted attribute is reset when a new window is opened. Since the
@@ -18,4 +19,6 @@
         buf)
       buf)))
 
-
+(defn empty? [buf]
+  (and (<= (nvim.buf_line_count buf) 1)
+       (= 0 (a.count (a.first (nvim.buf_get_lines buf 0 -1 false))))))

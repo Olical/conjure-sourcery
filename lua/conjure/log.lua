@@ -15,15 +15,22 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {a = "conjure.aniseed.core", buffer = "conjure.buffer", lang = "conjure.lang", nvim = "conjure.aniseed.nvim"}}
-  return {require("conjure.aniseed.core"), require("conjure.buffer"), require("conjure.lang"), require("conjure.aniseed.nvim")}
+  _0_0["aniseed/local-fns"] = {require = {a = "conjure.aniseed.core", buffer = "conjure.buffer", config = "conjure.config", lang = "conjure.lang", nvim = "conjure.aniseed.nvim"}}
+  return {require("conjure.aniseed.core"), require("conjure.buffer"), require("conjure.config"), require("conjure.lang"), require("conjure.aniseed.nvim")}
 end
 local _2_ = _1_(...)
 local a = _2_[1]
 local buffer = _2_[2]
-local lang = _2_[3]
-local nvim = _2_[4]
+local config = _2_[3]
+local lang = _2_[4]
+local nvim = _2_[5]
 do local _ = ({nil, _0_0, nil})[2] end
+local state = nil
+do
+  local v_23_0_ = (_0_0["aniseed/locals"].state or {hud = {id = nil}})
+  _0_0["aniseed/locals"]["state"] = v_23_0_
+  state = v_23_0_
+end
 local log_buf_name = nil
 do
   local v_23_0_ = nil
@@ -44,15 +51,43 @@ do
   _0_0["aniseed/locals"]["upsert-buf"] = v_23_0_
   upsert_buf = v_23_0_
 end
-local buf_empty_3f = nil
+local close_hud = nil
 do
   local v_23_0_ = nil
-  local function buf_empty_3f0(buf)
-    return ((nvim.buf_line_count(buf) <= 1) and (0 == a.count(a.first(nvim.buf_get_lines(buf, 0, -1, false)))))
+  do
+    local v_23_0_0 = nil
+    local function close_hud0()
+      if state.hud.id then
+        local function _3_()
+          return nvim.win_close(state.hud.id, true)
+        end
+        pcall(_3_)
+        state.hud.id = nil
+        return nil
+      end
+    end
+    v_23_0_0 = close_hud0
+    _0_0["close-hud"] = v_23_0_0
+    v_23_0_ = v_23_0_0
   end
-  v_23_0_ = buf_empty_3f0
-  _0_0["aniseed/locals"]["buf-empty?"] = v_23_0_
-  buf_empty_3f = v_23_0_
+  _0_0["aniseed/locals"]["close-hud"] = v_23_0_
+  close_hud = v_23_0_
+end
+local display_hud = nil
+do
+  local v_23_0_ = nil
+  local function display_hud0()
+    if (config.log.hud["enabled?"] and not state.hud.id) then
+      local buf = upsert_buf()
+      local opts = {anchor = "NW", col = 424242, focusable = false, height = 10, relative = "editor", row = 0, style = "minimal", width = 90}
+      state.hud.id = nvim.open_win(buf, false, opts)
+      nvim.win_set_option(state.hud.id, "wrap", false)
+      return nvim.win_set_cursor(state.hud.id, {nvim.buf_line_count(buf), 0})
+    end
+  end
+  v_23_0_ = display_hud0
+  _0_0["aniseed/locals"]["display-hud"] = v_23_0_
+  display_hud = v_23_0_
 end
 local append = nil
 do
@@ -61,27 +96,30 @@ do
     local v_23_0_0 = nil
     local function append0(lines)
       if not a["empty?"](lines) then
-        local buf = upsert_buf()
-        local old_lines = nvim.buf_line_count(buf)
-        local _3_
-        if buf_empty_3f(buf) then
-          _3_ = 0
-        else
-          _3_ = -1
-        end
-        nvim.buf_set_lines(buf, _3_, -1, false, lines)
         do
-          local new_lines = nvim.buf_line_count(buf)
-          local function _5_(win)
-            local _6_ = nvim.win_get_cursor(win)
-            local row = _6_[1]
-            local col = _6_[2]
-            if ((buf == nvim.win_get_buf(win)) and (old_lines == row)) then
-              return nvim.win_set_cursor(win, {new_lines, 0})
-            end
+          local buf = upsert_buf()
+          local old_lines = nvim.buf_line_count(buf)
+          local _3_
+          if buffer["empty?"](buf) then
+            _3_ = 0
+          else
+            _3_ = -1
           end
-          return a["run!"](_5_, nvim.list_wins())
+          nvim.buf_set_lines(buf, _3_, -1, false, lines)
+          do
+            local new_lines = nvim.buf_line_count(buf)
+            local function _5_(win)
+              local _6_ = nvim.win_get_cursor(win)
+              local row = _6_[1]
+              local col = _6_[2]
+              if ((buf == nvim.win_get_buf(win)) and (old_lines == row)) then
+                return nvim.win_set_cursor(win, {new_lines, 0})
+              end
+            end
+            a["run!"](_5_, nvim.list_wins())
+          end
         end
+        return display_hud()
       end
     end
     v_23_0_0 = append0

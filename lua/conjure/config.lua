@@ -43,16 +43,16 @@ do
   _0_0["aniseed/locals"]["mappings"] = v_23_0_
   mappings = v_23_0_
 end
-local hud = nil
+local log = nil
 do
   local v_23_0_ = nil
   do
-    local v_23_0_0 = {["close-passive-timeout"] = 500, ["close-passive?"] = true, ["enabled?"] = true, ["max-height"] = 20, ["max-width"] = 80}
-    _0_0["hud"] = v_23_0_0
+    local v_23_0_0 = {hud = {["enabled?"] = true, height = 0.32000000000000001, width = 0.41999999999999998}}
+    _0_0["log"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
-  _0_0["aniseed/locals"]["hud"] = v_23_0_
-  hud = v_23_0_
+  _0_0["aniseed/locals"]["log"] = v_23_0_
+  log = v_23_0_
 end
 local extract = nil
 do

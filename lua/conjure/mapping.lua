@@ -15,8 +15,8 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {a = "conjure.aniseed.core", bridge = "conjure.bridge", config = "conjure.config", eval = "conjure.eval", extract = "conjure.extract", hud = "conjure.hud", lang = "conjure.lang", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string"}}
-  return {require("conjure.aniseed.core"), require("conjure.bridge"), require("conjure.config"), require("conjure.eval"), require("conjure.extract"), require("conjure.hud"), require("conjure.lang"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string")}
+  _0_0["aniseed/local-fns"] = {require = {a = "conjure.aniseed.core", bridge = "conjure.bridge", config = "conjure.config", eval = "conjure.eval", extract = "conjure.extract", lang = "conjure.lang", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string"}}
+  return {require("conjure.aniseed.core"), require("conjure.bridge"), require("conjure.config"), require("conjure.eval"), require("conjure.extract"), require("conjure.lang"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string")}
 end
 local _2_ = _1_(...)
 local a = _2_[1]
@@ -24,10 +24,9 @@ local bridge = _2_[2]
 local config = _2_[3]
 local eval = _2_[4]
 local extract = _2_[5]
-local hud = _2_[6]
-local lang = _2_[7]
-local nvim = _2_[8]
-local str = _2_[9]
+local lang = _2_[6]
+local nvim = _2_[7]
+local str = _2_[8]
 do local _ = ({nil, _0_0, nil})[2] end
 local buf_21 = nil
 do
@@ -74,9 +73,9 @@ do
       buf("n", config.mappings["eval-file"], "conjure.eval", "file")
       buf("n", config.mappings["eval-buf"], "conjure.eval", "buf")
       buf("v", config.mappings["eval-visual"], "conjure.mapping", "eval-selection")
-      buf("n", config.mappings["close-hud"], "conjure.hud", "close")
-      nvim.ex.autocmd("CursorMoved", "<buffer>", bridge["viml->lua"]("conjure.hud", "close-passive", {}))
-      nvim.ex.autocmd("CursorMovedI", "<buffer>", bridge["viml->lua"]("conjure.hud", "close-passive", {}))
+      buf("n", config.mappings["close-hud"], "conjure.log", "close-hud")
+      nvim.ex.autocmd("CursorMoved", "<buffer>", bridge["viml->lua"]("conjure.log", "close-hud", {}))
+      nvim.ex.autocmd("CursorMovedI", "<buffer>", bridge["viml->lua"]("conjure.log", "close-hud", {}))
       return lang.call("on-filetype")
     end
     v_23_0_0 = on_filetype0
