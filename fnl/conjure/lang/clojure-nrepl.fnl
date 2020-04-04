@@ -9,6 +9,7 @@
             mapping conjure.mapping
             bencode conjure.bencode
             bridge conjure.bridge
+            editor conjure.editor
             uuid conjure.uuid
             ll conjure.linked-list
             conjure-config conjure.config}})
@@ -272,7 +273,8 @@
                 [(.. "; Interrupted: "
                      (text.left-sample
                        oldest.msg.code
-                       conjure-config.preview.sample-limit))]))))))))
+                       (editor.percent-width
+                         conjure-config.preview.sample-limit)))]))))))))
 
 (defn- eval-str-fn [code]
   (fn []

@@ -15,15 +15,16 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {a = "conjure.aniseed.core", buffer = "conjure.buffer", config = "conjure.config", lang = "conjure.lang", nvim = "conjure.aniseed.nvim"}}
-  return {require("conjure.aniseed.core"), require("conjure.buffer"), require("conjure.config"), require("conjure.lang"), require("conjure.aniseed.nvim")}
+  _0_0["aniseed/local-fns"] = {require = {a = "conjure.aniseed.core", buffer = "conjure.buffer", config = "conjure.config", editor = "conjure.editor", lang = "conjure.lang", nvim = "conjure.aniseed.nvim"}}
+  return {require("conjure.aniseed.core"), require("conjure.buffer"), require("conjure.config"), require("conjure.editor"), require("conjure.lang"), require("conjure.aniseed.nvim")}
 end
 local _2_ = _1_(...)
 local a = _2_[1]
 local buffer = _2_[2]
 local config = _2_[3]
-local lang = _2_[4]
-local nvim = _2_[5]
+local editor = _2_[4]
+local lang = _2_[5]
+local nvim = _2_[6]
 do local _ = ({nil, _0_0, nil})[2] end
 local state = nil
 do
@@ -79,7 +80,7 @@ do
   local function display_hud0()
     if (config.log.hud["enabled?"] and not state.hud.id) then
       local buf = upsert_buf()
-      local opts = {anchor = "NW", col = 424242, focusable = false, height = 10, relative = "editor", row = 0, style = "minimal", width = 90}
+      local opts = {anchor = "NW", col = 424242, focusable = false, height = editor["percent-height"](config.log.hud.height), relative = "editor", row = 0, style = "minimal", width = editor["percent-width"](config.log.hud.width)}
       state.hud.id = nvim.open_win(buf, false, opts)
       nvim.win_set_option(state.hud.id, "wrap", false)
       return nvim.win_set_cursor(state.hud.id, {nvim.buf_line_count(buf), 0})

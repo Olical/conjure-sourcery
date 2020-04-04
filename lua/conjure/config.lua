@@ -47,7 +47,7 @@ local log = nil
 do
   local v_23_0_ = nil
   do
-    local v_23_0_0 = {hud = {["enabled?"] = true, height = 0.32000000000000001, width = 0.41999999999999998}}
+    local v_23_0_0 = {hud = {["enabled?"] = true, height = 0.29999999999999999, width = 0.41999999999999998}}
     _0_0["log"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
@@ -69,7 +69,7 @@ local preview = nil
 do
   local v_23_0_ = nil
   do
-    local v_23_0_0 = {["sample-limit"] = 32}
+    local v_23_0_0 = {["sample-limit"] = 0.29999999999999999}
     _0_0["preview"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end

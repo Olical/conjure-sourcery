@@ -3,12 +3,12 @@
             nvim conjure.aniseed.nvim
             buffer conjure.buffer
             lang conjure.lang
-            config conjure.config}})
+            config conjure.config
+            editor conjure.editor}})
 
 ;; TODO Don't display HUD if we can see the bottom of a log.
 ;; TODO Use markers to scroll to the last entry.
 ;; TODO Implement trimming using a marker so as not to cut forms in half.
-;; TODO Use config and percentages for HUD size.
 ;; TODO Mapping to open log in a tab.
 
 (defonce- state
@@ -34,8 +34,8 @@
                 :col 424242
                 :anchor :NW
 
-                :width 90
-                :height 10
+                :width (editor.percent-width config.log.hud.width)
+                :height (editor.percent-height config.log.hud.height)
                 :focusable false
                 :style :minimal}]
       (set state.hud.id (nvim.open_win buf false opts))

@@ -20,15 +20,14 @@
 
 (def log
   {:hud {:width 0.42
-         :height 0.32
+         :height 0.3
          :enabled? true}})
 
 (def extract
   {:context-header-lines 24})
 
 (def preview
-  ;; TODO Make this percentage based.
-  {:sample-limit 32})
+  {:sample-limit 0.3})
 
 (defn filetypes []
   (a.keys langs))

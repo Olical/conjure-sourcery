@@ -15,23 +15,24 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {["conjure-config"] = "conjure.config", a = "conjure.aniseed.core", bencode = "conjure.bencode", bridge = "conjure.bridge", lang = "conjure.lang", ll = "conjure.linked-list", log = "conjure.log", mapping = "conjure.mapping", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", text = "conjure.text", uuid = "conjure.uuid", view = "conjure.aniseed.view"}}
-  return {require("conjure.aniseed.core"), require("conjure.bencode"), require("conjure.bridge"), require("conjure.config"), require("conjure.lang"), require("conjure.linked-list"), require("conjure.log"), require("conjure.mapping"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.text"), require("conjure.uuid"), require("conjure.aniseed.view")}
+  _0_0["aniseed/local-fns"] = {require = {["conjure-config"] = "conjure.config", a = "conjure.aniseed.core", bencode = "conjure.bencode", bridge = "conjure.bridge", editor = "conjure.editor", lang = "conjure.lang", ll = "conjure.linked-list", log = "conjure.log", mapping = "conjure.mapping", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", text = "conjure.text", uuid = "conjure.uuid", view = "conjure.aniseed.view"}}
+  return {require("conjure.aniseed.core"), require("conjure.bencode"), require("conjure.bridge"), require("conjure.config"), require("conjure.editor"), require("conjure.lang"), require("conjure.linked-list"), require("conjure.log"), require("conjure.mapping"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.text"), require("conjure.uuid"), require("conjure.aniseed.view")}
 end
 local _2_ = _1_(...)
 local a = _2_[1]
 local bencode = _2_[2]
 local bridge = _2_[3]
 local conjure_config = _2_[4]
-local lang = _2_[5]
-local ll = _2_[6]
-local log = _2_[7]
-local mapping = _2_[8]
-local nvim = _2_[9]
-local str = _2_[10]
-local text = _2_[11]
-local uuid = _2_[12]
-local view = _2_[13]
+local editor = _2_[5]
+local lang = _2_[6]
+local ll = _2_[7]
+local log = _2_[8]
+local mapping = _2_[9]
+local nvim = _2_[10]
+local str = _2_[11]
+local text = _2_[12]
+local uuid = _2_[13]
+local view = _2_[14]
 do local _ = ({nil, _0_0, nil})[2] end
 local buf_suffix = nil
 do
@@ -541,7 +542,7 @@ do
           do
             local oldest = a.first(msgs)
             send({id = oldest.msg.id, op = "interrupt", session = oldest.msg.session})
-            return display({("; Interrupted: " .. text["left-sample"](oldest.msg.code, conjure_config.preview["sample-limit"]))})
+            return display({("; Interrupted: " .. text["left-sample"](oldest.msg.code, editor["percent-width"](conjure_config.preview["sample-limit"])))})
           end
         end
       end

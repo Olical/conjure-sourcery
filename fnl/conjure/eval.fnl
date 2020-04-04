@@ -5,13 +5,15 @@
             lang conjure.lang
             text conjure.text
             config conjure.config
+            editor conjure.editor
             log conjure.log}})
 
 ;; TODO Eval form at mark.
 ;; TODO Languages: Janet, Racket, MIT Scheme.
 
 (defn- preview [opts]
-  (let [sample-limit config.preview.sample-limit]
+  (let [sample-limit (editor.percent-width
+                       config.preview.sample-limit)]
     (.. (lang.get :comment-prefix)
         opts.action " (" opts.origin "): "
         (if (or (= :file opts.origin) (= :buf opts.origin))
