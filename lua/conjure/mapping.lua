@@ -67,6 +67,7 @@ do
       buf_21("n", config.mappings["eval-motion"], ":set opfunc=ConjureEvalMotion<cr>g@")
       buf("n", config.mappings["log-split"], "conjure.log", "split")
       buf("n", config.mappings["log-vsplit"], "conjure.log", "vsplit")
+      buf("n", config.mappings["log-tab"], "conjure.log", "tab")
       buf("n", config.mappings["eval-current-form"], "conjure.eval", "current-form")
       buf("n", config.mappings["eval-root-form"], "conjure.eval", "root-form")
       buf("n", config.mappings["eval-word"], "conjure.eval", "word")

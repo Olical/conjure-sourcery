@@ -9,7 +9,6 @@
 ;; TODO Don't display HUD if we can see the bottom of a log.
 ;; TODO Use markers to scroll to the last entry.
 ;; TODO Implement trimming using a marker so as not to cut forms in half.
-;; TODO Mapping to open log in a tab.
 
 (defonce- state
   {:hud {:id nil}})
@@ -77,3 +76,6 @@
 
 (defn vsplit []
   (create-win nvim.ex.vsplit))
+
+(defn tab []
+  (create-win nvim.ex.tabnew))

@@ -174,4 +174,19 @@ do
   _0_0["aniseed/locals"]["vsplit"] = v_23_0_
   vsplit = v_23_0_
 end
+local tab = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function tab0()
+      return create_win(nvim.ex.tabnew)
+    end
+    v_23_0_0 = tab0
+    _0_0["tab"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["tab"] = v_23_0_
+  tab = v_23_0_
+end
 return nil
