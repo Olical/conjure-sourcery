@@ -244,7 +244,24 @@
                    (.. "(in-ns '" context ")")
                    "(in-ns #?(:clj 'user, :cljs 'cljs.user))")}
           (fn [])))
-      (eval-str-raw opts #(display-result opts $1)))))
+      (eval-str-raw opts (or opts.cb #(display-result opts $1))))))
+
+(defn doc-str [opts]
+  (when (not (a.empty? opts.code))
+    (eval-str
+      (a.merge
+        opts
+        {:code (.. "(require 'clojure.repl)"
+                   "(clojure.repl/doc " opts.code ")")
+         :cb (with-all-msgs-fn
+               (fn [msgs]
+                 (-> msgs
+                     (->> (a.map #(a.get $1 :out))
+                          (a.filter a.string?)
+                          (a.rest)
+                          (str.join ""))
+                     (text.prefixed-lines "; | ")
+                     (display))))}))))
 
 (defn eval-file [opts]
   (eval-str-raw

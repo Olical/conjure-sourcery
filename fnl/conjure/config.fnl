@@ -17,6 +17,7 @@
    :eval-buf "eb"
    :eval-visual "E"
    :eval-motion "E"
+   :doc-word ["K"]
    :close-hud "q"})
 
 (def log

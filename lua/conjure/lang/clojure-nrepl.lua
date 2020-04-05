@@ -490,7 +490,7 @@ do
         local function _4_(_241)
           return display_result(opts, _241)
         end
-        return eval_str_raw(opts, _4_)
+        return eval_str_raw(opts, (opts.cb or _4_))
       end
       return with_conn_or_warn(_3_)
     end
@@ -500,6 +500,29 @@ do
   end
   _0_0["aniseed/locals"]["eval-str"] = v_23_0_
   eval_str = v_23_0_
+end
+local doc_str = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function doc_str0(opts)
+      if not a["empty?"](opts.code) then
+        local function _3_(msgs)
+          local function _4_(_241)
+            return a.get(_241, "out")
+          end
+          return display(text["prefixed-lines"](str.join("", a.rest(a.filter(a["string?"], a.map(_4_, msgs)))), "; | "))
+        end
+        return eval_str(a.merge(opts, {cb = with_all_msgs_fn(_3_), code = ("(require 'clojure.repl)" .. "(clojure.repl/doc " .. opts.code .. ")")}))
+      end
+    end
+    v_23_0_0 = doc_str0
+    _0_0["doc-str"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["doc-str"] = v_23_0_
+  doc_str = v_23_0_
 end
 local eval_file = nil
 do

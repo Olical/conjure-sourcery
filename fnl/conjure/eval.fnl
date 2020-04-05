@@ -9,7 +9,6 @@
             log conjure.log}})
 
 ;; TODO Eval form at mark.
-;; TODO K calls through to lang doc fn.
 ;; TODO Languages: Janet, Racket, MIT Scheme.
 
 (defn- preview [opts]
@@ -32,15 +31,19 @@
     (display-request opts)
     (lang.call :eval-file opts)))
 
-(defn- eval-str [opts]
-  (set opts.action :eval)
-  (set opts.context
-       (or nvim.b.conjure_context
-           (extract.context)))
-  (set opts.file-path (extract.file-path))
-  (set opts.preview (preview opts))
-  (display-request opts)
-  (lang.call :eval-str opts))
+(defn- lang-exec-fn [action f-name]
+  (fn [opts]
+    (set opts.action action)
+    (set opts.context
+         (or nvim.b.conjure_context
+             (extract.context)))
+    (set opts.file-path (extract.file-path))
+    (set opts.preview (preview opts))
+    (display-request opts)
+    (lang.call f-name opts)))
+
+(def- eval-str (lang-exec-fn :eval :eval-str))
+(def- doc-str (lang-exec-fn :doc :doc-str))
 
 (defn current-form []
   (let [form (extract.form {})]
@@ -63,6 +66,13 @@
 (defn word []
   (let [{: content : range} (extract.word)]
     (eval-str
+      {:code content
+       :range range
+       :origin :word})))
+
+(defn doc-word []
+  (let [{: content : range} (extract.word)]
+    (doc-str
       {:code content
        :range range
        :origin :word})))

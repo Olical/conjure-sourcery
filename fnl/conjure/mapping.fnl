@@ -33,6 +33,7 @@
   (buf :n config.mappings.eval-buf :conjure.eval :buf)
   (buf :v config.mappings.eval-visual :conjure.mapping :eval-selection)
   (buf :n config.mappings.close-hud :conjure.log :close-hud)
+  (buf :n config.mappings.doc-word :conjure.eval :doc-word)
 
   (nvim.ex.autocmd
     :CursorMoved :<buffer>

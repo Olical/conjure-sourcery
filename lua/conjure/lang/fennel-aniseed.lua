@@ -142,6 +142,22 @@ do
   _0_0["aniseed/locals"]["eval-str"] = v_23_0_
   eval_str = v_23_0_
 end
+local doc_str = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function doc_str0(opts)
+      a.assoc(opts, "code", ("(doc " .. opts.code .. ")"))
+      return eval_str(opts)
+    end
+    v_23_0_0 = doc_str0
+    _0_0["doc-str"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["doc-str"] = v_23_0_
+  doc_str = v_23_0_
+end
 local eval_file = nil
 do
   local v_23_0_ = nil

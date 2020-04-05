@@ -74,20 +74,35 @@ do
   _0_0["aniseed/locals"]["file"] = v_23_0_
   file = v_23_0_
 end
-local eval_str = nil
+local lang_exec_fn = nil
 do
   local v_23_0_ = nil
-  local function eval_str0(opts)
-    opts.action = "eval"
-    opts.context = (nvim.b.conjure_context or extract.context())
-    opts["file-path"] = extract["file-path"]()
-    opts.preview = preview(opts)
-    display_request(opts)
-    return lang.call("eval-str", opts)
+  local function lang_exec_fn0(action, f_name)
+    local function _3_(opts)
+      opts.action = action
+      opts.context = (nvim.b.conjure_context or extract.context())
+      opts["file-path"] = extract["file-path"]()
+      opts.preview = preview(opts)
+      display_request(opts)
+      return lang.call(f_name, opts)
+    end
+    return _3_
   end
-  v_23_0_ = eval_str0
+  v_23_0_ = lang_exec_fn0
+  _0_0["aniseed/locals"]["lang-exec-fn"] = v_23_0_
+  lang_exec_fn = v_23_0_
+end
+local eval_str = nil
+do
+  local v_23_0_ = lang_exec_fn("eval", "eval-str")
   _0_0["aniseed/locals"]["eval-str"] = v_23_0_
   eval_str = v_23_0_
+end
+local doc_str = nil
+do
+  local v_23_0_ = lang_exec_fn("doc", "doc-str")
+  _0_0["aniseed/locals"]["doc-str"] = v_23_0_
+  doc_str = v_23_0_
 end
 local current_form = nil
 do
@@ -148,6 +163,24 @@ do
   end
   _0_0["aniseed/locals"]["word"] = v_23_0_
   word = v_23_0_
+end
+local doc_word = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function doc_word0()
+      local _3_ = extract.word()
+      local range = _3_["range"]
+      local content = _3_["content"]
+      return doc_str({code = content, origin = "word", range = range})
+    end
+    v_23_0_0 = doc_word0
+    _0_0["doc-word"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["doc-word"] = v_23_0_
+  doc_word = v_23_0_
 end
 local buf = nil
 do

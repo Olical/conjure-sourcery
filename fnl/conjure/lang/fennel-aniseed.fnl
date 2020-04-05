@@ -42,6 +42,10 @@
     (set opts.result result)
     (display-result opts)))
 
+(defn doc-str [opts]
+  (a.assoc opts :code (.. "(doc " opts.code ")"))
+  (eval-str opts))
+
 (defn eval-file [opts]
   (set opts.code (a.slurp opts.file-path))
   (when opts.code
