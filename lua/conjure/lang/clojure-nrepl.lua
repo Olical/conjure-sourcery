@@ -508,13 +508,7 @@ do
     local v_23_0_0 = nil
     local function doc_str0(opts)
       if not a["empty?"](opts.code) then
-        local function _3_(msgs)
-          local function _4_(_241)
-            return a.get(_241, "out")
-          end
-          return display(text["prefixed-lines"](str.join("", a.rest(a.filter(a["string?"], a.map(_4_, msgs)))), "; | "))
-        end
-        return eval_str(a.merge(opts, {cb = with_all_msgs_fn(_3_), code = ("(require 'clojure.repl)" .. "(clojure.repl/doc " .. opts.code .. ")")}))
+        return eval_str(a.assoc(opts, "code", ("(do (require 'clojure.repl)" .. "    (clojure.repl/doc " .. opts.code .. "))")))
       end
     end
     v_23_0_0 = doc_str0
