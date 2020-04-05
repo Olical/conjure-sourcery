@@ -7,6 +7,7 @@
             editor conjure.editor}})
 
 ;; TODO Don't display HUD if we can see the bottom of a log.
+;; TODO Move HUD to the bottom if it'll hide the cursor.
 ;; TODO Use markers to scroll to the last entry.
 ;; TODO Implement trimming using a marker so as not to cut forms in half.
 
