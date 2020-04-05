@@ -35,15 +35,41 @@ do
   _0_0["aniseed/locals"]["percent-fn"] = v_23_0_
   percent_fn = v_23_0_
 end
-local percent_width = nil
+local width = nil
 do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
-    local function _3_()
+    local function width0()
       return nvim.o.columns
     end
-    v_23_0_0 = percent_fn(_3_)
+    v_23_0_0 = width0
+    _0_0["width"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["width"] = v_23_0_
+  width = v_23_0_
+end
+local height = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function height0()
+      return nvim.o.lines
+    end
+    v_23_0_0 = height0
+    _0_0["height"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["height"] = v_23_0_
+  height = v_23_0_
+end
+local percent_width = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = percent_fn(width)
     _0_0["percent-width"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
@@ -54,15 +80,41 @@ local percent_height = nil
 do
   local v_23_0_ = nil
   do
-    local v_23_0_0 = nil
-    local function _3_()
-      return nvim.o.lines
-    end
-    v_23_0_0 = percent_fn(_3_)
+    local v_23_0_0 = percent_fn(height)
     _0_0["percent-height"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
   _0_0["aniseed/locals"]["percent-height"] = v_23_0_
   percent_height = v_23_0_
+end
+local cursor_left = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function cursor_left0()
+      return nvim.fn.screencol()
+    end
+    v_23_0_0 = cursor_left0
+    _0_0["cursor-left"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["cursor-left"] = v_23_0_
+  cursor_left = v_23_0_
+end
+local cursor_top = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function cursor_top0()
+      return nvim.fn.screenrow()
+    end
+    v_23_0_0 = cursor_top0
+    _0_0["cursor-top"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["cursor-top"] = v_23_0_
+  cursor_top = v_23_0_
 end
 return nil

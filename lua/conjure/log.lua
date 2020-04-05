@@ -80,7 +80,15 @@ do
   local function display_hud0()
     if (config.log.hud["enabled?"] and not state.hud.id) then
       local buf = upsert_buf()
-      local opts = {anchor = "NW", col = 424242, focusable = false, height = editor["percent-height"](config.log.hud.height), relative = "editor", row = 0, style = "minimal", width = editor["percent-width"](config.log.hud.width)}
+      local cursor_top_right_3f = ((editor["cursor-left"]() > editor["percent-width"](0.5)) and (editor["cursor-top"]() < editor["percent-height"](0.5)))
+      local opts = nil
+      local _3_
+      if cursor_top_right_3f then
+        _3_ = (editor.height() - 2)
+      else
+        _3_ = 0
+      end
+      opts = {anchor = "SE", col = editor.width(), focusable = false, height = editor["percent-height"](config.log.hud.height), relative = "editor", row = _3_, style = "minimal", width = editor["percent-width"](config.log.hud.width)}
       state.hud.id = nvim.open_win(buf, false, opts)
       nvim.win_set_option(state.hud.id, "wrap", false)
       return nvim.win_set_cursor(state.hud.id, {nvim.buf_line_count(buf), 0})

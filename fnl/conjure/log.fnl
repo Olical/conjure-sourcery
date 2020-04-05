@@ -7,7 +7,6 @@
             editor conjure.editor}})
 
 ;; TODO Don't display HUD if we can see the bottom of a log.
-;; TODO Move HUD to the bottom if it'll hide the cursor.
 ;; TODO Use markers to scroll to the last entry.
 ;; TODO Implement trimming using a marker so as not to cut forms in half.
 
@@ -28,11 +27,14 @@
 (defn- display-hud []
   (when (and config.log.hud.enabled? (not state.hud.id))
     (let [buf (upsert-buf)
-          opts {;; Ensure it always sticks to the top right.
-                :relative :editor
-                :row 0
-                :col 424242
-                :anchor :NW
+          cursor-top-right? (and (> (editor.cursor-left) (editor.percent-width 0.5))
+                                 (< (editor.cursor-top) (editor.percent-height 0.5)))
+          opts {:relative :editor
+                :row (if cursor-top-right?
+                       (- (editor.height) 2)
+                       0)
+                :col (editor.width)
+                :anchor :SE
 
                 :width (editor.percent-width config.log.hud.width)
                 :height (editor.percent-height config.log.hud.height)
