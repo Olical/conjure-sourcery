@@ -28,28 +28,26 @@ local lang = _2_[6]
 local nvim = _2_[7]
 local str = _2_[8]
 do local _ = ({nil, _0_0, nil})[2] end
-local buf_21 = nil
-do
-  local v_23_0_ = nil
-  do
-    local v_23_0_0 = nil
-    local function buf_210(mode, keys, action)
-      return nvim.buf_set_keymap(0, mode, (config.mappings.prefix .. keys), action, {noremap = true, silent = true})
-    end
-    v_23_0_0 = buf_210
-    _0_0["buf!"] = v_23_0_0
-    v_23_0_ = v_23_0_0
-  end
-  _0_0["aniseed/locals"]["buf!"] = v_23_0_
-  buf_21 = v_23_0_
-end
 local buf = nil
 do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
     local function buf0(mode, keys, ...)
-      return buf_21(mode, keys, (":" .. bridge["viml->lua"](...) .. "<cr>"))
+      local args = {...}
+      local _3_
+      if a["string?"](keys) then
+        _3_ = (config.mappings.prefix .. keys)
+      else
+        _3_ = a.first(keys)
+      end
+      local _5_
+      if (2 == a.count(args)) then
+        _5_ = (":" .. bridge["viml->lua"](unpack(args)) .. "<cr>")
+      else
+        _5_ = unpack(args)
+      end
+      return nvim.buf_set_keymap(0, mode, _3_, _5_, {noremap = true, silent = true})
     end
     v_23_0_0 = buf0
     _0_0["buf"] = v_23_0_0
@@ -64,7 +62,7 @@ do
   do
     local v_23_0_0 = nil
     local function on_filetype0()
-      buf_21("n", config.mappings["eval-motion"], ":set opfunc=ConjureEvalMotion<cr>g@")
+      buf("n", config.mappings["eval-motion"], ":set opfunc=ConjureEvalMotion<cr>g@")
       buf("n", config.mappings["log-split"], "conjure.log", "split")
       buf("n", config.mappings["log-vsplit"], "conjure.log", "vsplit")
       buf("n", config.mappings["log-tab"], "conjure.log", "tab")

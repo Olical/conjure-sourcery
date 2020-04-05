@@ -8,20 +8,21 @@
             eval conjure.eval
             bridge conjure.bridge}})
 
-(defn buf! [mode keys action]
-  (nvim.buf_set_keymap
-    0 mode
-    (.. config.mappings.prefix keys)
-    action
-    {:silent true
-     :noremap true}))
-
 (defn buf [mode keys ...]
-  (buf! mode keys
-        (.. ":" (bridge.viml->lua ...) "<cr>")))
+  (let [args [...]]
+    (nvim.buf_set_keymap
+      0 mode
+      (if (a.string? keys)
+        (.. config.mappings.prefix keys)
+        (a.first keys))
+      (if (= 2 (a.count args))
+        (.. ":" (bridge.viml->lua (unpack args)) "<cr>")
+        (unpack args))
+      {:silent true
+       :noremap true})))
 
 (defn on-filetype []
-  (buf! :n config.mappings.eval-motion ":set opfunc=ConjureEvalMotion<cr>g@")
+  (buf :n config.mappings.eval-motion ":set opfunc=ConjureEvalMotion<cr>g@")
   (buf :n config.mappings.log-split :conjure.log :split)
   (buf :n config.mappings.log-vsplit :conjure.log :vsplit)
   (buf :n config.mappings.log-tab :conjure.log :tab)
