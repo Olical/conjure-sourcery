@@ -11,8 +11,7 @@
             bridge conjure.bridge
             editor conjure.editor
             uuid conjure.uuid
-            ll conjure.linked-list
-            conjure-config conjure.config}})
+            ll conjure.linked-list}})
 
 ;; TODO Handle partial chunks of bencode data. (stream wrapper)
 ;; TODO Split up into multiple modules.
@@ -23,6 +22,7 @@
 
 (def config
   {:debug? false
+   :interrupt {:sample-limit 0.3}
    :mappings {:disconnect "cd"
               :connect-port-file "cf"
               :interrupt "ei"
@@ -274,7 +274,7 @@
                      (text.left-sample
                        oldest.msg.code
                        (editor.percent-width
-                         conjure-config.preview.sample-limit)))]))))))))
+                         config.interrupt.sample-limit)))]))))))))
 
 (defn- eval-str-fn [code]
   (fn []

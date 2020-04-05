@@ -9,6 +9,7 @@
             log conjure.log}})
 
 ;; TODO Eval form at mark.
+;; TODO K calls through to lang doc fn.
 ;; TODO Languages: Janet, Racket, MIT Scheme.
 
 (defn- preview [opts]
