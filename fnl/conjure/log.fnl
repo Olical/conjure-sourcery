@@ -6,9 +6,8 @@
             config conjure.config
             editor conjure.editor}})
 
-;; TODO Don't display HUD if we can see the bottom of a log.
-;; TODO Use markers to scroll to the last entry.
-;; TODO Implement trimming using a marker so as not to cut forms in half.
+;; TODO Trim using a marker so as not to cut forms in half.
+;; TODO Scroll to the last marker for HUD on append.
 
 (defonce- state
   {:hud {:id nil}})
@@ -44,8 +43,14 @@
       (nvim.win_set_option state.hud.id :wrap false)
       (nvim.win_set_cursor state.hud.id [(nvim.buf_line_count buf) 0]))))
 
+(defn- win-visible? [win]
+  (= (nvim.fn.tabpagenr)
+     (a.first (nvim.fn.win_id2tabwin win))))
+
 (defn append [lines]
   (when (not (a.empty? lines))
+    (var visible-scrolling-log? false)
+
     (let [buf (upsert-buf)
           old-lines (nvim.buf_line_count buf)]
 
@@ -60,10 +65,13 @@
             (let [[row col] (nvim.win_get_cursor win)]
               (when (and (= buf (nvim.win_get_buf win))
                          (= old-lines row))
+                (when (win-visible? win)
+                  (set visible-scrolling-log? true))
                 (nvim.win_set_cursor win [new-lines 0]))))
           (nvim.list_wins))))
 
-    (display-hud)))
+    (when (not visible-scrolling-log?)
+      (display-hud))))
 
 (defn- create-win [split-fn]
   (let [buf (upsert-buf)

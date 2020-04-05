@@ -98,6 +98,16 @@ do
   _0_0["aniseed/locals"]["display-hud"] = v_23_0_
   display_hud = v_23_0_
 end
+local win_visible_3f = nil
+do
+  local v_23_0_ = nil
+  local function win_visible_3f0(win)
+    return (nvim.fn.tabpagenr() == a.first(nvim.fn.win_id2tabwin(win)))
+  end
+  v_23_0_ = win_visible_3f0
+  _0_0["aniseed/locals"]["win-visible?"] = v_23_0_
+  win_visible_3f = v_23_0_
+end
 local append = nil
 do
   local v_23_0_ = nil
@@ -105,6 +115,7 @@ do
     local v_23_0_0 = nil
     local function append0(lines)
       if not a["empty?"](lines) then
+        local visible_scrolling_log_3f = false
         do
           local buf = upsert_buf()
           local old_lines = nvim.buf_line_count(buf)
@@ -122,13 +133,18 @@ do
               local row = _6_[1]
               local col = _6_[2]
               if ((buf == nvim.win_get_buf(win)) and (old_lines == row)) then
+                if win_visible_3f(win) then
+                  visible_scrolling_log_3f = true
+                end
                 return nvim.win_set_cursor(win, {new_lines, 0})
               end
             end
             a["run!"](_5_, nvim.list_wins())
           end
         end
-        return display_hud()
+        if not visible_scrolling_log_3f then
+          return display_hud()
+        end
       end
     end
     v_23_0_0 = append0
