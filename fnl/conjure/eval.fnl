@@ -10,6 +10,7 @@
 
 ;; TODO Eval form at mark.
 ;; TODO Go to definition.
+;; TODO Completion.
 ;; TODO Languages: Janet, Racket, MIT Scheme.
 
 (defn- preview [opts]
