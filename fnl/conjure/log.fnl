@@ -6,7 +6,6 @@
             config conjure.config
             editor conjure.editor}})
 
-;; TODO Trim using a marker so as not to cut forms in half.
 ;; TODO Scroll to the last marker for HUD on append.
 
 (defonce- state
@@ -51,6 +50,42 @@
   (= (nvim.fn.tabpagenr)
      (a.first (nvim.fn.win_id2tabwin win))))
 
+(defn- with-buf-wins [buf f]
+  (a.run!
+    (fn [win]
+      (when (= buf (nvim.win_get_buf win))
+        (f win)))
+    (nvim.list_wins)))
+
+(defn- trim [buf]
+  (let [line-count (nvim.buf_line_count buf)]
+    (when (> line-count config.log.trim.at)
+      (let [break-str (break)
+            target-line-count (- line-count config.log.trim.to)
+            last-break-line
+            (->> (nvim.buf_get_lines buf 0 -1 false)
+                 (a.kv-pairs)
+                 (a.filter
+                   (fn [[n s]]
+                     (and (<= n target-line-count)
+                          (= s break-str))))
+                 (a.last)
+                 (a.first))]
+        (nvim.buf_set_lines
+          buf 0
+          (or last-break-line target-line-count)
+          false [])
+
+        ;; This hack keeps all log window view ports correct after trim.
+        ;; Without it the text moves off screen in the HUD.
+        (let [line-count (nvim.buf_line_count buf)]
+          (with-buf-wins
+            buf
+            (fn [win]
+              (let [[row col] (nvim.win_get_cursor win)]
+                (nvim.win_set_cursor win [1 0])
+                (nvim.win_set_cursor win [row col])))))))))
+
 (defn append [lines opts]
   (when (not (a.empty? lines))
     (var visible-scrolling-log? false)
@@ -67,18 +102,19 @@
         -1 false lines)
 
       (let [new-lines (nvim.buf_line_count buf)]
-        (a.run!
+        (with-buf-wins
+          buf
           (fn [win]
             (let [[row col] (nvim.win_get_cursor win)]
-              (when (and (= buf (nvim.win_get_buf win))
-                         (= old-lines row))
+              (when (= old-lines row)
                 (when (win-visible? win)
                   (set visible-scrolling-log? true))
-                (nvim.win_set_cursor win [new-lines 0]))))
-          (nvim.list_wins))))
+                (nvim.win_set_cursor win [new-lines 0]))))))
 
-    (when (not visible-scrolling-log?)
-      (display-hud))))
+      (when (not visible-scrolling-log?)
+        (display-hud))
+
+      (trim buf))))
 
 (defn- create-win [split-fn]
   (let [buf (upsert-buf)

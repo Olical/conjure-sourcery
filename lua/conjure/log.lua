@@ -118,6 +118,55 @@ do
   _0_0["aniseed/locals"]["win-visible?"] = v_23_0_
   win_visible_3f = v_23_0_
 end
+local with_buf_wins = nil
+do
+  local v_23_0_ = nil
+  local function with_buf_wins0(buf, f)
+    local function _3_(win)
+      if (buf == nvim.win_get_buf(win)) then
+        return f(win)
+      end
+    end
+    return a["run!"](_3_, nvim.list_wins())
+  end
+  v_23_0_ = with_buf_wins0
+  _0_0["aniseed/locals"]["with-buf-wins"] = v_23_0_
+  with_buf_wins = v_23_0_
+end
+local trim = nil
+do
+  local v_23_0_ = nil
+  local function trim0(buf)
+    local line_count = nvim.buf_line_count(buf)
+    if (line_count > config.log.trim.at) then
+      local break_str = _break()
+      local target_line_count = (line_count - config.log.trim.to)
+      local last_break_line = nil
+      local function _3_(_4_0)
+        local _5_ = _4_0
+        local n = _5_[1]
+        local s = _5_[2]
+        return ((n <= target_line_count) and (s == break_str))
+      end
+      last_break_line = a.first(a.last(a.filter(_3_, a["kv-pairs"](nvim.buf_get_lines(buf, 0, -1, false)))))
+      nvim.buf_set_lines(buf, 0, (last_break_line or target_line_count), false, {})
+      do
+        local line_count0 = nvim.buf_line_count(buf)
+        local function _5_(win)
+          local _6_ = nvim.win_get_cursor(win)
+          local row = _6_[1]
+          local col = _6_[2]
+          nvim.win_set_cursor(win, {1, 0})
+          return nvim.win_set_cursor(win, {row, col})
+        end
+        return with_buf_wins(buf, _5_)
+      end
+    end
+  end
+  v_23_0_ = trim0
+  _0_0["aniseed/locals"]["trim"] = v_23_0_
+  trim = v_23_0_
+end
 local append = nil
 do
   local v_23_0_ = nil
@@ -148,18 +197,19 @@ do
               local _7_ = nvim.win_get_cursor(win)
               local row = _7_[1]
               local col = _7_[2]
-              if ((buf == nvim.win_get_buf(win)) and (old_lines == row)) then
+              if (old_lines == row) then
                 if win_visible_3f(win) then
                   visible_scrolling_log_3f = true
                 end
                 return nvim.win_set_cursor(win, {new_lines, 0})
               end
             end
-            a["run!"](_6_, nvim.list_wins())
+            with_buf_wins(buf, _6_)
           end
-        end
-        if not visible_scrolling_log_3f then
-          return display_hud()
+          if not visible_scrolling_log_3f then
+            display_hud()
+          end
+          return trim(buf)
         end
       end
     end
