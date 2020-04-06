@@ -50,7 +50,7 @@ local display_request = nil
 do
   local v_23_0_ = nil
   local function display_request0(opts)
-    return log.append({opts.preview})
+    return log.append({opts.preview}, {["break?"] = true})
   end
   v_23_0_ = display_request0
   _0_0["aniseed/locals"]["display-request"] = v_23_0_

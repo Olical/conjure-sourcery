@@ -23,7 +23,8 @@
 (def log
   {:hud {:width 0.42
          :height 0.3
-         :enabled? true}})
+         :enabled? true}
+   :break-length 0.42})
 
 (def extract
   {:context-header-lines 24})

@@ -12,6 +12,10 @@
 (defonce- state
   {:hud {:id nil}})
 
+(defn- break []
+  (.. (lang.get :comment-prefix)
+      (string.rep "-" (editor.percent-width config.log.break-length))))
+
 (defn- log-buf-name []
   (.. "conjure-log-" (nvim.fn.getpid) (lang.get :buf-suffix)))
 
@@ -47,11 +51,14 @@
   (= (nvim.fn.tabpagenr)
      (a.first (nvim.fn.win_id2tabwin win))))
 
-(defn append [lines]
+(defn append [lines opts]
   (when (not (a.empty? lines))
     (var visible-scrolling-log? false)
 
     (let [buf (upsert-buf)
+          lines (if (a.get opts :break?)
+                  (a.concat [(break)] lines)
+                  lines)
           old-lines (nvim.buf_line_count buf)]
 
       (nvim.buf_set_lines

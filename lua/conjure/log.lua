@@ -32,6 +32,16 @@ do
   _0_0["aniseed/locals"]["state"] = v_23_0_
   state = v_23_0_
 end
+local _break = nil
+do
+  local v_23_0_ = nil
+  local function _break0()
+    return (lang.get("comment-prefix") .. string.rep("-", editor["percent-width"](config.log["break-length"])))
+  end
+  v_23_0_ = _break0
+  _0_0["aniseed/locals"]["break"] = v_23_0_
+  _break = v_23_0_
+end
 local log_buf_name = nil
 do
   local v_23_0_ = nil
@@ -113,25 +123,31 @@ do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
-    local function append0(lines)
+    local function append0(lines, opts)
       if not a["empty?"](lines) then
         local visible_scrolling_log_3f = false
         do
           local buf = upsert_buf()
-          local old_lines = nvim.buf_line_count(buf)
-          local _3_
-          if buffer["empty?"](buf) then
-            _3_ = 0
+          local lines0 = nil
+          if a.get(opts, "break?") then
+            lines0 = a.concat({_break()}, lines)
           else
-            _3_ = -1
+            lines0 = lines
           end
-          nvim.buf_set_lines(buf, _3_, -1, false, lines)
+          local old_lines = nvim.buf_line_count(buf)
+          local _4_
+          if buffer["empty?"](buf) then
+            _4_ = 0
+          else
+            _4_ = -1
+          end
+          nvim.buf_set_lines(buf, _4_, -1, false, lines0)
           do
             local new_lines = nvim.buf_line_count(buf)
-            local function _5_(win)
-              local _6_ = nvim.win_get_cursor(win)
-              local row = _6_[1]
-              local col = _6_[2]
+            local function _6_(win)
+              local _7_ = nvim.win_get_cursor(win)
+              local row = _7_[1]
+              local col = _7_[2]
               if ((buf == nvim.win_get_buf(win)) and (old_lines == row)) then
                 if win_visible_3f(win) then
                   visible_scrolling_log_3f = true
@@ -139,7 +155,7 @@ do
                 return nvim.win_set_cursor(win, {new_lines, 0})
               end
             end
-            a["run!"](_5_, nvim.list_wins())
+            a["run!"](_6_, nvim.list_wins())
           end
         end
         if not visible_scrolling_log_3f then

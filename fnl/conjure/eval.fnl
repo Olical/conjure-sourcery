@@ -23,7 +23,7 @@
           (text.left-sample opts.code sample-limit)))))
 
 (defn- display-request [opts]
-  (log.append [opts.preview]))
+  (log.append [opts.preview] {:break? true}))
 
 (defn file []
   (let [opts {:file-path (extract.file-path)
