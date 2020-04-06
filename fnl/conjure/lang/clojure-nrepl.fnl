@@ -15,6 +15,9 @@
 
 ;; TODO Handle partial chunks of bencode data. (stream wrapper)
 ;; TODO Split up into multiple modules.
+;; TODO Refreshing of namespaces.
+;; TODO Test running.
+;; TODO View source.
 
 (def buf-suffix ".cljc")
 (def context-pattern "[(]%s*ns%s*(.-)[%s){]")
