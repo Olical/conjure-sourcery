@@ -79,8 +79,8 @@ end
 local display = nil
 do
   local v_23_0_ = nil
-  local function display0(lines)
-    return lang["with-filetype"]("fennel", log.append, lines)
+  local function display0(lines, opts)
+    return lang["with-filetype"]("fennel", log.append, lines, opts)
   end
   v_23_0_ = display0
   _0_0["aniseed/locals"]["display"] = v_23_0_
@@ -180,7 +180,7 @@ local wrapped_test = nil
 do
   local v_23_0_ = nil
   local function wrapped_test0(req_lines, f)
-    display(req_lines)
+    display(req_lines, {["break?"] = true})
     do
       local res = ani_core["with-out-str"](f)
       local _3_

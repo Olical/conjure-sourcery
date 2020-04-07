@@ -13,7 +13,6 @@
             uuid conjure.uuid
             ll conjure.linked-list}})
 
-;; TODO Handle partial chunks of bencode data. (stream wrapper)
 ;; TODO Split up into multiple modules.
 ;; TODO Refreshing of namespaces.
 ;; TODO Test running.

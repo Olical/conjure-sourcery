@@ -20,8 +20,8 @@
   {:mappings {:run-buf-tests "tt"
               :run-all-tests "ta"}})
 
-(defn- display [lines]
-  (lang.with-filetype :fennel log.append lines))
+(defn- display [lines opts]
+  (lang.with-filetype :fennel log.append lines opts))
 
 (defn display-result [opts]
   (when opts
@@ -52,7 +52,7 @@
     (eval-str opts)))
 
 (defn- wrapped-test [req-lines f]
-  (display req-lines)
+  (display req-lines {:break? true})
   (let [res (ani-core.with-out-str f)]
     (display
       (-> (if (= "" res)
