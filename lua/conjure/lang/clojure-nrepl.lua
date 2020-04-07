@@ -477,15 +477,16 @@ do
       local function _3_(_)
         do
           local context = a.get(opts, "context")
-          local _4_
-          if context then
-            _4_ = ("(in-ns '" .. context .. ")")
-          else
-            _4_ = "(in-ns #?(:clj 'user, :cljs 'cljs.user))"
+          local function _4_()
+            if context then
+              return ("(in-ns '" .. context .. ")")
+            else
+              return "(in-ns #?(:clj 'user, :cljs 'cljs.user))"
+            end
           end
-          local function _6_()
+          local function _5_()
           end
-          eval_str_raw({code = _4_}, _6_)
+          eval_str_raw({code = ("(do " .. _4_() .. " *1)")}, _5_)
         end
         local function _4_(_241)
           return display_result(opts, _241)

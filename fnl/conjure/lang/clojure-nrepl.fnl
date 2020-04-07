@@ -243,9 +243,11 @@
     (fn [_]
       (let [context (a.get opts :context)]
         (eval-str-raw
-          {:code (if context
-                   (.. "(in-ns '" context ")")
-                   "(in-ns #?(:clj 'user, :cljs 'cljs.user))")}
+          {:code (.. "(do "
+                     (if context
+                       (.. "(in-ns '" context ")")
+                       "(in-ns #?(:clj 'user, :cljs 'cljs.user))")
+                     " *1)")}
           (fn [])))
       (eval-str-raw opts (or opts.cb #(display-result opts $1))))))
 
