@@ -130,9 +130,17 @@ do
     local v_23_0_0 = nil
     local function eval_str0(opts)
       local code = (("(module " .. (opts.context or "aniseed.user") .. ") ") .. opts.code .. "\n")
-      local ok_3f, result = ani_eval.str(code, {filename = opts["file-path"]})
-      opts["ok?"] = ok_3f
-      opts.result = result
+      local out = nil
+      local function _3_()
+        local ok_3f, result = ani_eval.str(code, {filename = opts["file-path"]})
+        opts["ok?"] = ok_3f
+        opts.result = result
+        return nil
+      end
+      out = ani_core["with-out-str"](_3_)
+      if not a["empty?"](out) then
+        display(text["prefixed-lines"](out, "; (out) "))
+      end
       return display_result(opts)
     end
     v_23_0_0 = eval_str0

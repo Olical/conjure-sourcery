@@ -37,9 +37,13 @@
 (defn eval-str [opts]
   (let [code (.. (.. "(module " (or opts.context "aniseed.user") ") ")
                  opts.code "\n")
-        (ok? result) (ani-eval.str code {:filename opts.file-path})]
-    (set opts.ok? ok?)
-    (set opts.result result)
+        out (ani-core.with-out-str
+              (fn []
+                (let [(ok? result) (ani-eval.str code {:filename opts.file-path})]
+                  (set opts.ok? ok?)
+                  (set opts.result result))))]
+    (when (not (a.empty? out))
+      (display (text.prefixed-lines out "; (out) ")))
     (display-result opts)))
 
 (defn doc-str [opts]
