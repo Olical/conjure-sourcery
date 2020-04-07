@@ -40,6 +40,7 @@
           cursor-top-right? (and (> (editor.cursor-left) (editor.percent-width 0.5))
                                  (< (editor.cursor-top) (editor.percent-height 0.5)))
           last-break (a.last (break-lines buf))
+          line-count (nvim.buf_line_count buf)
           win-opts
           {:relative :editor
            :row (if cursor-top-right?
@@ -56,10 +57,13 @@
       (nvim.win_set_option state.hud.id :wrap false)
       (nvim.win_set_cursor
         state.hud.id
-        [(math.min
-           (+ last-break
-              (a.inc (math.floor (/ win-opts.height 2))))
-           (nvim.buf_line_count buf)) 0]))))
+        [(if last-break
+           (math.min
+             (+ last-break
+                (a.inc (math.floor (/ win-opts.height 2))))
+             line-count)
+           line-count)
+         0]))))
 
 (defn- win-visible? [win]
   (= (nvim.fn.tabpagenr)
