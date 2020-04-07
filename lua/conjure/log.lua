@@ -198,7 +198,7 @@ do
               local row = _7_[1]
               local col = _7_[2]
               if (old_lines == row) then
-                if win_visible_3f(win) then
+                if ((win ~= state.hud.id) and win_visible_3f(win)) then
                   visible_scrolling_log_3f = true
                 end
                 return nvim.win_set_cursor(win, {new_lines, 0})

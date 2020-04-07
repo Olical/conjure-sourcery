@@ -107,7 +107,7 @@
           (fn [win]
             (let [[row col] (nvim.win_get_cursor win)]
               (when (= old-lines row)
-                (when (win-visible? win)
+                (when (and (not= win state.hud.id) (win-visible? win))
                   (set visible-scrolling-log? true))
                 (nvim.win_set_cursor win [new-lines 0]))))))
 
