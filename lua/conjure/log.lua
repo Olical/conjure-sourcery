@@ -84,24 +84,45 @@ do
   _0_0["aniseed/locals"]["close-hud"] = v_23_0_
   close_hud = v_23_0_
 end
+local break_lines = nil
+do
+  local v_23_0_ = nil
+  local function break_lines0(buf)
+    local break_str = _break()
+    local function _3_(_4_0)
+      local _5_ = _4_0
+      local n = _5_[1]
+      local s = _5_[2]
+      return (s == break_str)
+    end
+    return a.map(a.first, a.filter(_3_, a["kv-pairs"](nvim.buf_get_lines(buf, 0, -1, false))))
+  end
+  v_23_0_ = break_lines0
+  _0_0["aniseed/locals"]["break-lines"] = v_23_0_
+  break_lines = v_23_0_
+end
 local display_hud = nil
 do
   local v_23_0_ = nil
   local function display_hud0()
-    if (config.log.hud["enabled?"] and not state.hud.id) then
-      local buf = upsert_buf()
-      local cursor_top_right_3f = ((editor["cursor-left"]() > editor["percent-width"](0.5)) and (editor["cursor-top"]() < editor["percent-height"](0.5)))
-      local opts = nil
-      local _3_
-      if cursor_top_right_3f then
-        _3_ = (editor.height() - 2)
-      else
-        _3_ = 0
+    if config.log.hud["enabled?"] then
+      close_hud()
+      do
+        local buf = upsert_buf()
+        local cursor_top_right_3f = ((editor["cursor-left"]() > editor["percent-width"](0.5)) and (editor["cursor-top"]() < editor["percent-height"](0.5)))
+        local last_break = a.last(break_lines(buf))
+        local win_opts = nil
+        local _3_
+        if cursor_top_right_3f then
+          _3_ = (editor.height() - 2)
+        else
+          _3_ = 0
+        end
+        win_opts = {anchor = "SE", col = editor.width(), focusable = false, height = editor["percent-height"](config.log.hud.height), relative = "editor", row = _3_, style = "minimal", width = editor["percent-width"](config.log.hud.width)}
+        state.hud.id = nvim.open_win(buf, false, win_opts)
+        nvim.win_set_option(state.hud.id, "wrap", false)
+        return nvim.win_set_cursor(state.hud.id, {math.min((last_break + a.inc(math.floor((win_opts.height / 2)))), nvim.buf_line_count(buf)), 0})
       end
-      opts = {anchor = "SE", col = editor.width(), focusable = false, height = editor["percent-height"](config.log.hud.height), relative = "editor", row = _3_, style = "minimal", width = editor["percent-width"](config.log.hud.width)}
-      state.hud.id = nvim.open_win(buf, false, opts)
-      nvim.win_set_option(state.hud.id, "wrap", false)
-      return nvim.win_set_cursor(state.hud.id, {nvim.buf_line_count(buf), 0})
     end
   end
   v_23_0_ = display_hud0
@@ -139,27 +160,23 @@ do
   local function trim0(buf)
     local line_count = nvim.buf_line_count(buf)
     if (line_count > config.log.trim.at) then
-      local break_str = _break()
       local target_line_count = (line_count - config.log.trim.to)
       local last_break_line = nil
-      local function _3_(_4_0)
-        local _5_ = _4_0
-        local n = _5_[1]
-        local s = _5_[2]
-        return ((n <= target_line_count) and (s == break_str))
+      local function _3_(_241)
+        return (_241 <= target_line_count)
       end
-      last_break_line = a.first(a.last(a.filter(_3_, a["kv-pairs"](nvim.buf_get_lines(buf, 0, -1, false)))))
+      last_break_line = a.last(a.filter(_3_, break_lines(buf)))
       nvim.buf_set_lines(buf, 0, (last_break_line or target_line_count), false, {})
       do
         local line_count0 = nvim.buf_line_count(buf)
-        local function _5_(win)
-          local _6_ = nvim.win_get_cursor(win)
-          local row = _6_[1]
-          local col = _6_[2]
+        local function _4_(win)
+          local _5_ = nvim.win_get_cursor(win)
+          local row = _5_[1]
+          local col = _5_[2]
           nvim.win_set_cursor(win, {1, 0})
           return nvim.win_set_cursor(win, {row, col})
         end
-        return with_buf_wins(buf, _5_)
+        return with_buf_wins(buf, _4_)
       end
     end
   end

@@ -6,8 +6,6 @@
             config conjure.config
             editor conjure.editor}})
 
-;; TODO Scroll to the last marker for HUD on append.
-
 (defonce- state
   {:hud {:id nil}})
 
@@ -26,25 +24,42 @@
     (pcall (fn [] (nvim.win_close state.hud.id true)))
     (set state.hud.id nil)))
 
+(defn- break-lines [buf]
+  (let [break-str (break)]
+    (->> (nvim.buf_get_lines buf 0 -1 false)
+         (a.kv-pairs)
+         (a.filter
+           (fn [[n s]]
+             (= s break-str)))
+         (a.map a.first))))
+
 (defn- display-hud []
-  (when (and config.log.hud.enabled? (not state.hud.id))
+  (when config.log.hud.enabled?
+    (close-hud)
     (let [buf (upsert-buf)
           cursor-top-right? (and (> (editor.cursor-left) (editor.percent-width 0.5))
                                  (< (editor.cursor-top) (editor.percent-height 0.5)))
-          opts {:relative :editor
-                :row (if cursor-top-right?
-                       (- (editor.height) 2)
-                       0)
-                :col (editor.width)
-                :anchor :SE
+          last-break (a.last (break-lines buf))
+          win-opts
+          {:relative :editor
+           :row (if cursor-top-right?
+                  (- (editor.height) 2)
+                  0)
+           :col (editor.width)
+           :anchor :SE
 
-                :width (editor.percent-width config.log.hud.width)
-                :height (editor.percent-height config.log.hud.height)
-                :focusable false
-                :style :minimal}]
-      (set state.hud.id (nvim.open_win buf false opts))
+           :width (editor.percent-width config.log.hud.width)
+           :height (editor.percent-height config.log.hud.height)
+           :focusable false
+           :style :minimal}]
+      (set state.hud.id (nvim.open_win buf false win-opts))
       (nvim.win_set_option state.hud.id :wrap false)
-      (nvim.win_set_cursor state.hud.id [(nvim.buf_line_count buf) 0]))))
+      (nvim.win_set_cursor
+        state.hud.id
+        [(math.min
+           (+ last-break
+              (a.inc (math.floor (/ win-opts.height 2))))
+           (nvim.buf_line_count buf)) 0]))))
 
 (defn- win-visible? [win]
   (= (nvim.fn.tabpagenr)
@@ -60,17 +75,11 @@
 (defn- trim [buf]
   (let [line-count (nvim.buf_line_count buf)]
     (when (> line-count config.log.trim.at)
-      (let [break-str (break)
-            target-line-count (- line-count config.log.trim.to)
+      (let [target-line-count (- line-count config.log.trim.to)
             last-break-line
-            (->> (nvim.buf_get_lines buf 0 -1 false)
-                 (a.kv-pairs)
-                 (a.filter
-                   (fn [[n s]]
-                     (and (<= n target-line-count)
-                          (= s break-str))))
-                 (a.last)
-                 (a.first))]
+            (->> (break-lines buf)
+                 (a.filter #(<= $1 target-line-count))
+                 (a.last))]
         (nvim.buf_set_lines
           buf 0
           (or last-break-line target-line-count)
