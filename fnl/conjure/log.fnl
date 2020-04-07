@@ -35,7 +35,6 @@
 
 (defn- display-hud []
   (when config.log.hud.enabled?
-    (close-hud)
     (let [buf (upsert-buf)
           cursor-top-right? (and (> (editor.cursor-left) (editor.percent-width 0.5))
                                  (< (editor.cursor-top) (editor.percent-height 0.5)))
@@ -53,17 +52,22 @@
            :height (editor.percent-height config.log.hud.height)
            :focusable false
            :style :minimal}]
-      (set state.hud.id (nvim.open_win buf false win-opts))
-      (nvim.win_set_option state.hud.id :wrap false)
-      (nvim.win_set_cursor
-        state.hud.id
-        [(if last-break
-           (math.min
-             (+ last-break
-                (a.inc (math.floor (/ win-opts.height 2))))
-             line-count)
-           line-count)
-         0]))))
+
+      (when (not state.hud.id)
+        (set state.hud.id (nvim.open_win buf false win-opts))
+        (nvim.win_set_option state.hud.id :wrap false))
+
+      (if last-break
+        (do
+          (nvim.win_set_cursor state.hud.id [1 0])
+          (nvim.win_set_cursor
+            state.hud.id
+            [(math.min
+               (+ last-break
+                  (a.inc (math.floor (/ win-opts.height 2))))
+               line-count)
+             0]))
+        (nvim.win_set_cursor state.hud.id [line-count 0])))))
 
 (defn- win-visible? [win]
   (= (nvim.fn.tabpagenr)

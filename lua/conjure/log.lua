@@ -106,29 +106,27 @@ do
   local v_23_0_ = nil
   local function display_hud0()
     if config.log.hud["enabled?"] then
-      close_hud()
-      do
-        local buf = upsert_buf()
-        local cursor_top_right_3f = ((editor["cursor-left"]() > editor["percent-width"](0.5)) and (editor["cursor-top"]() < editor["percent-height"](0.5)))
-        local last_break = a.last(break_lines(buf))
-        local line_count = nvim.buf_line_count(buf)
-        local win_opts = nil
-        local _3_
-        if cursor_top_right_3f then
-          _3_ = (editor.height() - 2)
-        else
-          _3_ = 0
-        end
-        win_opts = {anchor = "SE", col = editor.width(), focusable = false, height = editor["percent-height"](config.log.hud.height), relative = "editor", row = _3_, style = "minimal", width = editor["percent-width"](config.log.hud.width)}
+      local buf = upsert_buf()
+      local cursor_top_right_3f = ((editor["cursor-left"]() > editor["percent-width"](0.5)) and (editor["cursor-top"]() < editor["percent-height"](0.5)))
+      local last_break = a.last(break_lines(buf))
+      local line_count = nvim.buf_line_count(buf)
+      local win_opts = nil
+      local _3_
+      if cursor_top_right_3f then
+        _3_ = (editor.height() - 2)
+      else
+        _3_ = 0
+      end
+      win_opts = {anchor = "SE", col = editor.width(), focusable = false, height = editor["percent-height"](config.log.hud.height), relative = "editor", row = _3_, style = "minimal", width = editor["percent-width"](config.log.hud.width)}
+      if not state.hud.id then
         state.hud.id = nvim.open_win(buf, false, win_opts)
         nvim.win_set_option(state.hud.id, "wrap", false)
-        local _5_
-        if last_break then
-          _5_ = math.min((last_break + a.inc(math.floor((win_opts.height / 2)))), line_count)
-        else
-          _5_ = line_count
-        end
-        return nvim.win_set_cursor(state.hud.id, {_5_, 0})
+      end
+      if last_break then
+        nvim.win_set_cursor(state.hud.id, {1, 0})
+        return nvim.win_set_cursor(state.hud.id, {math.min((last_break + a.inc(math.floor((win_opts.height / 2)))), line_count), 0})
+      else
+        return nvim.win_set_cursor(state.hud.id, {line_count, 0})
       end
     end
   end
