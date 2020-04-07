@@ -15,23 +15,24 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {a = "conjure.aniseed.core", bencode = "conjure.bencode", bridge = "conjure.bridge", editor = "conjure.editor", lang = "conjure.lang", ll = "conjure.linked-list", log = "conjure.log", mapping = "conjure.mapping", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", text = "conjure.text", uuid = "conjure.uuid", view = "conjure.aniseed.view"}}
-  return {require("conjure.aniseed.core"), require("conjure.bencode"), require("conjure.bridge"), require("conjure.editor"), require("conjure.lang"), require("conjure.linked-list"), require("conjure.log"), require("conjure.mapping"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.text"), require("conjure.uuid"), require("conjure.aniseed.view")}
+  _0_0["aniseed/local-fns"] = {require = {["bencode-stream"] = "conjure.bencode-stream", a = "conjure.aniseed.core", bencode = "conjure.bencode", bridge = "conjure.bridge", editor = "conjure.editor", lang = "conjure.lang", ll = "conjure.linked-list", log = "conjure.log", mapping = "conjure.mapping", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", text = "conjure.text", uuid = "conjure.uuid", view = "conjure.aniseed.view"}}
+  return {require("conjure.aniseed.core"), require("conjure.bencode"), require("conjure.bencode-stream"), require("conjure.bridge"), require("conjure.editor"), require("conjure.lang"), require("conjure.linked-list"), require("conjure.log"), require("conjure.mapping"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.text"), require("conjure.uuid"), require("conjure.aniseed.view")}
 end
 local _2_ = _1_(...)
 local a = _2_[1]
 local bencode = _2_[2]
-local bridge = _2_[3]
-local editor = _2_[4]
-local lang = _2_[5]
-local ll = _2_[6]
-local log = _2_[7]
-local mapping = _2_[8]
-local nvim = _2_[9]
-local str = _2_[10]
-local text = _2_[11]
-local uuid = _2_[12]
-local view = _2_[13]
+local bencode_stream = _2_[3]
+local bridge = _2_[4]
+local editor = _2_[5]
+local lang = _2_[6]
+local ll = _2_[7]
+local log = _2_[8]
+local mapping = _2_[9]
+local nvim = _2_[10]
+local str = _2_[11]
+local text = _2_[12]
+local uuid = _2_[13]
+local view = _2_[14]
 do local _ = ({nil, _0_0, nil})[2] end
 local buf_suffix = nil
 do
@@ -83,11 +84,17 @@ do
   _0_0["aniseed/locals"]["state"] = v_23_0_
   state = v_23_0_
 end
+local bs = nil
+do
+  local v_23_0_ = (_0_0["aniseed/locals"].bs or bencode_stream.new())
+  _0_0["aniseed/locals"]["bs"] = v_23_0_
+  bs = v_23_0_
+end
 local display = nil
 do
   local v_23_0_ = nil
-  local function display0(lines)
-    return lang["with-filetype"]("clojure", log.append, lines)
+  local function display0(lines, opts)
+    return lang["with-filetype"]("clojure", log.append, lines, opts)
   end
   v_23_0_ = display0
   _0_0["aniseed/locals"]["display"] = v_23_0_
@@ -113,7 +120,7 @@ do
   local v_23_0_ = nil
   local function display_conn_status0(status)
     local function _3_(conn)
-      return display({("; " .. conn.host .. ":" .. conn.port .. " (" .. status .. ")")})
+      return display({("; " .. conn.host .. ":" .. conn.port .. " (" .. status .. ")")}, {["break?"] = true})
     end
     return with_conn_or_warn(_3_)
   end
@@ -208,28 +215,6 @@ do
   _0_0["aniseed/locals"]["disconnect"] = v_23_0_
   disconnect = v_23_0_
 end
-local decode_all = nil
-do
-  local v_23_0_ = nil
-  local function decode_all0(s)
-    local progress = 1
-    do
-      local acc = {}
-      while (progress < a.count(s)) do
-        local msg, consumed = bencode.decode(s, progress)
-        if a["nil?"](msg) then
-          error(consumed)
-        end
-        table.insert(acc, msg)
-        progress = consumed
-      end
-      return acc
-    end
-  end
-  v_23_0_ = decode_all0
-  _0_0["aniseed/locals"]["decode-all"] = v_23_0_
-  decode_all = v_23_0_
-end
 local display_result = nil
 do
   local v_23_0_ = nil
@@ -255,7 +240,7 @@ do
   local v_23_0_ = nil
   local function assume_session0(session)
     a["assoc-in"](state, {"conn", "session"}, session)
-    return display({("; Assumed session: " .. session)})
+    return display({("; Assumed session: " .. session)}, {["break?"] = true})
   end
   v_23_0_ = assume_session0
   _0_0["aniseed/locals"]["assume-session"] = v_23_0_
@@ -325,7 +310,7 @@ do
     local v_23_0_0 = nil
     local function display_session_type0()
       local function _3_(msgs)
-        return display({("; Session type: " .. a.get(a.first(msgs), "value"))})
+        return display({("; Session type: " .. a.get(a.first(msgs), "value"))}, {["break?"] = true})
       end
       return eval_str_raw({code = ("#?(" .. str.join(" ", {":clj 'Clojure", ":cljs 'ClojureScript", ":cljr 'ClojureCLR", ":default 'Unknown"}) .. ")")}, with_all_msgs_fn(_3_))
     end
@@ -385,7 +370,7 @@ do
             end
           end
         end
-        return a["run!"](_4_, decode_all(chunk))
+        return a["run!"](_4_, bencode_stream["decode-all"](bs, chunk))
       end
     end
     return vim.schedule_wrap(_3_)
@@ -550,7 +535,7 @@ do
         end
         msgs = a.filter(_4_, a.vals(conn.msgs))
         if a["empty?"](msgs) then
-          return display({"; Nothing to interrupt"})
+          return display({"; Nothing to interrupt"}, {["break?"] = true})
         else
           local function _5_(a0, b)
             return (a0["sent-at"] < b["sent-at"])
@@ -559,7 +544,7 @@ do
           do
             local oldest = a.first(msgs)
             send({id = oldest.msg.id, op = "interrupt", session = oldest.msg.session})
-            return display({("; Interrupted: " .. text["left-sample"](oldest.msg.code, editor["percent-width"](config.interrupt["sample-limit"])))})
+            return display({("; Interrupted: " .. text["left-sample"](oldest.msg.code, editor["percent-width"](config.interrupt["sample-limit"])))}, {["break?"] = true})
           end
         end
       end
@@ -684,7 +669,7 @@ do
       local function _3_(conn)
         local session = a.get(conn, "session")
         a.assoc(conn, "session", nil)
-        display({("; Closed current session: " .. session)})
+        display({("; Closed current session: " .. session)}, {["break?"] = true})
         return close_session(session, assume_or_create_session)
       end
       return with_conn_or_warn(_3_)
@@ -714,7 +699,7 @@ do
       end
       return (";  " .. idx .. " - " .. session .. _6_())
     end
-    display(a.concat({("; Sessions (" .. a.count(sessions) .. "):")}, a["map-indexed"](_3_, sessions)))
+    display(a.concat({("; Sessions (" .. a.count(sessions) .. "):")}, a["map-indexed"](_3_, sessions)), {["break?"] = true})
     if cb then
       return cb(sessions)
     end
@@ -749,7 +734,7 @@ do
     local function close_all_sessions0()
       local function _3_(sessions)
         a["run!"](close_session, sessions)
-        display({("; Closed all sessions (" .. a.count(sessions) .. ")")})
+        display({("; Closed all sessions (" .. a.count(sessions) .. ")")}, {["break?"] = true})
         return clone_session()
       end
       return with_sessions(_3_)
@@ -768,7 +753,7 @@ do
     local function _3_(conn)
       local function _4_(sessions)
         if (1 == a.count(sessions)) then
-          return display({"; No other sessions"})
+          return display({"; No other sessions"}, {["break?"] = true})
         else
           local session = a.get(conn, "session")
           local function _5_(_241)
@@ -829,7 +814,7 @@ do
     local function select_session_interactive0()
       local function _3_(sessions)
         if (1 == a.count(sessions)) then
-          return display({"; No other sessions."})
+          return display({"; No other sessions"}, {["break?"] = true})
         else
           local function _4_()
             nvim.ex.redraw_()

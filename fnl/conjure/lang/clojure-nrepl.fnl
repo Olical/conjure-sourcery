@@ -8,6 +8,7 @@
             text conjure.text
             mapping conjure.mapping
             bencode conjure.bencode
+            bencode-stream conjure.bencode-stream
             bridge conjure.bridge
             editor conjure.editor
             uuid conjure.uuid
@@ -48,8 +49,10 @@
   {:loaded? false
    :conn nil})
 
-(defn- display [lines]
-  (lang.with-filetype :clojure log.append lines))
+(defonce- bs (bencode-stream.new))
+
+(defn- display [lines opts]
+  (lang.with-filetype :clojure log.append lines opts))
 
 (defn- with-conn-or-warn [f]
   (let [conn (a.get state :conn)]
@@ -60,7 +63,8 @@
 (defn- display-conn-status [status]
   (with-conn-or-warn
     (fn [conn]
-      (display [(.. "; " conn.host ":" conn.port " (" status ")")]))))
+      (display [(.. "; " conn.host ":" conn.port " (" status ")")]
+               {:break? true}))))
 
 (defn- dbg [desc data]
   (when config.debug?
@@ -102,19 +106,6 @@
       (display-conn-status :disconnected)
       (a.assoc state :conn nil))))
 
-(defn- decode-all [s]
-  (var progress 1)
-  (let [acc []]
-    (while (< progress (a.count s))
-      (let [(msg consumed) (bencode.decode s progress)]
-
-        (when (a.nil? msg)
-          (error consumed))
-
-        (table.insert acc msg)
-        (set progress consumed)))
-    acc))
-
 (defn- display-result [opts resp]
   (let [lines (if
                 resp.out (text.prefixed-lines resp.out "; (out) ")
@@ -125,7 +116,8 @@
 
 (defn- assume-session [session]
   (a.assoc-in state [:conn :session] session)
-  (display [(.. "; Assumed session: " session)]))
+  (display [(.. "; Assumed session: " session)]
+           {:break? true}))
 
 (defn- clone-session [session]
   (send
@@ -172,7 +164,8 @@
                ")")}
     (with-all-msgs-fn
       (fn [msgs]
-        (display [(.. "; Session type: " (a.get (a.first msgs) :value))])))))
+        (display [(.. "; Session type: " (a.get (a.first msgs) :value))]
+                 {:break? true})))))
 
 (defn- assume-or-create-session []
   (with-sessions
@@ -188,7 +181,7 @@
         (if
           err (display-conn-status err)
           (not chunk) (disconnect)
-          (->> (decode-all chunk)
+          (->> (bencode-stream.decode-all bs chunk)
                (a.run!
                  (fn [msg]
                    (dbg "<-" msg)
@@ -272,7 +265,7 @@
                         (fn [msg]
                           (= :eval msg.msg.op))))]
         (if (a.empty? msgs)
-          (display ["; Nothing to interrupt"])
+          (display ["; Nothing to interrupt"] {:break? true})
           (do
             (table.sort
               msgs
@@ -287,7 +280,8 @@
                      (text.left-sample
                        oldest.msg.code
                        (editor.percent-width
-                         config.interrupt.sample-limit)))]))))))))
+                         config.interrupt.sample-limit)))]
+                {:break? true}))))))))
 
 (defn- eval-str-fn [code]
   (fn []
@@ -316,7 +310,8 @@
     (fn [conn]
       (let [session (a.get conn :session)]
         (a.assoc conn :session nil)
-        (display [(.. "; Closed current session: " session)])
+        (display [(.. "; Closed current session: " session)]
+                 {:break? true})
         (close-session session assume-or-create-session)))))
 
 (defn- display-given-sessions [sessions cb]
@@ -327,7 +322,8 @@
                                             (if (= current session)
                                               " (current)"
                                               "")))
-                                      sessions)))
+                                      sessions))
+             {:break? true})
     (when cb
       (cb sessions))))
 
@@ -340,7 +336,8 @@
   (with-sessions
     (fn [sessions]
       (a.run! close-session sessions)
-      (display [(.. "; Closed all sessions (" (a.count sessions)")")])
+      (display [(.. "; Closed all sessions (" (a.count sessions)")")]
+               {:break? true})
       (clone-session))))
 
 (defn- cycle-session [f]
@@ -349,7 +346,7 @@
       (with-sessions
         (fn [sessions]
           (if (= 1 (a.count sessions))
-            (display ["; No other sessions"])
+            (display ["; No other sessions"] {:break? true})
             (let [session (a.get conn :session)]
               (assume-session (->> sessions
                                    (ll.create)
@@ -371,7 +368,7 @@
   (with-sessions
     (fn [sessions]
       (if (= 1 (a.count sessions))
-        (display ["; No other sessions."])
+        (display ["; No other sessions"] {:break? true})
         (display-given-sessions
           sessions
           (fn []
