@@ -15,8 +15,8 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {["bencode-stream"] = "conjure.bencode-stream", a = "conjure.aniseed.core", bencode = "conjure.bencode", bridge = "conjure.bridge", editor = "conjure.editor", lang = "conjure.lang", ll = "conjure.linked-list", log = "conjure.log", mapping = "conjure.mapping", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", text = "conjure.text", uuid = "conjure.uuid", view = "conjure.aniseed.view"}}
-  return {require("conjure.aniseed.core"), require("conjure.bencode"), require("conjure.bencode-stream"), require("conjure.bridge"), require("conjure.editor"), require("conjure.lang"), require("conjure.linked-list"), require("conjure.log"), require("conjure.mapping"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.text"), require("conjure.uuid"), require("conjure.aniseed.view")}
+  _0_0["aniseed/local-fns"] = {require = {["bencode-stream"] = "conjure.bencode-stream", a = "conjure.aniseed.core", bencode = "conjure.bencode", bridge = "conjure.bridge", editor = "conjure.editor", extract = "conjure.extract", lang = "conjure.lang", ll = "conjure.linked-list", log = "conjure.log", mapping = "conjure.mapping", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", text = "conjure.text", uuid = "conjure.uuid", view = "conjure.aniseed.view"}}
+  return {require("conjure.aniseed.core"), require("conjure.bencode"), require("conjure.bencode-stream"), require("conjure.bridge"), require("conjure.editor"), require("conjure.extract"), require("conjure.lang"), require("conjure.linked-list"), require("conjure.log"), require("conjure.mapping"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.text"), require("conjure.uuid"), require("conjure.aniseed.view")}
 end
 local _2_ = _1_(...)
 local a = _2_[1]
@@ -24,15 +24,16 @@ local bencode = _2_[2]
 local bencode_stream = _2_[3]
 local bridge = _2_[4]
 local editor = _2_[5]
-local lang = _2_[6]
-local ll = _2_[7]
-local log = _2_[8]
-local mapping = _2_[9]
-local nvim = _2_[10]
-local str = _2_[11]
-local text = _2_[12]
-local uuid = _2_[13]
-local view = _2_[14]
+local extract = _2_[6]
+local lang = _2_[7]
+local ll = _2_[8]
+local log = _2_[9]
+local mapping = _2_[10]
+local nvim = _2_[11]
+local str = _2_[12]
+local text = _2_[13]
+local uuid = _2_[14]
+local view = _2_[15]
 do local _ = ({nil, _0_0, nil})[2] end
 local buf_suffix = nil
 do
@@ -71,7 +72,7 @@ local config = nil
 do
   local v_23_0_ = nil
   do
-    local v_23_0_0 = {["debug?"] = false, interrupt = {["sample-limit"] = 0.29999999999999999}, mappings = {["connect-port-file"] = "cf", ["last-exception"] = "ex", ["result-1"] = "e1", ["result-2"] = "e2", ["result-3"] = "e3", ["session-clone"] = "sc", ["session-close"] = "sq", ["session-close-all"] = "sQ", ["session-fresh"] = "sf", ["session-list"] = "sl", ["session-next"] = "sn", ["session-prev"] = "sp", ["session-select"] = "ss", ["session-type"] = "st", disconnect = "cd", interrupt = "ei"}}
+    local v_23_0_0 = {["debug?"] = false, interrupt = {["sample-limit"] = 0.29999999999999999}, mappings = {["connect-port-file"] = "cf", ["last-exception"] = "ex", ["result-1"] = "e1", ["result-2"] = "e2", ["result-3"] = "e3", ["session-clone"] = "sc", ["session-close"] = "sq", ["session-close-all"] = "sQ", ["session-fresh"] = "sf", ["session-list"] = "sl", ["session-next"] = "sn", ["session-prev"] = "sp", ["session-select"] = "ss", ["session-type"] = "st", ["view-source"] = "es", disconnect = "cd", interrupt = "ei"}}
     _0_0["config"] = v_23_0_0
     v_23_0_ = v_23_0_0
   end
@@ -494,7 +495,13 @@ do
     local v_23_0_0 = nil
     local function doc_str0(opts)
       if not a["empty?"](opts.code) then
-        return eval_str(a.assoc(opts, "code", ("(do (require 'clojure.repl)" .. "    (clojure.repl/doc " .. opts.code .. "))")))
+        local function _3_(msgs)
+          local function _4_(_241)
+            return a.get(_241, "out")
+          end
+          return display(text["prefixed-lines"](str.join("\n", a.rest(a.filter(a["string?"], a.map(_4_, msgs)))), "; "))
+        end
+        return eval_str(a.merge(opts, {cb = with_all_msgs_fn(_3_), code = ("(do (require 'clojure.repl)" .. "    (clojure.repl/doc " .. opts.code .. "))")}))
       end
     end
     v_23_0_0 = doc_str0
@@ -613,6 +620,36 @@ do
   end
   _0_0["aniseed/locals"]["result-3"] = v_23_0_
   result_3 = v_23_0_
+end
+local view_source = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function view_source0()
+      local word = a.get(extract.word(), "content")
+      if not a["empty?"](word) then
+        display({("; source (word): " .. word)}, {["break?"] = true})
+        local function _3_(msgs)
+          local source = a.get(a.first(msgs), "out")
+          local function _4_()
+            if ("Source not found\n" == source) then
+              return ("; " .. source)
+            else
+              return source
+            end
+          end
+          return display(text["split-lines"](_4_()))
+        end
+        return eval_str({cb = with_all_msgs_fn(_3_), code = ("(do (require 'clojure.repl)" .. "(clojure.repl/source " .. word .. "))"), context = extract.context()})
+      end
+    end
+    v_23_0_0 = view_source0
+    _0_0["view-source"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["view-source"] = v_23_0_
+  view_source = v_23_0_
 end
 local clone_current_session = nil
 do
@@ -853,6 +890,7 @@ do
       mapping.buf("n", config.mappings["result-1"], "conjure.lang.clojure-nrepl", "result-1")
       mapping.buf("n", config.mappings["result-2"], "conjure.lang.clojure-nrepl", "result-2")
       mapping.buf("n", config.mappings["result-3"], "conjure.lang.clojure-nrepl", "result-3")
+      mapping.buf("n", config.mappings["view-source"], "conjure.lang.clojure-nrepl", "view-source")
       mapping.buf("n", config.mappings["session-clone"], "conjure.lang.clojure-nrepl", "clone-current-session")
       mapping.buf("n", config.mappings["session-fresh"], "conjure.lang.clojure-nrepl", "clone-fresh-session")
       mapping.buf("n", config.mappings["session-close"], "conjure.lang.clojure-nrepl", "close-current-session")

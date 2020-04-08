@@ -18,6 +18,7 @@
    :eval-visual "E"
    :eval-motion "E"
    :doc-word ["K"]
+   :def-word ["gd"]
    :close-hud "q"})
 
 (def log

@@ -46,6 +46,7 @@
 
 (def- eval-str (lang-exec-fn :eval :eval-str))
 (def- doc-str (lang-exec-fn :doc :doc-str))
+(def- def-str (lang-exec-fn :def :def-str))
 
 (defn current-form []
   (let [form (extract.form {})]
@@ -75,6 +76,13 @@
 (defn doc-word []
   (let [{: content : range} (extract.word)]
     (doc-str
+      {:code content
+       :range range
+       :origin :word})))
+
+(defn def-word []
+  (let [{: content : range} (extract.word)]
+    (def-str
       {:code content
        :range range
        :origin :word})))

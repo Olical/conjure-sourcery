@@ -50,6 +50,12 @@
   (a.assoc opts :code (.. "(doc " opts.code ")"))
   (eval-str opts))
 
+(defn- not-implemented []
+  (display ["; Not implemented for conjure.lang.fennel-aniseed"]))
+
+(defn def-str [opts]
+  (not-implemented))
+
 (defn eval-file [opts]
   (set opts.code (a.slurp opts.file-path))
   (when opts.code

@@ -74,6 +74,7 @@ do
       buf("v", config.mappings["eval-visual"], "conjure.eval", "selection")
       buf("n", config.mappings["close-hud"], "conjure.log", "close-hud")
       buf("n", config.mappings["doc-word"], "conjure.eval", "doc-word")
+      buf("n", config.mappings["def-word"], "conjure.eval", "def-word")
       nvim.ex.autocmd("CursorMoved", "<buffer>", bridge["viml->lua"]("conjure.log", "close-hud", {}))
       nvim.ex.autocmd("CursorMovedI", "<buffer>", bridge["viml->lua"]("conjure.log", "close-hud", {}))
       return lang.call("on-filetype")

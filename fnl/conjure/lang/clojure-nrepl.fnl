@@ -6,6 +6,7 @@
             log conjure.log
             lang conjure.lang
             text conjure.text
+            extract conjure.extract
             mapping conjure.mapping
             bencode conjure.bencode
             bencode-stream conjure.bencode-stream
@@ -29,12 +30,13 @@
    :interrupt {:sample-limit 0.3}
    :mappings {:disconnect "cd"
               :connect-port-file "cf"
-              :interrupt "ei"
 
+              :interrupt "ei"
               :last-exception "ex"
               :result-1 "e1"
               :result-2 "e2"
               :result-3 "e3"
+              :view-source "es"
 
               :session-clone "sc"
               :session-fresh "sf"
@@ -247,11 +249,19 @@
 (defn doc-str [opts]
   (when (not (a.empty? opts.code))
     (eval-str
-      (a.assoc
+      (a.merge
         opts
-        :code
-        (.. "(do (require 'clojure.repl)"
-            "    (clojure.repl/doc " opts.code "))")))))
+        {:code (.. "(do (require 'clojure.repl)"
+                   "    (clojure.repl/doc " opts.code "))")
+         :cb (with-all-msgs-fn
+               (fn [msgs]
+                 (-> msgs
+                     (->> (a.map #(a.get $1 :out))
+                          (a.filter a.string?)
+                          (a.rest)
+                          (str.join "\n"))
+                     (text.prefixed-lines "; ")
+                     (display))))}))))
 
 (defn eval-file [opts]
   (eval-str-raw
@@ -292,6 +302,23 @@
 (def result-1 (eval-str-fn "*1"))
 (def result-2 (eval-str-fn "*2"))
 (def result-3 (eval-str-fn "*3"))
+
+(defn view-source []
+  (let [word (a.get (extract.word) :content)]
+    (when (not (a.empty? word))
+      (display [(.. "; source (word): " word)] {:break? true})
+      (eval-str
+        {:code (.. "(do (require 'clojure.repl)"
+                   "(clojure.repl/source " word "))")
+         :context (extract.context)
+         :cb (with-all-msgs-fn
+               (fn [msgs]
+                 (let [source (a.get (a.first msgs) :out)]
+                   (display
+                     (text.split-lines
+                       (if (= "Source not found\n" source)
+                         (.. "; " source)
+                         source))))))}))))
 
 (defn clone-current-session []
   (with-conn-or-warn
@@ -392,6 +419,7 @@
   (mapping.buf :n config.mappings.result-1 :conjure.lang.clojure-nrepl :result-1)
   (mapping.buf :n config.mappings.result-2 :conjure.lang.clojure-nrepl :result-2)
   (mapping.buf :n config.mappings.result-3 :conjure.lang.clojure-nrepl :result-3)
+  (mapping.buf :n config.mappings.view-source :conjure.lang.clojure-nrepl :view-source)
 
   (mapping.buf :n config.mappings.session-clone
                :conjure.lang.clojure-nrepl :clone-current-session)
