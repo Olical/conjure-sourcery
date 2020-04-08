@@ -631,15 +631,19 @@ do
       if not a["empty?"](word) then
         display({("; source (word): " .. word)}, {["break?"] = true})
         local function _3_(msgs)
-          local source = a.get(a.first(msgs), "out")
-          local function _4_()
+          local source = nil
+          local function _4_(_241)
+            return a.get(_241, "out")
+          end
+          source = str.join("\n", a.filter(a["string?"], a.map(_4_, msgs)))
+          local function _5_()
             if ("Source not found\n" == source) then
               return ("; " .. source)
             else
               return source
             end
           end
-          return display(text["split-lines"](_4_()))
+          return display(text["split-lines"](_5_()))
         end
         return eval_str({cb = with_all_msgs_fn(_3_), code = ("(do (require 'clojure.repl)" .. "(clojure.repl/source " .. word .. "))"), context = extract.context()})
       end

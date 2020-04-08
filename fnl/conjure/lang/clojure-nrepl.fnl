@@ -18,7 +18,6 @@
 ;; TODO Split up into multiple modules.
 ;; TODO Refreshing of namespaces.
 ;; TODO Test running.
-;; TODO View source.
 ;; TODO Handle stdin requests.
 
 (def buf-suffix ".cljc")
@@ -313,7 +312,10 @@
          :context (extract.context)
          :cb (with-all-msgs-fn
                (fn [msgs]
-                 (let [source (a.get (a.first msgs) :out)]
+                 (let [source (->> msgs
+                                   (a.map #(a.get $1 :out))
+                                   (a.filter a.string?)
+                                   (str.join "\n"))]
                    (display
                      (text.split-lines
                        (if (= "Source not found\n" source)
