@@ -71,7 +71,7 @@ do
       buf("n", config.mappings["eval-word"], "conjure.eval", "word")
       buf("n", config.mappings["eval-file"], "conjure.eval", "file")
       buf("n", config.mappings["eval-buf"], "conjure.eval", "buf")
-      buf("v", config.mappings["eval-visual"], "conjure.mapping", "eval-selection")
+      buf("v", config.mappings["eval-visual"], "conjure.eval", "selection")
       buf("n", config.mappings["close-hud"], "conjure.log", "close-hud")
       buf("n", config.mappings["doc-word"], "conjure.eval", "doc-word")
       nvim.ex.autocmd("CursorMoved", "<buffer>", bridge["viml->lua"]("conjure.log", "close-hud", {}))
@@ -122,20 +122,5 @@ do
   _0_0["aniseed/locals"]["eval-ranged-command"] = v_23_0_
   eval_ranged_command = v_23_0_
 end
-local eval_selection = nil
-do
-  local v_23_0_ = nil
-  do
-    local v_23_0_0 = nil
-    local function eval_selection0(kind)
-      return eval.selection(kind)
-    end
-    v_23_0_0 = eval_selection0
-    _0_0["eval-selection"] = v_23_0_0
-    v_23_0_ = v_23_0_0
-  end
-  _0_0["aniseed/locals"]["eval-selection"] = v_23_0_
-  eval_selection = v_23_0_
-end
-nvim.ex.function_(str.join("\n", {"ConjureEvalMotion(kind)", "call luaeval(\"require('conjure.mapping')['eval-selection'](_A)\", a:kind)", "endfunction"}))
+nvim.ex.function_(str.join("\n", {"ConjureEvalMotion(kind)", "call luaeval(\"require('conjure.eval')['selection'](_A)\", a:kind)", "endfunction"}))
 return nvim.ex.command_("-nargs=? -range ConjureEval", bridge["viml->lua"]("conjure.mapping", "eval-ranged-command", {args = "<line1>, <line2>, <q-args>"}))

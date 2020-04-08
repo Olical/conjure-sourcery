@@ -31,7 +31,7 @@
   (buf :n config.mappings.eval-word :conjure.eval :word)
   (buf :n config.mappings.eval-file :conjure.eval :file)
   (buf :n config.mappings.eval-buf :conjure.eval :buf)
-  (buf :v config.mappings.eval-visual :conjure.mapping :eval-selection)
+  (buf :v config.mappings.eval-visual :conjure.eval :selection)
   (buf :n config.mappings.close-hud :conjure.log :close-hud)
   (buf :n config.mappings.doc-word :conjure.eval :doc-word)
 
@@ -58,12 +58,9 @@
     (eval.range (a.dec start) end)
     (eval.command code)))
 
-(defn eval-selection [kind]
-  (eval.selection kind))
-
 (nvim.ex.function_
   (->> ["ConjureEvalMotion(kind)"
-        "call luaeval(\"require('conjure.mapping')['eval-selection'](_A)\", a:kind)"
+        "call luaeval(\"require('conjure.eval')['selection'](_A)\", a:kind)"
         "endfunction"]
        (str.join "\n")))
 
