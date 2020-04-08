@@ -68,24 +68,27 @@
 
 (defn word []
   (let [{: content : range} (extract.word)]
-    (eval-str
-      {:code content
-       :range range
-       :origin :word})))
+    (when (not (a.empty? content))
+      (eval-str
+        {:code content
+         :range range
+         :origin :word}))))
 
 (defn doc-word []
   (let [{: content : range} (extract.word)]
-    (doc-str
-      {:code content
-       :range range
-       :origin :word})))
+    (when (not (a.empty? content))
+      (doc-str
+        {:code content
+         :range range
+         :origin :word}))))
 
 (defn def-word []
   (let [{: content : range} (extract.word)]
-    (def-str
-      {:code content
-       :range range
-       :origin :word})))
+    (when (not (a.empty? content))
+      (def-str
+        {:code content
+         :range range
+         :origin :word}))))
 
 (defn buf []
   (let [{: content : range} (extract.buf)]

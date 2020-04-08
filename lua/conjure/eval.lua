@@ -161,7 +161,9 @@ do
       local _3_ = extract.word()
       local range = _3_["range"]
       local content = _3_["content"]
-      return eval_str({code = content, origin = "word", range = range})
+      if not a["empty?"](content) then
+        return eval_str({code = content, origin = "word", range = range})
+      end
     end
     v_23_0_0 = word0
     _0_0["word"] = v_23_0_0
@@ -179,7 +181,9 @@ do
       local _3_ = extract.word()
       local range = _3_["range"]
       local content = _3_["content"]
-      return doc_str({code = content, origin = "word", range = range})
+      if not a["empty?"](content) then
+        return doc_str({code = content, origin = "word", range = range})
+      end
     end
     v_23_0_0 = doc_word0
     _0_0["doc-word"] = v_23_0_0
@@ -197,7 +201,9 @@ do
       local _3_ = extract.word()
       local range = _3_["range"]
       local content = _3_["content"]
-      return def_str({code = content, origin = "word", range = range})
+      if not a["empty?"](content) then
+        return def_str({code = content, origin = "word", range = range})
+      end
     end
     v_23_0_0 = def_word0
     _0_0["def-word"] = v_23_0_0

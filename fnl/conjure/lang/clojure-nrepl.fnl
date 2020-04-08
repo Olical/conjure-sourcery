@@ -246,21 +246,23 @@
       (eval-str-raw opts (or opts.cb #(display-result opts $1))))))
 
 (defn doc-str [opts]
-  (when (not (a.empty? opts.code))
-    (eval-str
-      (a.merge
-        opts
-        {:code (.. "(do (require 'clojure.repl)"
-                   "    (clojure.repl/doc " opts.code "))")
-         :cb (with-all-msgs-fn
-               (fn [msgs]
-                 (-> msgs
-                     (->> (a.map #(a.get $1 :out))
-                          (a.filter a.string?)
-                          (a.rest)
-                          (str.join "\n"))
-                     (text.prefixed-lines "; ")
-                     (display))))}))))
+  (eval-str
+    (a.merge
+      opts
+      {:code (.. "(do (require 'clojure.repl)"
+                 "    (clojure.repl/doc " opts.code "))")
+       :cb (with-all-msgs-fn
+             (fn [msgs]
+               (-> msgs
+                   (->> (a.map #(a.get $1 :out))
+                        (a.filter a.string?)
+                        (a.rest)
+                        (str.join "\n"))
+                   (text.prefixed-lines "; ")
+                   (display))))})))
+
+(defn def-str [opts]
+  (a.println opts.code))
 
 (defn eval-file [opts]
   (eval-str-raw

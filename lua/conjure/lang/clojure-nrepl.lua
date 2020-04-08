@@ -494,15 +494,13 @@ do
   do
     local v_23_0_0 = nil
     local function doc_str0(opts)
-      if not a["empty?"](opts.code) then
-        local function _3_(msgs)
-          local function _4_(_241)
-            return a.get(_241, "out")
-          end
-          return display(text["prefixed-lines"](str.join("\n", a.rest(a.filter(a["string?"], a.map(_4_, msgs)))), "; "))
+      local function _3_(msgs)
+        local function _4_(_241)
+          return a.get(_241, "out")
         end
-        return eval_str(a.merge(opts, {cb = with_all_msgs_fn(_3_), code = ("(do (require 'clojure.repl)" .. "    (clojure.repl/doc " .. opts.code .. "))")}))
+        return display(text["prefixed-lines"](str.join("\n", a.rest(a.filter(a["string?"], a.map(_4_, msgs)))), "; "))
       end
+      return eval_str(a.merge(opts, {cb = with_all_msgs_fn(_3_), code = ("(do (require 'clojure.repl)" .. "    (clojure.repl/doc " .. opts.code .. "))")}))
     end
     v_23_0_0 = doc_str0
     _0_0["doc-str"] = v_23_0_0
@@ -510,6 +508,21 @@ do
   end
   _0_0["aniseed/locals"]["doc-str"] = v_23_0_
   doc_str = v_23_0_
+end
+local def_str = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function def_str0(opts)
+      return a.println(opts.code)
+    end
+    v_23_0_0 = def_str0
+    _0_0["def-str"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["def-str"] = v_23_0_
+  def_str = v_23_0_
 end
 local eval_file = nil
 do
