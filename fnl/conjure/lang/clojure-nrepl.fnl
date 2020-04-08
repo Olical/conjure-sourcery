@@ -262,7 +262,13 @@
                    (display))))})))
 
 (defn def-str [opts]
-  (a.println opts.code))
+  (eval-str
+    (a.merge
+      opts
+      {:code (.. "(map (meta #'" opts.code ") [:file :line :column])")
+       :cb (with-all-msgs-fn
+             (fn [msgs]
+               (a.println msgs)))})))
 
 (defn eval-file [opts]
   (eval-str-raw

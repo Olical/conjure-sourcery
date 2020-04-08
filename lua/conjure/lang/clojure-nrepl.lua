@@ -515,7 +515,10 @@ do
   do
     local v_23_0_0 = nil
     local function def_str0(opts)
-      return a.println(opts.code)
+      local function _3_(msgs)
+        return a.println(msgs)
+      end
+      return eval_str(a.merge(opts, {cb = with_all_msgs_fn(_3_), code = ("(map (meta #'" .. opts.code .. ") [:file :line :column])")}))
     end
     v_23_0_0 = def_str0
     _0_0["def-str"] = v_23_0_0
