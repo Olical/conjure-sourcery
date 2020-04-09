@@ -275,7 +275,8 @@
       opts
       {:code (.. "(mapv #(% (meta #'" opts.code "))
       [(comp #(.toString %)
-      (some-fn (comp clojure.java.io/resource :file) :file))
+      (some-fn (comp #?(:clj clojure.java.io/resource :cljs identity)
+      :file) :file))
       :line :column])")
        :cb (with-all-msgs-fn
              (fn [msgs]

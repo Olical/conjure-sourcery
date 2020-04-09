@@ -551,7 +551,7 @@ do
           return display({"; Couldn't find definition."})
         end
       end
-      return eval_str(a.merge(opts, {cb = with_all_msgs_fn(_3_), code = ("(mapv #(% (meta #'" .. opts.code .. "))\n      [(comp #(.toString %)\n      (some-fn (comp clojure.java.io/resource :file) :file))\n      :line :column])")}))
+      return eval_str(a.merge(opts, {cb = with_all_msgs_fn(_3_), code = ("(mapv #(% (meta #'" .. opts.code .. "))\n      [(comp #(.toString %)\n      (some-fn (comp #?(:clj clojure.java.io/resource :cljs identity)\n      :file) :file))\n      :line :column])")}))
     end
     v_23_0_0 = def_str0
     _0_0["def-str"] = v_23_0_0
