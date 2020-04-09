@@ -115,13 +115,13 @@ do
   local v_23_0_ = nil
   do
     local v_23_0_0 = nil
-    local function current_form0()
+    local function current_form0(extra_opts)
       local form = extract.form({})
       if form then
         local _3_ = form
         local range = _3_["range"]
         local content = _3_["content"]
-        return eval_str({code = content, origin = "current-form", range = range})
+        return eval_str(a.merge({code = content, origin = "current-form", range = range}, extra_opts))
       end
     end
     v_23_0_0 = current_form0
@@ -152,6 +152,33 @@ do
   _0_0["aniseed/locals"]["root-form"] = v_23_0_
   root_form = v_23_0_
 end
+local marked_form = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function marked_form0()
+      local mark = extract["prompt-char"]()
+      local comment_prefix = lang.get("comment-prefix")
+      local ok_3f, err = nil, nil
+      local function _3_()
+        return editor["go-to-mark"](mark)
+      end
+      ok_3f, err = pcall(_3_)
+      if ok_3f then
+        current_form({origin = ("marked-form [" .. mark .. "]")})
+        return editor["go-back"]()
+      else
+        return log.append({(comment_prefix .. "Couldn't eval form at mark: " .. mark), (comment_prefix .. err)}, {["break?"] = true})
+      end
+    end
+    v_23_0_0 = marked_form0
+    _0_0["marked-form"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["marked-form"] = v_23_0_
+  marked_form = v_23_0_
+end
 local word = nil
 do
   local v_23_0_ = nil
@@ -172,6 +199,7 @@ do
   _0_0["aniseed/locals"]["word"] = v_23_0_
   word = v_23_0_
 end
+do local _ = (10 + 20 + 30) end
 local doc_word = nil
 do
   local v_23_0_ = nil

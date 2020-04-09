@@ -28,6 +28,7 @@
   (buf :n config.mappings.log-tab :conjure.log :tab)
   (buf :n config.mappings.eval-current-form :conjure.eval :current-form)
   (buf :n config.mappings.eval-root-form :conjure.eval :root-form)
+  (buf :n config.mappings.eval-marked-form :conjure.eval :marked-form)
   (buf :n config.mappings.eval-word :conjure.eval :word)
   (buf :n config.mappings.eval-file :conjure.eval :file)
   (buf :n config.mappings.eval-buf :conjure.eval :buf)

@@ -293,4 +293,34 @@ do
   _0_0["aniseed/locals"]["context"] = v_23_0_
   context = v_23_0_
 end
+local prompt = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function prompt0(prefix)
+      return nvim.fn.input((prefix or ""))
+    end
+    v_23_0_0 = prompt0
+    _0_0["prompt"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["prompt"] = v_23_0_
+  prompt = v_23_0_
+end
+local prompt_char = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function prompt_char0()
+      return nvim.fn.nr2char(nvim.fn.getchar())
+    end
+    v_23_0_0 = prompt_char0
+    _0_0["prompt-char"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["prompt-char"] = v_23_0_
+  prompt_char = v_23_0_
+end
 return nil

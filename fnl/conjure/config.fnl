@@ -12,6 +12,7 @@
    :log-tab "lt"
    :eval-current-form "ee"
    :eval-root-form "er"
+   :eval-marked-form "em"
    :eval-word "ew"
    :eval-file "ef"
    :eval-buf "eb"

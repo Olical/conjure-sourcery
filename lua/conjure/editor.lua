@@ -133,4 +133,34 @@ do
   _0_0["aniseed/locals"]["go-to"] = v_23_0_
   go_to = v_23_0_
 end
+local go_to_mark = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function go_to_mark0(m)
+      return nvim.ex.normal_(("`" .. m))
+    end
+    v_23_0_0 = go_to_mark0
+    _0_0["go-to-mark"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["go-to-mark"] = v_23_0_
+  go_to_mark = v_23_0_
+end
+local go_back = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function go_back0()
+      return nvim.ex.normal_(nvim.replace_termcodes("<c-o>", true, false, true))
+    end
+    v_23_0_0 = go_back0
+    _0_0["go-back"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["go-back"] = v_23_0_
+  go_back = v_23_0_
+end
 return nil

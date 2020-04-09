@@ -8,7 +8,6 @@
             editor conjure.editor
             log conjure.log}})
 
-;; TODO Eval form at mark.
 ;; TODO Completion.
 ;; TODO Languages: Janet, Racket, MIT Scheme.
 
@@ -47,14 +46,16 @@
 (def- doc-str (lang-exec-fn :doc :doc-str))
 (def- def-str (lang-exec-fn :def :def-str))
 
-(defn current-form []
+(defn current-form [extra-opts]
   (let [form (extract.form {})]
     (when form
       (let [{: content : range} form]
         (eval-str
-          {:code content
-           :range range
-           :origin :current-form})))))
+          (a.merge
+            {:code content
+             :range range
+             :origin :current-form}
+            extra-opts))))))
 
 (defn root-form []
   (let [form (extract.form {:root? true})]
@@ -65,6 +66,18 @@
            :range range
            :origin :root-form})))))
 
+(defn marked-form []
+  (let [mark (extract.prompt-char)
+        comment-prefix (lang.get :comment-prefix)
+        (ok? err) (pcall #(editor.go-to-mark mark))]
+    (if ok?
+      (do 
+        (current-form {:origin (..  "marked-form [" mark "]")})
+        (editor.go-back))
+      (log.append [(.. comment-prefix "Couldn't eval form at mark: " mark)
+                   (.. comment-prefix err)]
+                  {:break? true}))))
+
 (defn word []
   (let [{: content : range} (extract.word)]
     (when (not (a.empty? content))
@@ -72,6 +85,8 @@
         {:code content
          :range range
          :origin :word}))))
+
+(+ 10 20 30)
 
 (defn doc-word []
   (let [{: content : range} (extract.word)]

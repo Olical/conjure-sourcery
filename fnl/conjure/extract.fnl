@@ -119,3 +119,9 @@
                       0 0 config.extract.context-header-lines false)
                     (str.join "\n"))]
     (string.match header (lang.get :context-pattern))))
+
+(defn prompt [prefix]
+  (nvim.fn.input (or prefix "")))
+
+(defn prompt-char []
+  (nvim.fn.nr2char (nvim.fn.getchar)))

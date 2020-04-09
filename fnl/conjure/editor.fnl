@@ -24,3 +24,9 @@
 (defn go-to [path line column]
   (nvim.ex.edit path)
   (nvim.win_set_cursor 0 [line (a.dec column)]))
+
+(defn go-to-mark [m]
+  (nvim.ex.normal_ (.. "`" m)))
+
+(defn go-back []
+  (nvim.ex.normal_ (nvim.replace_termcodes "<c-o>" true false true)))
