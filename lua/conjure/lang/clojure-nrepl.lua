@@ -15,8 +15,8 @@ do
   _0_0 = module_23_0_
 end
 local function _1_(...)
-  _0_0["aniseed/local-fns"] = {require = {["bencode-stream"] = "conjure.bencode-stream", a = "conjure.aniseed.core", bencode = "conjure.bencode", bridge = "conjure.bridge", editor = "conjure.editor", extract = "conjure.extract", lang = "conjure.lang", ll = "conjure.linked-list", log = "conjure.log", mapping = "conjure.mapping", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", text = "conjure.text", uuid = "conjure.uuid", view = "conjure.aniseed.view"}}
-  return {require("conjure.aniseed.core"), require("conjure.bencode"), require("conjure.bencode-stream"), require("conjure.bridge"), require("conjure.editor"), require("conjure.extract"), require("conjure.lang"), require("conjure.linked-list"), require("conjure.log"), require("conjure.mapping"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.text"), require("conjure.uuid"), require("conjure.aniseed.view")}
+  _0_0["aniseed/local-fns"] = {require = {["bencode-stream"] = "conjure.bencode-stream", a = "conjure.aniseed.core", bencode = "conjure.bencode", bridge = "conjure.bridge", editor = "conjure.editor", eval = "conjure.aniseed.eval", extract = "conjure.extract", lang = "conjure.lang", ll = "conjure.linked-list", log = "conjure.log", mapping = "conjure.mapping", nvim = "conjure.aniseed.nvim", str = "conjure.aniseed.string", text = "conjure.text", uuid = "conjure.uuid", view = "conjure.aniseed.view"}}
+  return {require("conjure.aniseed.core"), require("conjure.bencode"), require("conjure.bencode-stream"), require("conjure.bridge"), require("conjure.editor"), require("conjure.aniseed.eval"), require("conjure.extract"), require("conjure.lang"), require("conjure.linked-list"), require("conjure.log"), require("conjure.mapping"), require("conjure.aniseed.nvim"), require("conjure.aniseed.string"), require("conjure.text"), require("conjure.uuid"), require("conjure.aniseed.view")}
 end
 local _2_ = _1_(...)
 local a = _2_[1]
@@ -24,16 +24,17 @@ local bencode = _2_[2]
 local bencode_stream = _2_[3]
 local bridge = _2_[4]
 local editor = _2_[5]
-local extract = _2_[6]
-local lang = _2_[7]
-local ll = _2_[8]
-local log = _2_[9]
-local mapping = _2_[10]
-local nvim = _2_[11]
-local str = _2_[12]
-local text = _2_[13]
-local uuid = _2_[14]
-local view = _2_[15]
+local eval = _2_[6]
+local extract = _2_[7]
+local lang = _2_[8]
+local ll = _2_[9]
+local log = _2_[10]
+local mapping = _2_[11]
+local nvim = _2_[12]
+local str = _2_[13]
+local text = _2_[14]
+local uuid = _2_[15]
+local view = _2_[16]
 do local _ = ({nil, _0_0, nil})[2] end
 local buf_suffix = nil
 do
@@ -509,6 +510,23 @@ do
   _0_0["aniseed/locals"]["doc-str"] = v_23_0_
   doc_str = v_23_0_
 end
+local jar__3ezip = nil
+do
+  local v_23_0_ = nil
+  local function jar__3ezip0(path)
+    if text["starts-with"](path, "jar:file:") then
+      local function _3_(zip, file)
+        return ("zipfile:" .. zip .. "::" .. file)
+      end
+      return string.gsub(path, "^jar:file:(.+)!/?(.+)$", _3_)
+    else
+      return path
+    end
+  end
+  v_23_0_ = jar__3ezip0
+  _0_0["aniseed/locals"]["jar->zip"] = v_23_0_
+  jar__3ezip = v_23_0_
+end
 local def_str = nil
 do
   local v_23_0_ = nil
@@ -516,9 +534,24 @@ do
     local v_23_0_0 = nil
     local function def_str0(opts)
       local function _3_(msgs)
-        return a.println(msgs)
+        local val = a.get(a.first(msgs), "value")
+        local ok_3f, res = nil, nil
+        if val then
+          ok_3f, res = eval.str(val)
+        else
+        ok_3f, res = nil
+        end
+        if ok_3f then
+          local _5_ = res
+          local path = _5_[1]
+          local line = _5_[2]
+          local column = _5_[3]
+          return editor["go-to"](jar__3ezip(path), line, column)
+        else
+          return display({"; Couldn't find definition."})
+        end
       end
-      return eval_str(a.merge(opts, {cb = with_all_msgs_fn(_3_), code = ("(map (meta #'" .. opts.code .. ") [:file :line :column])")}))
+      return eval_str(a.merge(opts, {cb = with_all_msgs_fn(_3_), code = ("(mapv #(% (meta #'" .. opts.code .. "))\n      [(comp #(.toString %)\n      (some-fn (comp clojure.java.io/resource :file) :file))\n      :line :column])")}))
     end
     v_23_0_0 = def_str0
     _0_0["def-str"] = v_23_0_0

@@ -117,4 +117,20 @@ do
   _0_0["aniseed/locals"]["cursor-top"] = v_23_0_
   cursor_top = v_23_0_
 end
+local go_to = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function go_to0(path, line, column)
+      nvim.ex.edit(path)
+      return nvim.win_set_cursor(0, {line, a.dec(column)})
+    end
+    v_23_0_0 = go_to0
+    _0_0["go-to"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["go-to"] = v_23_0_
+  go_to = v_23_0_
+end
 return nil

@@ -100,4 +100,19 @@ do
   _0_0["aniseed/locals"]["prefixed-lines"] = v_23_0_
   prefixed_lines = v_23_0_
 end
+local starts_with = nil
+do
+  local v_23_0_ = nil
+  do
+    local v_23_0_0 = nil
+    local function starts_with0(str0, start)
+      return (string.sub(str0, 1, a.count(start)) == start)
+    end
+    v_23_0_0 = starts_with0
+    _0_0["starts-with"] = v_23_0_0
+    v_23_0_ = v_23_0_0
+  end
+  _0_0["aniseed/locals"]["starts-with"] = v_23_0_
+  starts_with = v_23_0_
+end
 return nil

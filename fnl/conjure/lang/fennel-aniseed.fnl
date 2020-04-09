@@ -12,6 +12,8 @@
             log conjure.log
             extract conjure.extract}})
 
+;; TODO Display all results from multi returns.
+
 (def buf-suffix ".fnl")
 (def context-pattern "[(]%s*module%s*(.-)[%s){]")
 (def comment-prefix "; ")

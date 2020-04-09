@@ -23,3 +23,6 @@
   (->> (split-lines s)
        (a.map (fn [line]
                 (.. prefix line)))))
+
+(defn starts-with [str start]
+  (= (string.sub str 1 (a.count start)) start))

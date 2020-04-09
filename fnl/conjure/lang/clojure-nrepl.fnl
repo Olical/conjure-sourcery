@@ -10,6 +10,7 @@
             mapping conjure.mapping
             bencode conjure.bencode
             bencode-stream conjure.bencode-stream
+            eval conjure.aniseed.eval
             bridge conjure.bridge
             editor conjure.editor
             uuid conjure.uuid
@@ -261,14 +262,30 @@
                    (text.prefixed-lines "; ")
                    (display))))})))
 
+(defn- jar->zip [path]
+  (if (text.starts-with path "jar:file:")
+    (string.gsub path "^jar:file:(.+)!/?(.+)$"
+                 (fn [zip file]
+                   (.. "zipfile:" zip "::" file)))
+    path))
+
 (defn def-str [opts]
   (eval-str
     (a.merge
       opts
-      {:code (.. "(map (meta #'" opts.code ") [:file :line :column])")
+      {:code (.. "(mapv #(% (meta #'" opts.code "))
+      [(comp #(.toString %)
+      (some-fn (comp clojure.java.io/resource :file) :file))
+      :line :column])")
        :cb (with-all-msgs-fn
              (fn [msgs]
-               (a.println msgs)))})))
+               (let [val (a.get (a.first msgs) :value)
+                     (ok? res) (when val
+                                 (eval.str val))]
+                 (if ok?
+                   (let [[path line column] res]
+                     (editor.go-to (jar->zip path) line column))
+                   (display ["; Couldn't find definition."])))))})))
 
 (defn eval-file [opts]
   (eval-str-raw

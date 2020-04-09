@@ -20,3 +20,7 @@
 
 (defn cursor-top []
   (nvim.fn.screenrow))
+
+(defn go-to [path line column]
+  (nvim.ex.edit path)
+  (nvim.win_set_cursor 0 [line (a.dec column)]))
