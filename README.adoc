@@ -1,5 +1,6 @@
 = Conjure Sourcery
 
+ * 10/04/2020 - This repo has served it's purpose and has been moved into the develop branch of the main https://github.com/Olical/conjure[Conjure] repository.
 ____
 As they say in Discworld, we are trying to unravel the Mighty Infinite using a language which was designed to tell one another where the fresh fruit was.
 
